@@ -1,0 +1,242 @@
+/* CONTENEDOR GENERAL */
+.page {
+  min-height: 100vh;
+  padding: 40px;
+  background: linear-gradient(135deg, #f0f4f8, #e2e8f0);
+  font-family: 'Poppins', sans-serif;
+}
+
+/* CONTENEDOR INTERNO */
+.container {
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* TITULO */
+.titulo {
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  margin-bottom: 30px;
+  color: #1e3a8a;
+}
+
+/* FORM CARD */
+.form-card {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  margin-bottom: 40px;
+  animation: fadeIn 0.4s ease;
+}
+
+/* HEADER */
+.form-header h2 {
+  font-size: 20px;
+  color: #111827;
+}
+
+.sub {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* GRID FORM */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group.full {
+  grid-column: span 2;
+}
+
+.input-group label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.input-group input,
+.input-group textarea {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+  transition: all 0.25s ease;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 8px rgba(99,102,241,0.2);
+  outline: none;
+}
+
+textarea {
+  resize: none;
+  min-height: 80px;
+}
+
+/* BOTÓN GUARDAR */
+.btn-save {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: #7c3aed; /* morado lindo */
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-save:hover {
+  background: #5b21b6;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(124,58,237,0.3);
+}
+
+/* GRID CARDS */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 25px;
+}
+
+/* CARD */
+.card {
+  background: linear-gradient(145deg, #ffffff, #f9fafb);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  border-left: 4px solid #a78bfa; /* borde morado suave */
+  animation: aparecer 0.4s ease;
+}
+
+/* HOVER CARD */
+.card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+/* HEADER CARD */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h3 {
+  font-size: 16px;
+  color: #1f2937;
+}
+
+.precio {
+  font-weight: 600;
+  color: #10b981; /* verde suave */
+  font-size: 14px;
+}
+
+/* BODY */
+.card-body {
+  margin-top: 10px;
+}
+
+.duracion {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.descripcion {
+  font-size: 13px;
+  color: #374151;
+  margin-top: 5px;
+}
+
+/* ACCIONES */
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+/* BOTONES MODERNOS */
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.btn-icon:hover {
+  transform: translateY(-2px) scale(1.05);
+}
+
+/* EDITAR */
+.editar {
+  background: #dbeafe; /* azul suave */
+  color: #2563eb;
+}
+
+.editar:hover {
+  background: #2563eb;
+  color: white;
+  box-shadow: 0 5px 15px rgba(37,99,235,0.3);
+}
+
+/* ELIMINAR */
+.eliminar {
+  background: #fee2e2; /* rojo suave */
+  color: #b91c1c;
+}
+
+.eliminar:hover {
+  background: #dc2626;
+  color: white;
+  box-shadow: 0 5px 15px rgba(220,38,38,0.3);
+}
+
+/* ESTADO VACÍO */
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  background: #f9fafb;
+  border-radius: 15px;
+  color: #6b7280;
+  font-size: 14px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  margin-top: 20px;
+}
+
+/* ANIMACIÓN ENTRADA */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

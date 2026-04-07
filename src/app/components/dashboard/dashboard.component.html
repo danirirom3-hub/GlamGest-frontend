@@ -1,0 +1,33 @@
+<div class="dashboard">
+  <!-- Sidebar / menú lateral -->
+  <aside class="sidebar">
+    <!-- Logo o marca -->
+    <div class="brand">
+      <h2>Glam<span>Gest</span></h2>
+    </div>
+
+    <!-- Menú de navegación -->
+    <nav class="menu">
+      <a routerLink="/dashboard/servicios" routerLinkActive="activo">
+        <lucide-icon [img]="icons.Scissors"></lucide-icon>
+        Servicios
+      </a>
+
+      <a routerLink="/dashboard/clientes" routerLinkActive="activo">
+        <lucide-icon [img]="icons.Users"></lucide-icon>
+        Clientes
+      </a>
+    </nav>
+
+    <!-- Footer / copyright -->
+    <div class="footer">
+      <p>© 2026</p>
+    </div>
+  </aside> <!-- Cerramos correctamente el aside -->
+
+  <!-- Contenido principal del dashboard -->
+  <main class="contenido">
+    <!-- Aquí se mostrarán Servicios, Clientes o Citas -->
+    <router-outlet></router-outlet>
+  </main>
+</div> <!-- Cerramos el div.dashboard -->

@@ -1,0 +1,97 @@
+/* CONTENEDOR GENERAL */
+.dashboard {
+  display: flex;
+  height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background: #f8fafc;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 25px 20px;
+  animation: slideIn 0.4s ease;
+}
+
+/* LOGO */
+.brand h2 {
+  font-size: 20px;
+  text-align: center;
+  font-weight: 600;
+  color: #111827;
+}
+
+.brand span {
+  color: #6366f1;
+}
+
+/* MENU */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 40px;
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #4b5563;
+  padding: 12px 14px;
+  border-radius: 10px;
+  transition: all 0.25s ease;
+  font-size: 14px;
+}
+
+/* HOVER SUAVE */
+.menu a:hover {
+  background: #f1f5f9;
+  color: #111827;
+  transform: translateX(4px);
+}
+
+/* ACTIVO */
+.activo {
+  background: #eef2ff;
+  color: #4f46e5 !important;
+  font-weight: 500;
+}
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* CONTENIDO */
+.contenido {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  animation: fadeIn 0.4s ease;
+}
+
+/* ANIMACIONES */
+@keyframes slideIn {
+  from {
+    transform: translateX(-40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
