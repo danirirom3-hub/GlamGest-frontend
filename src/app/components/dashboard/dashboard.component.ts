@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, Scissors, Users } from 'lucide-angular';
+import { LucideAngularModule, Scissors, Users, ShoppingCart, Calendar } from 'lucide-angular';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,6 +12,8 @@ import { LucideAngularModule, Scissors, Users } from 'lucide-angular';
 export class DashboardComponent {
   icons = { 
     Scissors,
-    Users
+    Users,
+    ShoppingCart,
+    Calendar
   };
 }

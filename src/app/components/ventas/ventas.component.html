@@ -1,1 +1,171 @@
-<p>ventas works!</p>
+<div class="page">
+
+  <div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+      <h2>Ventas</h2>
+      <p>Controla los ingresos del salón</p>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button 
+        [class.active]="vista === 'registro'" 
+        (click)="vista = 'registro'">
+        Nueva Venta
+      </button>
+
+      <button 
+        [class.active]="vista === 'historial'" 
+        (click)="vista = 'historial'">
+        Historial
+      </button>
+    </div>
+
+    <!-- ========================= -->
+    <!-- 🧾 REGISTRO -->
+    <!-- ========================= -->
+    <div *ngIf="vista === 'registro'" class="card fade-in">
+
+      <h3>Registrar Venta</h3>
+
+      <div class="grid">
+
+        <!-- Cliente -->
+        <div class="form-group">
+          <label>Cliente</label>
+          <select>
+            <option>Seleccionar cliente</option>
+            <option>Ana Gómez</option>
+            <option>Laura Martínez</option>
+          </select>
+        </div>
+
+        <!-- Método de pago -->
+        <div class="form-group">
+          <label>Método de pago</label>
+          <select>
+            <option>Seleccionar método</option>
+            <option>Efectivo</option>
+            <option>Tarjeta</option>
+            <option>Transferencia</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- SERVICIOS -->
+      <div class="form-group">
+        <label>Servicios</label>
+
+        <div class="servicios-grid">
+
+          <div 
+            class="servicio-item"
+            [class.activo]="servicioActivo === 1"
+            (click)="seleccionarServicio(1)"
+          >
+            <span>Corte</span>
+            <small>$20.000</small>
+          </div>
+
+          <div 
+            class="servicio-item"
+            [class.activo]="servicioActivo === 2"
+            (click)="seleccionarServicio(2)"
+          >
+            <span>Uñas</span>
+            <small>$30.000</small>
+          </div>
+
+          <div 
+            class="servicio-item"
+            [class.activo]="servicioActivo === 3"
+            (click)="seleccionarServicio(3)"
+          >
+            <span>Tinte</span>
+            <small>$80.000</small>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TOTAL -->
+      <div class="total-box">
+        <span>Total</span>
+        <h2>$0</h2>
+      </div>
+
+      <!-- BOTÓN -->
+      <button class="btn-primary">
+        Registrar Venta
+      </button>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- 📊 HISTORIAL -->
+    <!-- ========================= -->
+    <div *ngIf="vista === 'historial'" class="card fade-in">
+
+      <h3>Historial de Ventas</h3>
+
+      <!-- MENSAJE SI NO HAY VENTAS -->
+      <div class="empty">
+        No hay ventas registradas
+      </div>
+
+      <!-- TABLA -->
+      <div class="tabla">
+
+        <!-- ENCABEZADO -->
+        <div class="fila header">
+          <span>Fecha</span>
+          <span>Cliente</span>
+          <span>Total</span>
+          <span>Pago</span>
+          <span></span>
+        </div>
+
+        <!-- VENTA 1 -->
+        <div class="fila">
+          <span>08/04</span>
+          <span>Ana</span>
+          <span>$50.000</span>
+          <span>Efectivo</span>
+
+          <button class="btn-detalle" (click)="toggleDetalle(1)">
+            Ver
+          </button>
+        </div>
+
+        <!-- DETALLE -->
+        <div class="detalle" *ngIf="ventaActiva === 1">
+          <p>• Corte - $20.000</p>
+          <p>• Uñas - $30.000</p>
+        </div>
+
+        <!-- VENTA 2 -->
+        <div class="fila">
+          <span>07/04</span>
+          <span>-</span>
+          <span>$80.000</span>
+          <span>Tarjeta</span>
+
+          <button class="btn-detalle" (click)="toggleDetalle(2)">
+            Ver
+          </button>
+        </div>
+
+        <!-- DETALLE -->
+        <div class="detalle" *ngIf="ventaActiva === 2">
+          <p>• Tinte - $80.000</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>

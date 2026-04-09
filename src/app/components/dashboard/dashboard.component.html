@@ -17,17 +17,27 @@
         <lucide-icon [img]="icons.Users"></lucide-icon>
         Clientes
       </a>
+
+      <a routerLink="/dashboard/ventas" routerLinkActive="activo">
+        <lucide-icon [img]="icons.ShoppingCart"></lucide-icon>
+        Ventas
+      </a>
+
+      <a routerLink="/dashboard/citas" routerLinkActive="activo">
+        <lucide-icon [img]="icons.Calendar"></lucide-icon>
+        Citas
+      </a>
     </nav>
 
     <!-- Footer / copyright -->
     <div class="footer">
       <p>© 2026</p>
     </div>
-  </aside> <!-- Cerramos correctamente el aside -->
+  </aside>
 
   <!-- Contenido principal del dashboard -->
   <main class="contenido">
-    <!-- Aquí se mostrarán Servicios, Clientes o Citas -->
+    <!-- Aquí se mostrarán Servicios, Clientes, Ventas o Citas -->
     <router-outlet></router-outlet>
   </main>
-</div> <!-- Cerramos el div.dashboard -->
+</div>

@@ -8,29 +8,48 @@
     </button>
   </div>
 
-  <!-- LISTADO -->
-  <div class="cards" *ngIf="clientesFiltrados().length > 0; else vacio">
-    <div class="card" *ngFor="let cliente of clientesFiltrados(); let i = index">
+  <!-- LISTADO VISUAL DE CLIENTES -->
+  <div class="cards">
+    <div class="card">
       <div class="card-header">
-        <h3>{{ cliente.nombre }} {{ cliente.apellido }}</h3>
-        <span class="correo">{{ cliente.correo }}</span>
+        <h3>Daniela Rincón</h3>
+        <span class="correo">daniela&#64;mail.com</span>
       </div>
       <div class="card-body">
-        <p><strong>Tel:</strong> {{ cliente.telefono }}</p>
-        <p><strong>Dirección:</strong> {{ cliente.direccion }}</p>
+        <p><strong>Tel:</strong> 3001234567</p>
+        <p><strong>Dirección:</strong> Calle 1 #23-45</p>
       </div>
       <div class="acciones">
-        <button class="btn-icon editar" (click)="editarCliente(i)">
+        <button class="btn-icon editar" (click)="editarCliente()">
           <i class="fas fa-pencil-alt"></i>
         </button>
-        <button class="btn-icon eliminar" (click)="eliminarCliente(i)">
+        <button class="btn-icon eliminar" (click)="eliminarCliente()">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>Felipe Hernandez</h3>
+        <span class="correo">felipe&#64;mail.com</span>
+      </div>
+      <div class="card-body">
+        <p><strong>Tel:</strong> 3009876543</p>
+        <p><strong>Dirección:</strong> Carrera 5 #67-89</p>
+      </div>
+      <div class="acciones">
+        <button class="btn-icon editar" (click)="editarCliente()">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+        <button class="btn-icon eliminar" (click)="eliminarCliente()">
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ESTADO VACÍO -->
+  <!-- ESTADO VACÍO (CUANDO NO HAY CLIENTES) -->
   <ng-template #vacio>
     <div class="empty-state">
       <h3>No hay clientes registrados</h3>
@@ -52,7 +71,7 @@
       </div>
       <div class="input-group">
         <label>Correo</label>
-        <input type="email" [(ngModel)]="nuevoCliente.correo" placeholder="Ej: correo@mail.com">
+        <input type="email" [(ngModel)]="nuevoCliente.correo" placeholder="Ej: correo&#64;mail.com">
       </div>
       <div class="input-group">
         <label>Teléfono</label>
@@ -63,9 +82,16 @@
         <input type="text" [(ngModel)]="nuevoCliente.direccion" placeholder="Ej: Calle 1 #23-45">
       </div>
     </div>
+
+    <!-- BOTÓN GUARDAR / ACTUALIZAR -->
     <button class="btn-save" (click)="guardarCliente()">
       {{ editando ? 'Actualizar cliente' : 'Guardar cliente' }}
     </button>
+
+    <!-- ALERTA VISUAL -->
+    <div class="alerta" *ngIf="mostrarConfirmacion">
+      Acción realizada correctamente
+    </div>
   </div>
 
 </div>

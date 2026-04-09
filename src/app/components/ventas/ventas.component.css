@@ -1,0 +1,351 @@
+/* ========================= */
+/* 🌈 FONDO GENERAL */
+/* ========================= */
+.page {
+  min-height: 100vh;
+  padding: 40px;
+  background: linear-gradient(135deg, #f3f4ff, #eef2ff); /* azul suave degradado */
+  font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
+  transition: padding 0.3s ease;
+}
+
+/* ========================= */
+/* 🧾 HEADER */
+/* ========================= */
+.header h2 {
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.header p {
+  color: #6b7280;
+  margin-bottom: 25px;
+  font-size: 14px;
+}
+
+/* ========================= */
+/* 🔘 TABS */
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.tabs button {
+  padding: 10px 20px;
+  border-radius: 14px;
+  border: none;
+  background: #eef2ff;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  outline: none; /* quitar borde gris */
+}
+
+.tabs button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+
+.tabs button.active {
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: white;
+  box-shadow: 0 12px 25px rgba(79, 70, 229, 0.4);
+}
+
+.tabs button:active {
+  transform: scale(0.95);
+}
+
+/* ========================= */
+/* 🧊 CARD */
+.card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  border: none; /* quitar borde */
+}
+
+/* ========================= */
+/* 📦 GRID */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+/* ========================= */
+/* 🧾 FORM */
+.form-group {
+  margin-bottom: 18px;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+  color: #374151;
+}
+
+select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  transition: 0.2s;
+  background: #fafafa;
+  outline: none; /* quitar borde gris */
+}
+
+select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+}
+
+/* ========================= */
+/* 💅 SERVICIOS */
+.servicios-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.servicio-item {
+  padding: 18px;
+  border-radius: 18px;
+  background: #f9fafb;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  text-align: center;
+}
+
+.servicio-item:hover {
+  transform: translateY(-6px) scale(1.04);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.servicio-item.activo {
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: white;
+  box-shadow: 0 15px 35px rgba(79, 70, 229, 0.5);
+  transform: scale(1.06);
+}
+
+.servicio-item span {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.servicio-item small {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.servicio-item.activo small {
+  color: #e0e7ff;
+}
+
+.servicio-item:active {
+  transform: scale(0.95);
+}
+
+/* ========================= */
+/* 💰 TOTAL */
+.total-box {
+  margin: 25px 0;
+  padding: 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 15px 30px rgba(79, 70, 229, 0.4);
+}
+
+/* ========================= */
+/* 🚀 BOTÓN */
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none; /* quitar borde gris */
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(79, 70, 229, 0.4);
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+
+/* ========================= */
+/* 📊 TABLA */
+.tabla {
+  margin-top: 20px;
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 14px;
+  border-radius: 12px;
+  transition: 0.2s;
+  align-items: center;
+}
+
+.fila.header {
+  font-weight: 600;
+  background: #eef2ff;
+  margin-bottom: 10px;
+}
+
+.fila:not(.header):hover {
+  background: #f3f4ff;
+  transform: scale(1.01);
+}
+
+/* ========================= */
+/* 👁 BOTÓN DETALLE */
+.btn-detalle {
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: none;
+  background: #e0e7ff;
+  cursor: pointer;
+  transition: 0.2s;
+  outline: none; /* quitar borde gris */
+}
+
+.btn-detalle:hover {
+  background: #c7d2fe;
+  transform: scale(1.05);
+}
+
+/* ========================= */
+/* 📦 DETALLE VENTA */
+.detalle {
+  margin: 10px 0 15px 0;
+  padding: 12px 18px;
+  background: #f9fafb;
+  border-radius: 12px;
+  animation: slideDown 0.3s ease;
+}
+
+.detalle p {
+  margin: 4px 0;
+}
+
+/* ========================= */
+/* 📭 VACÍO */
+.empty {
+  text-align: center;
+  padding: 20px;
+  color: #9ca3af;
+}
+
+/* ========================= */
+/* ✨ ANIMACIONES */
+.fade-in {
+  animation: fade 0.4s ease-in-out;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================= */
+/* 📱 MEDIA QUERIES RESPONSIVE */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .servicios-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .fila {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .tabs {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .servicios-grid {
+    grid-template-columns: 1fr;
+  }
+  .fila {
+    grid-template-columns: 1fr 1fr;
+  }
+  .total-box {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 20px 15px;
+  }
+  .header h2 {
+    font-size: 24px;
+  }
+  .header p {
+    font-size: 13px;
+  }
+  .btn-primary {
+    padding: 12px;
+  }
+  .fila {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+  .servicio-item span {
+    font-size: 14px;
+  }
+  .servicio-item small {
+    font-size: 12px;
+  }
+}

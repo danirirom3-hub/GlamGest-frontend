@@ -2,79 +2,80 @@
 
   <!-- FORMULARIO -->
   <div class="form-card">
-
     <div class="form-header">
-      <h2>{{ editando ? 'Editar servicio' : 'Nuevo servicio' }}</h2>
+      <h2>Nuevo servicio</h2>
       <span class="sub">Completa la información</span>
     </div>
 
     <div class="form-grid">
-
       <div class="input-group">
         <label>Nombre</label>
-        <input type="text" [(ngModel)]="nuevoServicio.nombre" placeholder="Ej: Corte de cabello">
+        <input type="text" placeholder="Ej: Corte de cabello">
       </div>
 
       <div class="input-group">
         <label>Precio</label>
-        <input type="number" [(ngModel)]="nuevoServicio.precio" placeholder="$">
+        <input type="number" placeholder="$">
       </div>
 
       <div class="input-group">
         <label>Duración</label>
-        <input type="text" [(ngModel)]="nuevoServicio.duracion" placeholder="Ej: 30 min">
+        <input type="text" placeholder="Ej: 30 min">
       </div>
 
       <div class="input-group full">
         <label>Descripción</label>
-        <textarea [(ngModel)]="nuevoServicio.descripcion" placeholder="Describe el servicio..."></textarea>
+        <textarea placeholder="Describe el servicio..."></textarea>
       </div>
-
     </div>
 
-    <button class="btn-save" (click)="guardarServicio()">
-      {{ editando ? 'Actualizar servicio' : 'Guardar servicio' }}
-    </button>
-
+    <button class="btn-save">Guardar servicio</button>
   </div>
 
-  <!-- LISTADO -->
-  <div class="cards" *ngIf="servicios.length > 0; else vacio">
+  <!-- BÚSQUEDA VISUAL -->
+  <div class="form-card search-card">
+    <div class="input-group full">
+      <label>Buscar servicio</label>
+      <div class="search-input">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Escribe el nombre del servicio">
+      </div>
+    </div>
+  </div>
 
-    <div class="card" *ngFor="let servicio of servicios; let i = index">
+  <!-- LISTADO DE SERVICIOS -->
+  <div class="cards">
 
+    <div class="card">
       <div class="card-header">
-        <h3>{{ servicio.nombre }}</h3>
-        <span class="precio">$ {{ servicio.precio }}</span>
+        <h3>Corte de cabello</h3>
+        <span class="precio">$20000</span>
       </div>
-
       <div class="card-body">
-        <p class="duracion">{{ servicio.duracion }}</p>
-        <p class="descripcion">{{ servicio.descripcion }}</p>
+        <p class="duracion">30 minutos</p>
+        <p class="descripcion">Corte moderno y estilizado</p>
       </div>
-
       <div class="acciones">
-        <button class="btn-icon editar" (click)="editarServicio(i)">
-          <i class="fas fa-pencil-alt"></i>
-        </button>
-        <button class="btn-icon eliminar" (click)="eliminarServicio(i)">
-          <i class="fas fa-trash-alt"></i>
-        </button>
+        <button class="btn-icon editar"><i class="fas fa-pencil-alt"></i></button>
+        <button class="btn-icon eliminar"><i class="fas fa-trash-alt"></i></button>
       </div>
+    </div>
 
+    <div class="card">
+      <div class="card-header">
+        <h3>Manicure</h3>
+        <span class="precio">$15000</span>
+      </div>
+      <div class="card-body">
+        <p class="duracion">45 minutos</p>
+        <p class="descripcion">Cuidado y esmaltado de uñas</p>
+      </div>
+      <div class="acciones">
+        <button class="btn-icon editar"><i class="fas fa-pencil-alt"></i></button>
+        <button class="btn-icon eliminar"><i class="fas fa-trash-alt"></i></button>
+      </div>
     </div>
 
   </div>
-
-  <!-- ESTADO VACÍO -->
-  <ng-template #vacio>
-    <div class="empty-state">
-      <div class="empty-icon">
-        <i class="fas fa-box-open fa-2x"></i>
-      </div>
-      <h3>No hay servicios registrados</h3>
-      <p>Agrega tu primer servicio para comenzar a gestionar tu negocio.</p>
-    </div>
-  </ng-template>
 
 </div>

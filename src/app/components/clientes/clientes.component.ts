@@ -2,14 +2,6 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-interface Cliente {
-  nombre: string;
-  apellido: string;
-  correo: string;
-  telefono: string;
-  direccion: string;
-}
-
 @Component({
   selector: 'app-clientes',
   standalone: true,
@@ -19,12 +11,10 @@ interface Cliente {
 })
 export class ClientesComponent {
 
-  clientes: Cliente[] = [
-    { nombre: 'Daniela', apellido: 'Rincón', correo: 'daniela@mail.com', telefono: '3001234567', direccion: 'Calle 1 #23-45' },
-    { nombre: 'Felipe', apellido: 'Hernandez', correo: 'felipe@mail.com', telefono: '3009876543', direccion: 'Carrera 5 #67-89' }
-  ];
-
-  nuevoCliente: Cliente = {
+  // =========================
+  // 🧾 FORMULARIO (SOLO VISUAL)
+  // =========================
+  nuevoCliente = {
     nombre: '',
     apellido: '',
     correo: '',
@@ -32,32 +22,44 @@ export class ClientesComponent {
     direccion: ''
   };
 
-  editando = false;
-  indiceEditando: number | null = null;
-  busqueda = '';
+  // =========================
+  // 🔍 BUSCADOR (VISUAL)
+  // =========================
+  busqueda: string = '';
 
+  // =========================
+  // ✏️ MODO EDICIÓN (VISUAL)
+  // =========================
+  editando: boolean = false;
+
+  // =========================
+  // ✅ ALERTA VISUAL
+  // =========================
+  mostrarConfirmacion: boolean = false;
+
+  // =========================
+  // 🎯 ACCIONES (SIN LÓGICA)
+  // =========================
   guardarCliente() {
-    if (!this.nuevoCliente.nombre || !this.nuevoCliente.apellido) return;
+    this.mostrarConfirmacion = true;
 
-    if (this.editando && this.indiceEditando !== null) {
-      this.clientes[this.indiceEditando] = { ...this.nuevoCliente };
-      this.editando = false;
-      this.indiceEditando = null;
-    } else {
-      this.clientes.push({ ...this.nuevoCliente });
-    }
+    setTimeout(() => {
+      this.mostrarConfirmacion = false;
+    }, 3000);
 
     this.limpiarFormulario();
   }
 
-  editarCliente(index: number) {
-    this.nuevoCliente = { ...this.clientes[index] };
+  editarCliente() {
     this.editando = true;
-    this.indiceEditando = index;
   }
 
-  eliminarCliente(index: number) {
-    this.clientes.splice(index, 1);
+  eliminarCliente() {
+    this.mostrarConfirmacion = true;
+
+    setTimeout(() => {
+      this.mostrarConfirmacion = false;
+    }, 2000);
   }
 
   limpiarFormulario() {
@@ -68,13 +70,7 @@ export class ClientesComponent {
       telefono: '',
       direccion: ''
     };
+    this.editando = false;
   }
 
-  clientesFiltrados() {
-    return this.clientes.filter(c =>
-      c.nombre.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-      c.apellido.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-      c.correo.toLowerCase().includes(this.busqueda.toLowerCase())
-    );
-  }
 }

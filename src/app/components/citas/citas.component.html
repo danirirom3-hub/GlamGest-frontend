@@ -1,0 +1,147 @@
+<div class="page">
+
+  <div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+      <h2>Citas</h2>
+      <p>Gestiona la agenda del salón</p>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button 
+        [class.active]="vista === 'registro'" 
+        (click)="vista = 'registro'">
+        Nueva Cita
+      </button>
+
+      <button 
+        [class.active]="vista === 'agenda'" 
+        (click)="vista = 'agenda'">
+        Agenda
+      </button>
+    </div>
+
+    <!-- ========================= -->
+    <!-- 🧾 REGISTRO -->
+    <!-- ========================= -->
+    <div *ngIf="vista === 'registro'" class="card fade-in">
+
+      <h3>Registrar Cita</h3>
+
+      <div class="grid">
+
+        <!-- CLIENTE -->
+        <div class="form-group">
+          <label>Cliente</label>
+          <select>
+            <option>Seleccionar cliente</option>
+            <option>Ana Gómez</option>
+            <option>Laura Martínez</option>
+          </select>
+        </div>
+
+        <!-- FECHA -->
+        <div class="form-group">
+          <label>Fecha</label>
+          <input type="date">
+        </div>
+
+        <!-- HORA -->
+        <div class="form-group">
+          <label>Hora</label>
+          <input type="time">
+        </div>
+
+      </div>
+
+      <!-- SERVICIOS -->
+      <div class="form-group">
+        <label>Servicios</label>
+
+        <div class="servicios-grid">
+
+          <div class="servicio-item">
+            Corte
+          </div>
+
+          <div class="servicio-item">
+            Uñas
+          </div>
+
+          <div class="servicio-item">
+            Tinte
+          </div>
+
+        </div>
+      </div>
+
+      <!-- BOTÓN -->
+      <button class="btn-primary">
+        Agendar Cita
+      </button>
+
+      <!-- MENSAJE -->
+      <div class="alerta" *ngIf="mostrarConfirmacion">
+        Cita registrada correctamente
+      </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- 📊 AGENDA -->
+    <!-- ========================= -->
+    <div *ngIf="vista === 'agenda'" class="card fade-in">
+
+      <h3>Agenda de Citas</h3>
+
+      <!-- FILTROS -->
+      <div class="filtros">
+
+        <div class="form-group">
+          <label>Filtrar por fecha</label>
+          <input type="date">
+        </div>
+
+        <div class="form-group">
+          <label>Filtrar por cliente</label>
+          <input type="text" placeholder="Buscar cliente">
+        </div>
+
+      </div>
+
+      <!-- MENSAJE VACÍO -->
+      <div class="empty">
+        No hay citas registradas
+      </div>
+
+      <!-- LISTA -->
+      <div class="agenda-list">
+
+        <!-- CITA -->
+        <div class="cita-card">
+
+          <div class="cita-info">
+            <h4>Ana Gómez</h4>
+            <p>Corte • 10:00 AM</p>
+            <span>10 Abril 2026</span>
+          </div>
+
+          <div class="estado activo">
+            Activa
+          </div>
+
+          <div class="acciones">
+            <button class="btn-editar">Editar</button>
+            <button class="btn-cancelar">Cancelar</button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
