@@ -23,16 +23,13 @@
       </button>
     </div>
 
-    <!-- ========================= -->
-    <!-- 🧾 REGISTRO -->
-    <!-- ========================= -->
+    <!-- REGISTRO -->
     <div *ngIf="vista === 'registro'" class="card fade-in">
 
       <h3>Registrar Cita</h3>
 
       <div class="grid">
 
-        <!-- CLIENTE -->
         <div class="form-group">
           <label>Cliente</label>
           <select>
@@ -42,13 +39,11 @@
           </select>
         </div>
 
-        <!-- FECHA -->
         <div class="form-group">
           <label>Fecha</label>
           <input type="date">
         </div>
 
-        <!-- HORA -->
         <div class="form-group">
           <label>Hora</label>
           <input type="time">
@@ -56,47 +51,30 @@
 
       </div>
 
-      <!-- SERVICIOS -->
       <div class="form-group">
         <label>Servicios</label>
 
         <div class="servicios-grid">
-
-          <div class="servicio-item">
-            Corte
-          </div>
-
-          <div class="servicio-item">
-            Uñas
-          </div>
-
-          <div class="servicio-item">
-            Tinte
-          </div>
-
+          <div class="servicio-item">Corte</div>
+          <div class="servicio-item">Uñas</div>
+          <div class="servicio-item">Tinte</div>
         </div>
+
       </div>
 
-      <!-- BOTÓN -->
-      <button class="btn-primary">
-        Agendar Cita
-      </button>
+      <button class="btn-primary">Agendar Cita</button>
 
-      <!-- MENSAJE -->
       <div class="alerta" *ngIf="mostrarConfirmacion">
         Cita registrada correctamente
       </div>
 
     </div>
 
-    <!-- ========================= -->
-    <!-- 📊 AGENDA -->
-    <!-- ========================= -->
+    <!-- AGENDA -->
     <div *ngIf="vista === 'agenda'" class="card fade-in">
 
       <h3>Agenda de Citas</h3>
 
-      <!-- FILTROS -->
       <div class="filtros">
 
         <div class="form-group">
@@ -111,15 +89,8 @@
 
       </div>
 
-      <!-- MENSAJE VACÍO -->
-      <div class="empty">
-        No hay citas registradas
-      </div>
-
-      <!-- LISTA -->
       <div class="agenda-list">
 
-        <!-- CITA -->
         <div class="cita-card">
 
           <div class="cita-info">
