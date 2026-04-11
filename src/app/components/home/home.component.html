@@ -1,18 +1,25 @@
-<div class="page">
+<div class="home">
 
   <div class="card">
 
-    <h1 class="titulo">GlamGest</h1>
-    <p class="subtitulo">Sistema de gestión para tu salón de belleza</p>
+    <div class="brand">
+      <h1>Glam<span>Gest</span></h1>
+    </div>
 
-    <div class="botones">
+    <p class="frase">
+      Organiza, gestiona y crece sin complicaciones.
+    </p>
 
-      <button routerLink="/login" class="btn login">
-        Iniciar sesión
+    <div class="acciones">
+
+      <button routerLink="/login" class="btn primary">
+        <lucide-icon [img]="LogIn"></lucide-icon>
+        <span>Iniciar sesión</span>
       </button>
 
-      <button routerLink="/usuarios" class="btn registro">
-        Registrarse
+      <button routerLink="/usuarios" class="btn secondary">
+        <lucide-icon [img]="UserPlus"></lucide-icon>
+        <span>Crear cuenta</span>
       </button>
 
     </div>

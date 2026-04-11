@@ -21,7 +21,7 @@
   background: #ffffff;
   padding: 25px;
   border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
   margin-bottom: 40px;
   animation: fadeIn 0.4s ease;
 }
@@ -36,7 +36,9 @@
   color: #6b7280;
 }
 
+/* ========================= */
 /* GRID FORM */
+/* ========================= */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -53,6 +55,9 @@
   grid-column: span 2;
 }
 
+/* ========================= */
+/* INPUTS */
+/* ========================= */
 .input-group label {
   font-size: 12px;
   color: #6b7280;
@@ -71,7 +76,7 @@
 .input-group input:focus,
 .input-group textarea:focus {
   border-color: #6366f1;
-  box-shadow: 0 0 8px rgba(99,102,241,0.2);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.2);
   outline: none;
 }
 
@@ -80,7 +85,9 @@ textarea {
   min-height: 80px;
 }
 
+/* ========================= */
 /* BOTÓN GUARDAR */
+/* ========================= */
 .btn-save {
   margin-top: 20px;
   width: 100%;
@@ -97,7 +104,7 @@ textarea {
 .btn-save:hover {
   background: #5b21b6;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(124,58,237,0.3);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
 }
 
 /* ========================= */
@@ -137,12 +144,14 @@ textarea {
   gap: 25px;
 }
 
+/* ========================= */
 /* CARD */
+/* ========================= */
 .card {
   background: linear-gradient(145deg, #ffffff, #f9fafb);
   border-radius: 18px;
   padding: 18px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   position: relative;
   border-left: 4px solid #a78bfa;
@@ -151,10 +160,12 @@ textarea {
 
 .card:hover {
   transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
 }
 
+/* ========================= */
 /* CARD HEADER */
+/* ========================= */
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -172,7 +183,9 @@ textarea {
   font-size: 14px;
 }
 
+/* ========================= */
 /* CARD BODY */
+/* ========================= */
 .card-body {
   margin-top: 10px;
 }
@@ -188,7 +201,9 @@ textarea {
   color: #374151;
 }
 
+/* ========================= */
 /* ACCIONES */
+/* ========================= */
 .acciones {
   display: flex;
   justify-content: flex-end;
@@ -196,7 +211,9 @@ textarea {
   margin-top: 15px;
 }
 
+/* ========================= */
 /* BOTONES */
+/* ========================= */
 .btn-icon {
   width: 36px;
   height: 36px;
@@ -224,7 +241,7 @@ textarea {
 .editar:hover {
   background: #2563eb;
   color: white;
-  box-shadow: 0 5px 15px rgba(37,99,235,0.3);
+  box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
 }
 
 .eliminar {
@@ -235,10 +252,12 @@ textarea {
 .eliminar:hover {
   background: #dc2626;
   color: white;
-  box-shadow: 0 5px 15px rgba(220,38,38,0.3);
+  box-shadow: 0 5px 15px rgba(220, 38, 38, 0.3);
 }
 
+/* ========================= */
 /* ANIMACIONES */
+/* ========================= */
 @keyframes aparecer {
   from {
     opacity: 0;
@@ -251,11 +270,17 @@ textarea {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-/* MEDIA QUERIES */
+/* ========================= */
+/* RESPONSIVE */
+/* ========================= */
 @media (max-width: 1024px) {
   .form-grid {
     grid-template-columns: 1fr;
@@ -267,16 +292,45 @@ textarea {
 }
 
 @media (max-width: 768px) {
-  .page { padding: 20px; }
-  .form-card { padding: 20px; }
-  .cards { gap: 15px; }
+  .page {
+    padding: 20px;
+  }
+
+  .form-card {
+    padding: 20px;
+  }
+
+  .cards {
+    gap: 15px;
+  }
 }
 
 @media (max-width: 480px) {
-  .page { padding: 15px; }
-  .btn-save { padding: 10px; }
-  .cards { grid-template-columns: 1fr; gap: 10px; }
-  .card { padding: 15px; }
-  .duracion, .descripcion { font-size: 12px; }
-  .btn-icon { width: 32px; height: 32px; font-size: 12px; }
+  .page {
+    padding: 15px;
+  }
+
+  .btn-save {
+    padding: 10px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .card {
+    padding: 15px;
+  }
+
+  .duracion,
+  .descripcion {
+    font-size: 12px;
+  }
+
+  .btn-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
 }

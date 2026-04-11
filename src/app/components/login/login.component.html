@@ -1,6 +1,17 @@
 <div class="page">
+
   <div class="login-container">
-    <h2 class="titulo">GlamGest</h2>
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <button routerLink="/home" class="btn-back">
+        <lucide-icon [img]="ArrowLeft"></lucide-icon>
+        <span>Volver</span>
+      </button>
+    </div>
+
+    <!-- HEADER -->
+    <h2 class="titulo">Glam<span>Gest</span></h2>
     <p class="subtitulo">Inicia sesión</p>
 
     <form (ngSubmit)="login()">
@@ -28,5 +39,7 @@
     </form>
 
     <p class="mensaje">{{ mensaje }}</p>
+
   </div>
+
 </div>
