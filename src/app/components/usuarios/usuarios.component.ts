@@ -1,22 +1,27 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-usuarios',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './usuarios.component.html',
   styleUrls: ['./usuarios.component.css']
 })
 export class UsuariosComponent {
-  // Solo para mantener los datos de los inputs
-  usuario = { nombre: '', password: '', tipo: '' };
-  
-  // Mensaje fijo para simular feedback visual
-  mensaje: string = 'Bienvenido Daniela (Administrador)';
 
-  // Método vacío para simular submit sin lógica real
-  login() {
-    // Aquí no se hace nada, solo para mantener el (ngSubmit)
+  usuario = {
+    nombre: '',
+    email: '',
+    password: '',
+    rol: ''
+  };
+
+  mensaje: string = '';
+
+  registrar() {
+    this.mensaje = 'Usuario registrado correctamente (simulación)';
+    console.log('Usuario:', this.usuario);
   }
 }

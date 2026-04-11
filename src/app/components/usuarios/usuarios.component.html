@@ -1,32 +1,48 @@
 <div class="page">
-  <div class="login-container">
-    <h2 class="titulo">GlamGest</h2>
-    <p class="subtitulo">Inicia sesión</p>
 
-    <form (ngSubmit)="login()">
-      
-      <div class="input-group">
+  <div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+      <h2>Usuarios</h2>
+      <p>Registro de nuevos usuarios</p>
+    </div>
+
+    <!-- FORMULARIO -->
+    <form class="form" (ngSubmit)="registrar()">
+
+      <div class="campo">
         <label>Nombre</label>
-        <input type="text" [(ngModel)]="usuario.nombre" name="nombre" placeholder="Tu nombre">
+        <input type="text" [(ngModel)]="usuario.nombre" name="nombre" placeholder="Ingrese nombre">
       </div>
 
-      <div class="input-group">
+      <div class="campo">
+        <label>Correo</label>
+        <input type="email" [(ngModel)]="usuario.email" name="email" placeholder="Ingrese correo">
+      </div>
+
+      <div class="campo">
         <label>Contraseña</label>
-        <input type="password" [(ngModel)]="usuario.password" name="password" placeholder="Contraseña">
+        <input type="password" [(ngModel)]="usuario.password" name="password" placeholder="Ingrese contraseña">
       </div>
 
-      <div class="input-group">
-        <label>Tipo de usuario</label>
-        <select [(ngModel)]="usuario.tipo" name="tipo">
-          <option value="" disabled selected>Selecciona tipo</option>
-          <option value="admin">Administrador</option>
-          <option value="recepcionista">Recepcionista</option>
+      <div class="campo">
+        <label>Rol</label>
+        <select [(ngModel)]="usuario.rol" name="rol">
+          <option value="">Seleccione rol</option>
+          <option value="ADMIN">Administrador</option>
+          <option value="RECEPCIONISTA">Recepcionista</option>
         </select>
       </div>
 
-      <button type="submit">Ingresar</button>
+      <button class="btn" type="submit">
+        Registrar usuario
+      </button>
+
     </form>
 
     <p class="mensaje">{{ mensaje }}</p>
+
   </div>
+
 </div>
