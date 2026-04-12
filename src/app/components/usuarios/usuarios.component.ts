@@ -18,8 +18,7 @@ export class UsuariosComponent {
   usuario = {
     nombre: '',
     email: '',
-    password: '',
-    rol: ''
+    password: ''
   };
 
   mensaje: string = '';

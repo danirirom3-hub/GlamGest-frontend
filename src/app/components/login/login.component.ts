@@ -15,7 +15,7 @@ export class LoginComponent {
 
   readonly ArrowLeft = ArrowLeft;
 
-  usuario = { nombre: '', password: '', tipo: '' };
+  usuario = { email: '', password: '' };
 
   mensaje: string = '';
 

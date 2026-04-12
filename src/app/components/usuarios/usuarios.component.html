@@ -34,15 +34,6 @@
         <input id="password" type="password" [(ngModel)]="usuario.password" name="password" placeholder="Mínimo 6 caracteres" required>
       </div>
 
-      <div class="campo">
-        <label for="rol">Rol</label>
-        <select id="rol" [(ngModel)]="usuario.rol" name="rol" required>
-          <option value="" disabled selected>Seleccione un rol</option>
-          <option value="ADMIN">Administrador</option>
-          <option value="RECEPCIONISTA">Recepcionista</option>
-        </select>
-      </div>
-
       <button class="btn" type="submit">
         Registrar usuario
       </button>

@@ -11,9 +11,7 @@ import { CommonModule } from '@angular/common';
 })
 export class ClientesComponent {
 
-  // =========================
-  // 🧾 FORMULARIO (SOLO VISUAL)
-  // =========================
+  // Formulario de cliente
   nuevoCliente = {
     nombre: '',
     apellido: '',
@@ -22,24 +20,50 @@ export class ClientesComponent {
     direccion: ''
   };
 
-  // =========================
-  // 🔍 BUSCADOR (VISUAL)
-  // =========================
+  // Lista de clientes
+  clientes = [
+    {
+      nombre: 'Daniela',
+      apellido: 'Rincón',
+      correo: 'daniela@mail.com',
+      telefono: '3001234567',
+      direccion: 'Fusagasugá'
+    },
+    {
+      nombre: 'Felipe',
+      apellido: 'Hernandez',
+      correo: 'felipe@mail.com',
+      telefono: '3009876543',
+      direccion: 'Bogotá'
+    }
+  ];
+
+  // Texto del buscador
   busqueda: string = '';
 
-  // =========================
-  // ✏️ MODO EDICIÓN (VISUAL)
-  // =========================
+  // Modo edición
   editando: boolean = false;
 
-  // =========================
-  // ✅ ALERTA VISUAL
-  // =========================
+  // Mensaje de confirmación
   mostrarConfirmacion: boolean = false;
 
-  // =========================
-  // 🎯 ACCIONES (SIN LÓGICA)
-  // =========================
+  // Filtrar clientes por nombre, correo o teléfono
+  clientesFiltrados() {
+    if (!this.busqueda) {
+      return this.clientes;
+    }
+
+    const texto = this.busqueda.toLowerCase();
+
+    return this.clientes.filter(cliente =>
+      cliente.nombre.toLowerCase().includes(texto) ||
+      cliente.apellido.toLowerCase().includes(texto) ||
+      cliente.correo.toLowerCase().includes(texto) ||
+      cliente.telefono.includes(texto)
+    );
+  }
+
+  // Guardar cliente
   guardarCliente() {
     this.mostrarConfirmacion = true;
 
@@ -50,18 +74,29 @@ export class ClientesComponent {
     this.limpiarFormulario();
   }
 
-  editarCliente() {
+  // Activar edición de cliente
+  editarCliente(cliente?: any) {
     this.editando = true;
+
+    if (cliente) {
+      this.nuevoCliente = { ...cliente };
+    }
   }
 
-  eliminarCliente() {
+  // Eliminar cliente
+  eliminarCliente(cliente?: any) {
     this.mostrarConfirmacion = true;
 
     setTimeout(() => {
       this.mostrarConfirmacion = false;
     }, 2000);
+
+    if (cliente) {
+      this.clientes = this.clientes.filter(c => c !== cliente);
+    }
   }
 
+  // Limpiar formulario
   limpiarFormulario() {
     this.nuevoCliente = {
       nombre: '',
@@ -70,7 +105,7 @@ export class ClientesComponent {
       telefono: '',
       direccion: ''
     };
+
     this.editando = false;
   }
-
 }

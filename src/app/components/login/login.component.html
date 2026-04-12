@@ -17,22 +17,21 @@
     <form (ngSubmit)="login()">
       
       <div class="input-group">
-        <label>Nombre</label>
-        <input type="text" [(ngModel)]="usuario.nombre" name="nombre" placeholder="Tu nombre">
+        <label>Correo electrónico</label>
+        <input 
+          type="email" 
+          [(ngModel)]="usuario.email" 
+          name="email" 
+          placeholder="Tu correo electrónico">
       </div>
 
       <div class="input-group">
         <label>Contraseña</label>
-        <input type="password" [(ngModel)]="usuario.password" name="password" placeholder="Contraseña">
-      </div>
-
-      <div class="input-group">
-        <label>Tipo de usuario</label>
-        <select [(ngModel)]="usuario.tipo" name="tipo">
-          <option value="" disabled selected>Selecciona tipo</option>
-          <option value="admin">Administrador</option>
-          <option value="recepcionista">Recepcionista</option>
-        </select>
+        <input 
+          type="password" 
+          [(ngModel)]="usuario.password" 
+          name="password" 
+          placeholder="Contraseña">
       </div>
 
       <button type="submit">Ingresar</button>

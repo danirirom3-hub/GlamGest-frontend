@@ -2,54 +2,45 @@
 
   <!-- BUSCADOR Y NUEVO CLIENTE -->
   <div class="header-clientes">
-    <input type="text" [(ngModel)]="busqueda" placeholder="Buscar cliente...">
+    <input 
+      type="text" 
+      [(ngModel)]="busqueda" 
+      placeholder="Buscar por nombre, correo o teléfono..."
+    >
+
     <button class="btn-nuevo" (click)="limpiarFormulario(); editando=false;">
       Nuevo Cliente
     </button>
   </div>
 
-  <!-- LISTADO VISUAL DE CLIENTES -->
-  <div class="cards">
-    <div class="card">
+  <!-- LISTADO DE CLIENTES -->
+  <div class="cards" *ngIf="clientes.length > 0; else vacio">
+
+    <div class="card" *ngFor="let cliente of clientesFiltrados()">
+
       <div class="card-header">
-        <h3>Daniela Rincón</h3>
-        <span class="correo">daniela&#64;mail.com</span>
+        <h3>{{ cliente.nombre }} {{ cliente.apellido }}</h3>
+        <span class="correo">{{ cliente.correo }}</span>
       </div>
+
       <div class="card-body">
-        <p><strong>Tel:</strong> 3001234567</p>
-        <p><strong>Dirección:</strong> Calle 1 #23-45</p>
+        <p><strong>Tel:</strong> {{ cliente.telefono }}</p>
       </div>
+
       <div class="acciones">
-        <button class="btn-icon editar" (click)="editarCliente()">
+        <button class="btn-icon editar" (click)="editarCliente(cliente)">
           <i class="fas fa-pencil-alt"></i>
         </button>
-        <button class="btn-icon eliminar" (click)="eliminarCliente()">
+        <button class="btn-icon eliminar" (click)="eliminarCliente(cliente)">
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>
+
     </div>
 
-    <div class="card">
-      <div class="card-header">
-        <h3>Felipe Hernandez</h3>
-        <span class="correo">felipe&#64;mail.com</span>
-      </div>
-      <div class="card-body">
-        <p><strong>Tel:</strong> 3009876543</p>
-        <p><strong>Dirección:</strong> Carrera 5 #67-89</p>
-      </div>
-      <div class="acciones">
-        <button class="btn-icon editar" (click)="editarCliente()">
-          <i class="fas fa-pencil-alt"></i>
-        </button>
-        <button class="btn-icon eliminar" (click)="eliminarCliente()">
-          <i class="fas fa-trash-alt"></i>
-        </button>
-      </div>
-    </div>
   </div>
 
-  <!-- ESTADO VACÍO (CUANDO NO HAY CLIENTES) -->
+  <!-- ESTADO VACÍO -->
   <ng-template #vacio>
     <div class="empty-state">
       <h3>No hay clientes registrados</h3>
@@ -60,27 +51,29 @@
   <!-- FORMULARIO -->
   <div class="form-card">
     <h2>{{ editando ? 'Editar cliente' : 'Nuevo cliente' }}</h2>
+
     <div class="form-grid">
+
       <div class="input-group">
         <label>Nombre</label>
         <input type="text" [(ngModel)]="nuevoCliente.nombre" placeholder="Ej: Daniela">
       </div>
+
       <div class="input-group">
         <label>Apellido</label>
         <input type="text" [(ngModel)]="nuevoCliente.apellido" placeholder="Ej: Rincón">
       </div>
+
       <div class="input-group">
         <label>Correo</label>
-        <input type="email" [(ngModel)]="nuevoCliente.correo" placeholder="Ej: correo&#64;mail.com">
+        <input type="email" [(ngModel)]="nuevoCliente.correo" placeholder="Ej: correo@mail.com">
       </div>
+
       <div class="input-group">
         <label>Teléfono</label>
         <input type="text" [(ngModel)]="nuevoCliente.telefono" placeholder="Ej: 3001234567">
       </div>
-      <div class="input-group full">
-        <label>Dirección</label>
-        <input type="text" [(ngModel)]="nuevoCliente.direccion" placeholder="Ej: Calle 1 #23-45">
-      </div>
+
     </div>
 
     <!-- BOTÓN GUARDAR / ACTUALIZAR -->
@@ -88,10 +81,11 @@
       {{ editando ? 'Actualizar cliente' : 'Guardar cliente' }}
     </button>
 
-    <!-- ALERTA VISUAL -->
+    <!-- ALERTA -->
     <div class="alerta" *ngIf="mostrarConfirmacion">
       Acción realizada correctamente
     </div>
+
   </div>
 
 </div>
