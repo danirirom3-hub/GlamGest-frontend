@@ -15,34 +15,39 @@ export class ServiciosService {
     private authService: AuthService
   ) { }
 
+  private getAuthHeaders(): HttpHeaders | undefined {
+    const token = this.authService.getToken();
+    return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
+  }
+
   // crear servicio (ej: corte, manicure, etc)
   crearServicio(data: any): Observable<any> {
-    const token = this.authService.getToken();
-    const headers = token
-      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
-      : undefined;
-
+    const headers = this.getAuthHeaders();
     return this.http.post(this.apiUrl, data, { headers });
   }
 
   // ver todos los servicios
   obtenerServicios(): Observable<any> {
-    return this.http.get(this.apiUrl);
+    const headers = this.getAuthHeaders();
+    return this.http.get(this.apiUrl, { headers });
   }
 
   // ver servicio por id
   obtenerServicioPorId(id: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${id}`);
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/${id}`, { headers });
   }
 
   // actualizar servicio
   actualizarServicio(id: number, data: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, data);
+    const headers = this.getAuthHeaders();
+    return this.http.put(`${this.apiUrl}/${id}`, data, { headers });
   }
 
   // eliminar servicio
   eliminarServicio(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    const headers = this.getAuthHeaders();
+    return this.http.delete(`${this.apiUrl}/${id}`, { headers });
   }
 
 }

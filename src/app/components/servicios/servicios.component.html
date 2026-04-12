@@ -3,7 +3,7 @@
   <!-- FORMULARIO -->
   <div class="form-card">
     <div class="form-header">
-      <h2>Nuevo servicio</h2>
+      <h2>{{ editing ? 'Editar servicio' : 'Nuevo servicio' }}</h2>
       <span class="sub">Completa la información</span>
     </div>
 
@@ -48,7 +48,19 @@
         ></textarea>
       </div>
 
-      <button class="btn-save" type="submit">Guardar servicio</button>
+      <div class="form-actions">
+        <button class="btn-save" type="submit">
+          {{ editing ? 'Actualizar servicio' : 'Guardar servicio' }}
+        </button>
+        <button
+          class="btn-cancel"
+          type="button"
+          *ngIf="editing"
+          (click)="cancelarEdicion()"
+        >
+          Cancelar
+        </button>
+      </div>
     </form>
     <p class="mensaje">{{ mensaje }}</p>
   </div>
@@ -68,49 +80,30 @@
 
   <!-- LISTADO -->
   <div class="cards">
-
-    <div class="card">
+    <div class="card" *ngFor="let servicioItem of servicios">
       <div class="card-header">
-        <h3>Corte de cabello</h3>
-        <span class="precio">$20000</span>
+        <h3>{{ servicioItem.name }}</h3>
+        <span class="precio">${{ servicioItem.price }}</span>
       </div>
 
       <div class="card-body">
-        <p class="duracion">30 minutos</p>
-        <p class="descripcion">Corte moderno y estilizado</p>
+        <p class="duracion">{{ servicioItem.durationMinutes }} minutos</p>
+        <p class="descripcion">{{ servicioItem.description }}</p>
       </div>
 
       <div class="acciones">
-        <button class="btn-icon editar">
+        <button class="btn-icon editar" type="button" (click)="editarServicio(servicioItem)">
           <i class="fas fa-pencil-alt"></i>
         </button>
-        <button class="btn-icon eliminar">
+        <button class="btn-icon eliminar" type="button" (click)="eliminarServicio(servicioItem.id, servicioItem.name)">
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-header">
-        <h3>Manicure</h3>
-        <span class="precio">$15000</span>
-      </div>
-
-      <div class="card-body">
-        <p class="duracion">45 minutos</p>
-        <p class="descripcion">Cuidado y esmaltado de uñas</p>
-      </div>
-
-      <div class="acciones">
-        <button class="btn-icon editar">
-          <i class="fas fa-pencil-alt"></i>
-        </button>
-        <button class="btn-icon eliminar">
-          <i class="fas fa-trash-alt"></i>
-        </button>
-      </div>
+    <div *ngIf="servicios.length === 0" class="empty-state">
+      <p>No hay servicios disponibles.</p>
     </div>
-
   </div>
 
 </div>
