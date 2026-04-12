@@ -7,21 +7,17 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
 
-  // Aquí va la URL del backend cuando esté listo
-  // Por ahora lo dejo así porque aún no está conectado
-  private apiUrl = 'http://TU_BACKEND_URL/api/auth';
+  private apiUrl = 'http://192.168.1.9:8080/api/auth';
 
   constructor(private http: HttpClient) { }
 
   // Login del usuario
   login(data: any): Observable<any> {
-    // data = correo y contraseña
     return this.http.post(`${this.apiUrl}/login`, data);
   }
 
   // Registro de usuario
   register(data: any): Observable<any> {
-    // data = información del usuario
     return this.http.post(`${this.apiUrl}/register`, data);
   }
 
@@ -42,7 +38,7 @@ export class AuthService {
 
   // Verificar si el usuario está logueado
   isLoggedIn(): boolean {
-    return this.getToken() ? true : false;
+    return !!this.getToken();
   }
 
 }

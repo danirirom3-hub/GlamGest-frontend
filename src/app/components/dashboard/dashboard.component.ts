@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { LucideAngularModule, Scissors, Users, ShoppingCart, Calendar } from 'lucide-angular';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,10 +11,20 @@ import { LucideAngularModule, Scissors, Users, ShoppingCart, Calendar } from 'lu
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent {
-  icons = { 
+  icons = {
     Scissors,
     Users,
     ShoppingCart,
     Calendar
   };
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

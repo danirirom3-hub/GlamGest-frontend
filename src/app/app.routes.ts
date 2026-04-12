@@ -1,10 +1,14 @@
 import { Routes } from '@angular/router';
 
 // Componentes principales
-import { HomeComponent } from './components/home/home.component'; 
+import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 import { UsuariosComponent } from './components/usuarios/usuarios.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+
+// Guards
+import { AuthGuard } from './guards/auth.guard';
+import { LoginGuard } from './guards/login.guard';
 
 // Componentes del dashboard
 import { ServiciosComponent } from './components/servicios/servicios.component';
@@ -16,9 +20,10 @@ export const routes: Routes = [
 
   // Cuando inicia la app, muestra el home
   { path: '', component: HomeComponent },
+  { path: 'home', component: HomeComponent },
 
   // Página de inicio de sesión
-  { path: 'login', component: LoginComponent },
+  { path: 'login', component: LoginComponent, canActivate: [LoginGuard] },
 
   // Página para registrar usuarios
   { path: 'usuarios', component: UsuariosComponent },
@@ -27,6 +32,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
+    canActivate: [AuthGuard],
     children: [
       { path: 'servicios', component: ServiciosComponent },
       { path: 'clientes', component: ClientesComponent },
