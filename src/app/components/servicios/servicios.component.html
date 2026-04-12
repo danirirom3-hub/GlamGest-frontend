@@ -7,31 +7,50 @@
       <span class="sub">Completa la información</span>
     </div>
 
-    <div class="form-grid">
+    <form (ngSubmit)="guardarServicio()" class="form-grid">
 
       <div class="input-group">
         <label>Nombre</label>
-        <input type="text" placeholder="Ej: Corte de cabello">
+        <input
+          type="text"
+          placeholder="Ej: Corte de cabello"
+          name="name"
+          [(ngModel)]="servicio.name"
+        >
       </div>
 
       <div class="input-group">
         <label>Precio</label>
-        <input type="number" placeholder="$">
+        <input
+          type="number"
+          placeholder="$"
+          name="price"
+          [(ngModel)]="servicio.price"
+        >
       </div>
 
       <div class="input-group">
-        <label>Duración</label>
-        <input type="text" placeholder="Ej: 30 min">
+        <label>Duración (minutos)</label>
+        <input
+          type="number"
+          placeholder="Ej: 30"
+          name="durationMinutes"
+          [(ngModel)]="servicio.durationMinutes"
+        >
       </div>
 
       <div class="input-group full">
         <label>Descripción</label>
-        <textarea placeholder="Describe el servicio..."></textarea>
+        <textarea
+          name="description"
+          placeholder="Describe el servicio..."
+          [(ngModel)]="servicio.description"
+        ></textarea>
       </div>
 
-    </div>
-
-    <button class="btn-save">Guardar servicio</button>
+      <button class="btn-save" type="submit">Guardar servicio</button>
+    </form>
+    <p class="mensaje">{{ mensaje }}</p>
   </div>
 
   <!-- BÚSQUEDA -->

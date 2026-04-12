@@ -7,18 +7,19 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
 
-  private apiUrl = 'http://192.168.1.9:8080/api/auth';
+  private authUrl = 'http://192.168.1.9:8080/api/auth';
+  private usersUrl = 'http://192.168.1.9:8080/api/users';
 
   constructor(private http: HttpClient) { }
 
   // Login del usuario
   login(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, data);
+    return this.http.post(`${this.authUrl}/login`, data);
   }
 
   // Registro de usuario
   register(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, data);
+    return this.http.post(this.usersUrl, data);
   }
 
   // Guardar token en el navegador
