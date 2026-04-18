@@ -3,11 +3,11 @@
   <!-- FORMULARIO -->
   <div class="form-card">
     <div class="form-header">
-      <h2>{{ editing ? 'Editar servicio' : 'Nuevo servicio' }}</h2>
+      <h2>{{ isEditing ? 'Editar servicio' : 'Nuevo servicio' }}</h2>
       <span class="sub">Completa la información</span>
     </div>
 
-    <form (ngSubmit)="guardarServicio()" class="form-grid">
+    <form (ngSubmit)="saveService()" class="form-grid">
 
       <div class="input-group">
         <label>Nombre</label>
@@ -15,7 +15,7 @@
           type="text"
           placeholder="Ej: Corte de cabello"
           name="name"
-          [(ngModel)]="servicio.name"
+          [(ngModel)]="service.name"
         >
       </div>
 
@@ -25,7 +25,7 @@
           type="number"
           placeholder="$"
           name="price"
-          [(ngModel)]="servicio.price"
+          [(ngModel)]="service.price"
         >
       </div>
 
@@ -35,7 +35,7 @@
           type="number"
           placeholder="Ej: 30"
           name="durationMinutes"
-          [(ngModel)]="servicio.durationMinutes"
+          [(ngModel)]="service.durationMinutes"
         >
       </div>
 
@@ -44,28 +44,31 @@
         <textarea
           name="description"
           placeholder="Describe el servicio..."
-          [(ngModel)]="servicio.description"
+          [(ngModel)]="service.description"
         ></textarea>
       </div>
 
       <div class="form-actions">
         <button class="btn-save" type="submit">
-          {{ editing ? 'Actualizar servicio' : 'Guardar servicio' }}
+          {{ isEditing ? 'Actualizar servicio' : 'Guardar servicio' }}
         </button>
+
         <button
           class="btn-cancel"
           type="button"
-          *ngIf="editing"
-          (click)="cancelarEdicion()"
+          *ngIf="isEditing"
+          (click)="cancelEdit()"
         >
           Cancelar
         </button>
       </div>
+
     </form>
-    <p class="mensaje">{{ mensaje }}</p>
+
+    <p class="mensaje">{{ message }}</p>
   </div>
 
-  <!-- BÚSQUEDA -->
+  <!-- BUSCADOR -->
   <div class="form-card search-card">
     <div class="input-group full">
       <label>Buscar servicio</label>
@@ -80,30 +83,35 @@
 
   <!-- LISTADO -->
   <div class="cards">
-    <div class="card" *ngFor="let servicioItem of servicios">
+
+    <div class="card" *ngFor="let item of services">
+
       <div class="card-header">
-        <h3>{{ servicioItem.name }}</h3>
-        <span class="precio">${{ servicioItem.price }}</span>
+        <h3>{{ item.name }}</h3>
+        <span class="precio">${{ item.price }}</span>
       </div>
 
       <div class="card-body">
-        <p class="duracion">{{ servicioItem.durationMinutes }} minutos</p>
-        <p class="descripcion">{{ servicioItem.description }}</p>
+        <p class="duracion">{{ item.durationMinutes }} minutos</p>
+        <p class="descripcion">{{ item.description }}</p>
       </div>
 
       <div class="acciones">
-        <button class="btn-icon editar" type="button" (click)="editarServicio(servicioItem)">
+        <button class="btn-icon editar" type="button" (click)="editService(item)">
           <i class="fas fa-pencil-alt"></i>
         </button>
-        <button class="btn-icon eliminar" type="button" (click)="eliminarServicio(servicioItem.id, servicioItem.name)">
+
+        <button class="btn-icon eliminar" type="button" (click)="deleteService(item.id, item.name)">
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>
+
     </div>
 
-    <div *ngIf="servicios.length === 0" class="empty-state">
+    <div *ngIf="services.length === 0" class="empty-state">
       <p>No hay servicios disponibles.</p>
     </div>
+
   </div>
 
 </div>

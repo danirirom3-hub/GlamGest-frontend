@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { UsuariosComponent } from './components/usuarios/usuarios.component';
+import { UsersComponent } from './components/users/users.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { FullCalendarModule } from '@fullcalendar/angular';
 
@@ -9,7 +9,7 @@ import { FullCalendarModule } from '@fullcalendar/angular';
   standalone: true,
   imports: [
     RouterOutlet,
-    UsuariosComponent,
+    UsersComponent,
     DashboardComponent,
   ],
   templateUrl: './app.component.html',

@@ -1,0 +1,89 @@
+<div class="contenedor-clientes">
+
+  <!-- Buscador y botón -->
+  <div class="header-clientes">
+    <input 
+      type="text" 
+      [(ngModel)]="searchText" 
+      placeholder="Buscar por nombre, correo o teléfono..."
+    >
+
+    <button class="btn-nuevo" (click)="resetForm(); isEditing=false;">
+      Nuevo Cliente
+    </button>
+  </div>
+
+  <!-- Lista -->
+  <div class="cards" *ngIf="clients.length > 0; else vacio">
+
+    <div class="card" *ngFor="let client of filteredClients()">
+
+      <div class="card-header">
+        <h3>{{ client.name }} {{ client.lastName }}</h3>
+        <span class="correo">{{ client.email }}</span>
+      </div>
+
+      <div class="card-body">
+        <p><strong>Tel:</strong> {{ client.phone }}</p>
+      </div>
+
+      <div class="acciones">
+        <button class="btn-icon editar" (click)="editClient(client)">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+        <button class="btn-icon eliminar" (click)="deleteClient(client)">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Vacío -->
+  <ng-template #vacio>
+    <div class="empty-state">
+      <h3>No hay clientes registrados</h3>
+      <p>Agrega tu primer cliente para empezar a gestionar.</p>
+    </div>
+  </ng-template>
+
+  <!-- Formulario -->
+  <div class="form-card">
+    <h2>{{ isEditing ? 'Editar cliente' : 'Nuevo cliente' }}</h2>
+
+    <div class="form-grid">
+
+      <div class="input-group">
+        <label>Nombre</label>
+        <input type="text" [(ngModel)]="newClient.name" placeholder="Ej: Daniela">
+      </div>
+
+      <div class="input-group">
+        <label>Apellido</label>
+        <input type="text" [(ngModel)]="newClient.lastName" placeholder="Ej: Rincón">
+      </div>
+
+      <div class="input-group">
+        <label>Correo</label>
+        <input type="email" [(ngModel)]="newClient.email" placeholder="Ej: correo@mail.com">
+      </div>
+
+      <div class="input-group">
+        <label>Teléfono</label>
+        <input type="text" [(ngModel)]="newClient.phone" placeholder="Ej: 3001234567">
+      </div>
+
+    </div>
+
+    <button class="btn-save" (click)="saveClient()">
+      {{ isEditing ? 'Actualizar cliente' : 'Guardar cliente' }}
+    </button>
+
+    <div class="alerta" *ngIf="showConfirmation">
+      Acción realizada correctamente
+    </div>
+
+  </div>
+
+</div>

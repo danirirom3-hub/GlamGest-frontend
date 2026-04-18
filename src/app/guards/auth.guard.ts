@@ -21,6 +21,6 @@ export class AuthGuard implements CanActivate {
       queryParams: { returnUrl: state.url }
     });
 
-    return false;
+    return false; // SOLO TEMPORAL VOLVER A FALSE
   }
 }

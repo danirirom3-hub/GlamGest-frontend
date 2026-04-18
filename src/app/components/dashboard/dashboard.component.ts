@@ -11,6 +11,8 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent {
+
+  // Iconos del menú
   icons = {
     Scissors,
     Users,
@@ -23,8 +25,10 @@ export class DashboardComponent {
     private router: Router
   ) {}
 
+  // Cierra sesión
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
+
 }

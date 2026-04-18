@@ -2,31 +2,31 @@
 
   <div class="container">
 
-    <!-- HEADER -->
+    <!-- Header -->
     <div class="header">
       <h2>Ventas</h2>
       <p>Controla los ingresos del salón</p>
     </div>
 
-    <!-- TABS -->
+    <!-- Tabs -->
     <div class="tabs">
       <button 
-        [class.active]="vista === 'registro'" 
-        (click)="vista = 'registro'">
+        [class.active]="view === 'create'" 
+        (click)="view = 'create'">
         Nueva Venta
       </button>
 
       <button 
-        [class.active]="vista === 'historial'" 
-        (click)="vista = 'historial'">
+        [class.active]="view === 'history'" 
+        (click)="view = 'history'">
         Historial
       </button>
     </div>
 
     <!-- ========================= -->
-    <!-- 🧾 REGISTRO -->
+    <!-- Registro -->
     <!-- ========================= -->
-    <div *ngIf="vista === 'registro'" class="card fade-in">
+    <div *ngIf="view === 'create'" class="card fade-in">
 
       <h3>Registrar Venta</h3>
 
@@ -55,7 +55,7 @@
 
       </div>
 
-      <!-- SERVICIOS -->
+      <!-- Servicios -->
       <div class="form-group">
         <label>Servicios</label>
 
@@ -63,8 +63,8 @@
 
           <div 
             class="servicio-item"
-            [class.activo]="servicioActivo === 1"
-            (click)="seleccionarServicio(1)"
+            [class.activo]="selectedService === 1"
+            (click)="selectService(1)"
           >
             <span>Corte</span>
             <small>$20.000</small>
@@ -72,8 +72,8 @@
 
           <div 
             class="servicio-item"
-            [class.activo]="servicioActivo === 2"
-            (click)="seleccionarServicio(2)"
+            [class.activo]="selectedService === 2"
+            (click)="selectService(2)"
           >
             <span>Uñas</span>
             <small>$30.000</small>
@@ -81,8 +81,8 @@
 
           <div 
             class="servicio-item"
-            [class.activo]="servicioActivo === 3"
-            (click)="seleccionarServicio(3)"
+            [class.activo]="selectedService === 3"
+            (click)="selectService(3)"
           >
             <span>Tinte</span>
             <small>$80.000</small>
@@ -91,13 +91,13 @@
         </div>
       </div>
 
-      <!-- TOTAL -->
+      <!-- Total -->
       <div class="total-box">
         <span>Total</span>
         <h2>$0</h2>
       </div>
 
-      <!-- BOTÓN -->
+      <!-- Botón -->
       <button class="btn-primary">
         Registrar Venta
       </button>
@@ -105,21 +105,21 @@
     </div>
 
     <!-- ========================= -->
-    <!-- 📊 HISTORIAL -->
+    <!-- Historial -->
     <!-- ========================= -->
-    <div *ngIf="vista === 'historial'" class="card fade-in">
+    <div *ngIf="view === 'history'" class="card fade-in">
 
       <h3>Historial de Ventas</h3>
 
-      <!-- MENSAJE SI NO HAY VENTAS -->
+      <!-- Vacío -->
       <div class="empty">
         No hay ventas registradas
       </div>
 
-      <!-- TABLA -->
+      <!-- Tabla -->
       <div class="tabla">
 
-        <!-- ENCABEZADO -->
+        <!-- Header -->
         <div class="fila header">
           <span>Fecha</span>
           <span>Cliente</span>
@@ -128,38 +128,36 @@
           <span></span>
         </div>
 
-        <!-- VENTA 1 -->
+        <!-- Venta 1 -->
         <div class="fila">
           <span>08/04</span>
           <span>Ana</span>
           <span>$50.000</span>
           <span>Efectivo</span>
 
-          <button class="btn-detalle" (click)="toggleDetalle(1)">
+          <button class="btn-detalle" (click)="toggleDetail(1)">
             Ver
           </button>
         </div>
 
-        <!-- DETALLE -->
-        <div class="detalle" *ngIf="ventaActiva === 1">
+        <div class="detalle" *ngIf="activeSale === 1">
           <p>• Corte - $20.000</p>
           <p>• Uñas - $30.000</p>
         </div>
 
-        <!-- VENTA 2 -->
+        <!-- Venta 2 -->
         <div class="fila">
           <span>07/04</span>
           <span>-</span>
           <span>$80.000</span>
           <span>Tarjeta</span>
 
-          <button class="btn-detalle" (click)="toggleDetalle(2)">
+          <button class="btn-detalle" (click)="toggleDetail(2)">
             Ver
           </button>
         </div>
 
-        <!-- DETALLE -->
-        <div class="detalle" *ngIf="ventaActiva === 2">
+        <div class="detalle" *ngIf="activeSale === 2">
           <p>• Tinte - $80.000</p>
         </div>
 

@@ -11,7 +11,10 @@ import { LucideAngularModule, LogIn, UserPlus } from 'lucide-angular';
 })
 export class HomeComponent {
 
-  readonly LogIn = LogIn;
-  readonly UserPlus = UserPlus;
+  // Iconos
+  icons = {
+    logIn: LogIn,
+    userPlus: UserPlus
+  };
 
 }
