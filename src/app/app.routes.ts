@@ -16,6 +16,9 @@ import { ClientsComponent } from './components/clients/clients.component';
 import { SalesComponent } from './components/sales/sales.component';
 import { AppointmentsComponent } from './components/appointments/appointments.component';
 
+// ✅ SOLO ESTE IMPORT NUEVO
+import { EmployeesComponent } from './components/employees/employees.component';
+
 export const routes: Routes = [
 
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -32,6 +35,10 @@ export const routes: Routes = [
     children: [
       { path: 'services', component: ServicesComponent },
       { path: 'clients', component: ClientsComponent },
+
+      // ✅ SOLO ESTA LÍNEA NUEVA
+      { path: 'employees', component: EmployeesComponent },
+
       { path: 'sales', component: SalesComponent },
       { path: 'appointments', component: AppointmentsComponent },
       { path: '', redirectTo: 'services', pathMatch: 'full' }

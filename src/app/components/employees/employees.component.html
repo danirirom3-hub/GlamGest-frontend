@@ -1,0 +1,88 @@
+<div class="container">
+  <h2>Employee Management</h2>
+
+  <!-- Form -->
+  <form (ngSubmit)="saveEmployee()" #employeeForm="ngForm" class="form">
+
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input 
+        type="text" 
+        id="name" 
+        name="name"
+        [(ngModel)]="employee.name" 
+        required 
+        class="form-control"
+        placeholder="Enter employee name">
+    </div>
+
+    <div class="form-group">
+      <label for="phone">Phone</label>
+      <input 
+        type="text" 
+        id="phone" 
+        name="phone"
+        [(ngModel)]="employee.phone" 
+        required 
+        class="form-control"
+        placeholder="Enter phone number">
+    </div>
+
+    <div class="form-group">
+      <label for="active">Active</label>
+      <select 
+        id="active" 
+        name="active"
+        [(ngModel)]="employee.active" 
+        class="form-control">
+        <option [ngValue]="true">Active</option>
+        <option [ngValue]="false">Inactive</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="employeeForm.invalid">
+      Save Employee
+    </button>
+
+    <button type="button" class="btn btn-secondary" (click)="resetForm()">
+      Cancel
+    </button>
+  </form>
+
+  <hr>
+
+  <!-- Employee List -->
+  <h3>Employee List</h3>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let emp of employees">
+        <td>{{ emp.name }}</td>
+        <td>{{ emp.phone }}</td>
+        <td>
+          <span [ngClass]="emp.active ? 'text-success' : 'text-danger'">
+            {{ emp.active ? 'Active' : 'Inactive' }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-warning btn-sm" (click)="editEmployee(emp)">
+            Edit
+          </button>
+
+          <button class="btn btn-danger btn-sm" (click)="deleteEmployee(emp.id)">
+            Delete
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,6 +1,13 @@
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { LucideAngularModule, Scissors, Users, ShoppingCart, Calendar } from 'lucide-angular';
+import { 
+  LucideAngularModule, 
+  Scissors, 
+  Users, 
+  ShoppingCart, 
+  Calendar, 
+  User 
+} from 'lucide-angular';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -12,12 +19,13 @@ import { AuthService } from '../../services/auth.service';
 })
 export class DashboardComponent {
 
-  // Iconos del menú
+  // Icons for sidebar menu
   icons = {
     Scissors,
     Users,
     ShoppingCart,
-    Calendar
+    Calendar,
+    User // 👈 agregado para Employees
   };
 
   constructor(
@@ -25,10 +33,9 @@ export class DashboardComponent {
     private router: Router
   ) {}
 
-  // Cierra sesión
+  // Logout method
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
-
 }

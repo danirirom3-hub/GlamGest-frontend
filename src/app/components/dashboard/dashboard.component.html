@@ -1,40 +1,46 @@
 <div class="dashboard">
-  <!-- Menú lateral -->
+  <!-- Sidebar -->
   <aside class="sidebar">
 
-    <!-- Marca -->
+    <!-- Brand -->
     <div class="brand">
       <h2>Glam<span>Gest</span></h2>
     </div>
 
-    <!-- Navegación -->
+    <!-- Navigation -->
     <nav class="menu">
 
       <a routerLink="/dashboard/services" routerLinkActive="activo">
         <lucide-icon [img]="icons.Scissors"></lucide-icon>
-        Servicios
+        Services
       </a>
 
       <a routerLink="/dashboard/clients" routerLinkActive="activo">
         <lucide-icon [img]="icons.Users"></lucide-icon>
-        Clientes
+        Clients
+      </a>
+
+      <!-- ✅ Employees agregado -->
+      <a routerLink="/dashboard/employees" routerLinkActive="activo">
+        <lucide-icon [img]="icons.User"></lucide-icon>
+        Employees
       </a>
 
       <a routerLink="/dashboard/sales" routerLinkActive="activo">
         <lucide-icon [img]="icons.ShoppingCart"></lucide-icon>
-        Ventas
+        Sales
       </a>
 
       <a routerLink="/dashboard/appointments" routerLinkActive="activo">
         <lucide-icon [img]="icons.Calendar"></lucide-icon>
-        Citas
+        Appointments
       </a>
 
     </nav>
 
-    <!-- Botón logout -->
+    <!-- Logout -->
     <button class="logout-btn" (click)="logout()">
-      Cerrar sesión
+      Logout
     </button>
 
     <!-- Footer -->
@@ -44,7 +50,7 @@
 
   </aside>
 
-  <!-- Contenido -->
+  <!-- Content -->
   <main class="contenido">
     <router-outlet></router-outlet>
   </main>
