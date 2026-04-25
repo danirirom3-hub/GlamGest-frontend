@@ -49,6 +49,7 @@ export class ServicesComponent implements OnInit {
       },
       error: (err: any) => {
         this.services = [];
+        this.message = err?.error?.message || 'Error loading services.';
       }
     });
   }
@@ -59,6 +60,7 @@ export class ServicesComponent implements OnInit {
 
     if (!this.service.name || !this.service.price || !this.service.durationMinutes || !this.service.description) {
       this.message = 'Please fill all fields.';
+      return;
     }
 
     if (this.isEditing && this.editServiceId != null) {
