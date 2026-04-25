@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ServiciosService } from '../../services/servicios.service';
+import { ServicesService } from '../../services/services.service';
 
 interface Service {
   id?: number;
@@ -21,7 +21,6 @@ interface Service {
 })
 export class ServicesComponent implements OnInit {
 
-  // Datos del formulario
   service: Service = {
     active: true,
     name: '',
@@ -30,42 +29,36 @@ export class ServicesComponent implements OnInit {
     durationMinutes: 0
   };
 
-  // Lista de servicios
   services: Service[] = [];
 
-  // Estado de edición
   isEditing = false;
   editServiceId: number | null = null;
 
-  // Mensajes
   message: string = '';
 
-  constructor(private servicesService: ServiciosService) {}
+  constructor(private servicesService: ServicesService) {}
 
   ngOnInit(): void {
     this.loadServices();
   }
 
-  // Carga servicios
   loadServices(): void {
-    this.servicesService.obtenerServicios().subscribe({
+    this.servicesService.getServices().subscribe({
       next: (res: any) => {
         this.services = res?.data || res || [];
       },
-      error: () => {
+      error: (err: any) => {
         this.services = [];
       }
     });
   }
 
-  // Guarda servicio
   saveService(): void {
     this.message = '';
     this.service.active = true;
 
     if (!this.service.name || !this.service.price || !this.service.durationMinutes || !this.service.description) {
-      this.message = 'Completa todos los campos para guardar el servicio.';
-      return;
+      this.message = 'Please fill all fields.';
     }
 
     if (this.isEditing && this.editServiceId != null) {
@@ -73,65 +66,62 @@ export class ServicesComponent implements OnInit {
       return;
     }
 
-    this.servicesService.crearServicio(this.service).subscribe({
+    this.servicesService.createService(this.service).subscribe({
       next: (res: any) => {
         if (res?.successful) {
-          this.message = 'Servicio creado con éxito.';
+          this.message = 'Service created successfully.';
           const newService = res?.data || this.service;
           this.services.push(newService);
           this.resetForm();
         } else {
-          this.message = res?.message || 'No se pudo crear el servicio.';
+          this.message = res?.message || 'Could not create service.';
         }
       },
-      error: (err) => {
-        this.message = err?.error?.message || 'Error al crear el servicio.';
+      error: (err: any) => {
+        this.message = err?.error?.message || 'Error creating service.';
       }
     });
   }
 
-  // Editar servicio
   editService(service: Service): void {
     this.isEditing = true;
     this.editServiceId = service.id ?? null;
 
     this.service = { ...service };
-    this.message = 'Completa los campos y presiona actualizar servicio.';
+    this.message = 'Editing service...';
   }
 
-  // Eliminar servicio
   deleteService(serviceId?: number, serviceName?: string): void {
     if (serviceId == null) {
-      this.message = 'No se pudo eliminar el servicio.';
+      this.message = 'Could not delete service.';
       return;
     }
 
-    const confirmDelete = window.confirm(`¿Estás seguro de eliminar el servicio "${serviceName}"?`);
+    const confirmDelete = window.confirm(`Delete service "${serviceName}"?`);
     if (!confirmDelete) return;
 
-    this.servicesService.eliminarServicio(serviceId).subscribe({
+    this.servicesService.deleteService(serviceId).subscribe({
       next: (res: any) => {
         if (res?.successful) {
           this.services = this.services.filter(item => item.id !== serviceId);
-          this.message = 'Servicio eliminado con éxito.';
+          this.message = 'Service deleted successfully.';
 
           if (this.editServiceId === serviceId) {
             this.resetForm();
           }
         } else {
-          this.message = res?.message || 'No se pudo eliminar el servicio.';
+          this.message = res?.message || 'Could not delete service.';
         }
       },
-      error: (err) => {
-        this.message = err?.error?.message || 'Error al eliminar el servicio.';
+      error: (err: any) => {
+        this.message = err?.error?.message || 'Error deleting service.';
       }
     });
   }
 
-  // Actualizar servicio
   updateService(): void {
     if (this.editServiceId == null) {
-      this.message = 'No se seleccionó ningún servicio.';
+      this.message = 'No service selected.';
       return;
     }
 
@@ -143,10 +133,10 @@ export class ServicesComponent implements OnInit {
       active: true
     };
 
-    this.servicesService.actualizarServicio(this.editServiceId, payload).subscribe({
+    this.servicesService.updateService(this.editServiceId, payload).subscribe({
       next: (res: any) => {
         if (res?.successful) {
-          this.message = 'Servicio actualizado con éxito.';
+          this.message = 'Service updated successfully.';
 
           const updated = res?.data || { id: this.editServiceId, ...payload };
 
@@ -156,22 +146,20 @@ export class ServicesComponent implements OnInit {
 
           this.resetForm();
         } else {
-          this.message = res?.message || 'No se pudo actualizar el servicio.';
+          this.message = res?.message || 'Could not update service.';
         }
       },
-      error: (err) => {
-        this.message = err?.error?.message || 'Error al actualizar el servicio.';
+      error: (err: any) => {
+        this.message = err?.error?.message || 'Error updating service.';
       }
     });
   }
 
-  // Cancela edición
   cancelEdit(): void {
     this.resetForm();
-    this.message = 'Edición cancelada.';
+    this.message = 'Edit cancelled.';
   }
 
-  // Limpia formulario
   private resetForm(): void {
     this.isEditing = false;
     this.editServiceId = null;
@@ -184,5 +172,4 @@ export class ServicesComponent implements OnInit {
       durationMinutes: 0
     };
   }
-
 }
