@@ -2,85 +2,49 @@
 
   <div class="container">
 
-    <!-- Header -->
     <div class="header">
       <h2>Citas</h2>
       <p>Gestiona la agenda del salón</p>
     </div>
 
-    <!-- Tabs -->
+    <!-- TABS -->
     <div class="tabs">
-      <button 
-        [class.active]="view === 'create'" 
-        (click)="view = 'create'">
-        Nueva Cita
-      </button>
 
-      <button 
-        [class.active]="view === 'list'" 
-        (click)="view = 'list'">
-        Agenda
-      </button>
+      <button [class.active]="view === 'create'" (click)="view = 'create'">Nueva Cita</button>
+      <button [class.active]="view === 'list'" (click)="view = 'list'">Agenda</button>
+      <button [class.active]="view === 'calendar'" (click)="view = 'calendar'">Calendario</button>
+
     </div>
 
-    <!-- REGISTRO -->
-    <div *ngIf="view === 'create'" class="card fade-in">
-
-      <h3>Registrar Cita</h3>
+    <!-- CREATE -->
+    <div *ngIf="view === 'create'" class="card">
 
       <div class="grid">
 
-        <div class="form-group">
-          <label>Cliente</label>
-          <select>
-            <option>Seleccionar cliente</option>
-            <option>Ana Gómez</option>
-            <option>Laura Martínez</option>
-          </select>
-        </div>
+        <input type="text" [(ngModel)]="selectedClient" placeholder="Cliente">
 
-        <div class="form-group">
-          <label>Fecha</label>
-          <input type="date">
-        </div>
+        <select [(ngModel)]="selectedEmployee">
+          <option value="">Empleado</option>
+          <option>Laura</option>
+          <option>Camila</option>
+          <option>Andrés</option>
+        </select>
 
-        <div class="form-group">
-          <label>Hora</label>
-          <input type="time">
-        </div>
+        <input type="date" [(ngModel)]="selectedDate">
+        <input type="time" [(ngModel)]="selectedTime">
 
       </div>
 
-      <div class="form-group">
-        <label>Servicios</label>
+      <div class="servicios-grid">
 
-        <div class="servicios-grid">
-          <div 
-            class="servicio-item"
-            [class.activo]="selectedService === 1"
-            (click)="selectService(1)">
-            Corte
-          </div>
-
-          <div 
-            class="servicio-item"
-            [class.activo]="selectedService === 2"
-            (click)="selectService(2)">
-            Uñas
-          </div>
-
-          <div 
-            class="servicio-item"
-            [class.activo]="selectedService === 3"
-            (click)="selectService(3)">
-            Tinte
-          </div>
-        </div>
+        <div class="servicio-item" [class.activo]="selectedService === 1" (click)="selectService(1)">Corte</div>
+        <div class="servicio-item" [class.activo]="selectedService === 2" (click)="selectService(2)">Uñas</div>
+        <div class="servicio-item" [class.activo]="selectedService === 3" (click)="selectService(3)">Tinte</div>
 
       </div>
 
       <button class="btn-primary" (click)="scheduleAppointment()">
-        Agendar Cita
+        Agendar cita
       </button>
 
       <div class="alerta" *ngIf="showConfirmation">
@@ -89,47 +53,40 @@
 
     </div>
 
-    <!-- AGENDA -->
-    <div *ngIf="view === 'list'" class="card fade-in">
+    <!-- LIST -->
+    <div *ngIf="view === 'list'" class="card">
 
-      <h3>Agenda de Citas</h3>
+      <div class="grid filtros">
 
-      <div class="filtros">
+        <input type="text" placeholder="Buscar cliente" [(ngModel)]="filterClient">
+        <input type="text" placeholder="Buscar empleado" [(ngModel)]="filterEmployee">
+        <input type="date" [(ngModel)]="filterDate">
 
-        <div class="form-group">
-          <label>Filtrar por fecha</label>
-          <input type="date">
-        </div>
+      </div>
 
-        <div class="form-group">
-          <label>Filtrar por cliente</label>
-          <input type="text" placeholder="Buscar cliente">
+      <div *ngIf="appointments.length === 0" class="empty">
+        No hay citas registradas
+      </div>
+
+      <div class="cita-card" *ngFor="let c of filteredAppointments()">
+
+        <div>
+          <h4>{{ c.client }}</h4>
+          <p>{{ c.service }} • {{ c.time }}</p>
+          <span>Empleado: {{ c.employee }}</span><br>
+          <small>{{ c.status }}</small>
         </div>
 
       </div>
 
-      <div class="agenda-list">
+    </div>
 
-        <div class="cita-card">
+    <!-- CALENDAR -->
+    <div *ngIf="view === 'calendar'" class="card">
 
-          <div class="cita-info">
-            <h4>Ana Gómez</h4>
-            <p>Corte • 10:00 AM</p>
-            <span>10 Abril 2026</span>
-          </div>
+      <h3>Calendario</h3>
 
-          <div class="estado activo">
-            Activa
-          </div>
-
-          <div class="acciones">
-            <button class="btn-editar">Editar</button>
-            <button class="btn-cancelar">Cancelar</button>
-          </div>
-
-        </div>
-
-      </div>
+      <full-calendar [options]="calendarOptions"></full-calendar>
 
     </div>
 

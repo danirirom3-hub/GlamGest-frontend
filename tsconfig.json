@@ -1,31 +1,53 @@
-/* To learn more about this file see: https://angular.io/config/tsconfig. */
+/* To learn more about this file see: https://angular.io/config/tsconfig */
 {
   "compileOnSave": false,
+
   "compilerOptions": {
+
+    // 📦 Carpeta de salida del build
     "outDir": "./dist/out-tsc",
+
+    // 📁 Raíz del proyecto fuente
     "rootDir": "./src",
+
+    // 🔒 TypeScript estricto (mantener buenas prácticas)
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+
+    // 🧹 Limpieza de dependencias externas
     "skipLibCheck": true,
+
+    // 🔗 Compatibilidad módulos
     "esModuleInterop": true,
-    "sourceMap": true,
-    "declaration": false,
-    "experimentalDecorators": true,
     "moduleResolution": "node",
+
+    // 🧠 Decoradores Angular
+    "experimentalDecorators": true,
+
+    // 📌 Import helpers para optimización
     "importHelpers": true,
+
+    // 🚀 Versión moderna JS
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
+
+    // 🌐 Librerías base del navegador
     "lib": [
       "ES2022",
       "dom"
     ]
   },
+
   "angularCompilerOptions": {
+
+    // 🌍 i18n moderno Angular
     "enableI18nLegacyMessageIdFormat": false,
+
+    // 🧠 Reglas estrictas Angular (NO TOCAR)
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
