@@ -1,4 +1,5 @@
 <div class="dashboard">
+
   <!-- Sidebar -->
   <aside class="sidebar">
 
@@ -12,35 +13,34 @@
 
       <a routerLink="/dashboard/services" routerLinkActive="activo">
         <lucide-icon [img]="icons.Scissors"></lucide-icon>
-        Services
+        Servicios
       </a>
 
       <a routerLink="/dashboard/clients" routerLinkActive="activo">
         <lucide-icon [img]="icons.Users"></lucide-icon>
-        Clients
+        Clientes
       </a>
 
-      <!-- ✅ Employees agregado -->
       <a routerLink="/dashboard/employees" routerLinkActive="activo">
         <lucide-icon [img]="icons.User"></lucide-icon>
-        Employees
+        Empleados
       </a>
 
       <a routerLink="/dashboard/sales" routerLinkActive="activo">
         <lucide-icon [img]="icons.ShoppingCart"></lucide-icon>
-        Sales
+        Ventas
       </a>
 
       <a routerLink="/dashboard/appointments" routerLinkActive="activo">
         <lucide-icon [img]="icons.Calendar"></lucide-icon>
-        Appointments
+        Citas
       </a>
 
     </nav>
 
     <!-- Logout -->
     <button class="logout-btn" (click)="logout()">
-      Logout
+      Cerrar sesión
     </button>
 
     <!-- Footer -->
@@ -54,4 +54,5 @@
   <main class="contenido">
     <router-outlet></router-outlet>
   </main>
+
 </div>

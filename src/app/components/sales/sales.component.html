@@ -5,7 +5,7 @@
     <!-- Header -->
     <div class="header">
       <h2>Ventas</h2>
-      <p>Controla los ingresos del salón</p>
+      <p>Control de ingresos del salón</p>
     </div>
 
     <!-- Tabs -->
@@ -19,12 +19,12 @@
       <button 
         [class.active]="view === 'history'" 
         (click)="view = 'history'">
-        Historial
+        Historial de Ventas
       </button>
     </div>
 
     <!-- ========================= -->
-    <!-- Registro -->
+    <!-- REGISTRO -->
     <!-- ========================= -->
     <div *ngIf="view === 'create'" class="card fade-in">
 
@@ -36,9 +36,10 @@
         <div class="form-group">
           <label>Cliente</label>
           <select>
-            <option>Seleccionar cliente</option>
-            <option>Ana Gómez</option>
-            <option>Laura Martínez</option>
+            <option value="">Seleccionar cliente</option>
+            <option *ngFor="let client of clients" [value]="client.client_id">
+              {{ client.name }}
+            </option>
           </select>
         </div>
 
@@ -46,58 +47,105 @@
         <div class="form-group">
           <label>Método de pago</label>
           <select>
-            <option>Seleccionar método</option>
-            <option>Efectivo</option>
-            <option>Tarjeta</option>
-            <option>Transferencia</option>
+            <option value="">Seleccionar método</option>
+            <option value="Efectivo">Efectivo</option>
+            <option value="Tarjeta">Tarjeta</option>
+            <option value="Transferencia">Transferencia</option>
           </select>
         </div>
 
       </div>
 
-      <!-- Servicios -->
+      <!-- ========================= -->
+      <!-- 1. AGREGAR SERVICIOS -->
+      <!-- ========================= -->
       <div class="form-group">
-        <label>Servicios</label>
+        <label>Servicios disponibles</label>
 
-        <div class="servicios-grid">
+        <div class="tabla-servicios">
 
-          <div 
-            class="servicio-item"
-            [class.activo]="selectedService === 1"
-            (click)="selectService(1)"
-          >
-            <span>Corte</span>
-            <small>$20.000</small>
+          <div class="fila header">
+            <span>Servicio</span>
+            <span>Precio</span>
+            <span>Seleccionar</span>
           </div>
 
           <div 
-            class="servicio-item"
-            [class.activo]="selectedService === 2"
-            (click)="selectService(2)"
+            class="fila"
+            *ngFor="let service of services"
+            (click)="addService(service)"
           >
-            <span>Uñas</span>
-            <small>$30.000</small>
-          </div>
-
-          <div 
-            class="servicio-item"
-            [class.activo]="selectedService === 3"
-            (click)="selectService(3)"
-          >
-            <span>Tinte</span>
-            <small>$80.000</small>
+            <span>{{ service.name }}</span>
+            <span>{{ service.price | currency:'COP' }}</span>
+            <span>Agregar</span>
           </div>
 
         </div>
       </div>
 
-      <!-- Total -->
+      <!-- ========================= -->
+      <!-- 2. DETALLE (FACTURA) -->
+      <!-- ========================= -->
+      <div class="form-group">
+        <label>Detalle de la venta</label>
+
+        <div class="tabla-servicios">
+
+          <div class="fila header">
+            <span>Servicio</span>
+            <span>Empleado</span>
+            <span>Cantidad</span>
+            <span>Precio Unitario</span>
+            <span>Subtotal</span>
+            <span></span>
+          </div>
+
+          <div class="fila" *ngFor="let item of selectedServices; let i = index">
+
+            <!-- Servicio -->
+            <span>{{ item.name }}</span>
+
+            <!-- Empleado -->
+            <span>
+              <select>
+                <option value="">Seleccionar</option>
+                <option *ngFor="let emp of employees" [value]="emp.employee_id">
+                  {{ emp.name }}
+                </option>
+              </select>
+            </span>
+
+            <!-- Cantidad -->
+            <span>
+              <input type="number" min="1" value="1">
+            </span>
+
+            <!-- Precio -->
+            <span>{{ item.price | currency:'COP' }}</span>
+
+            <!-- Subtotal (visual) -->
+            <span>{{ item.price | currency:'COP' }}</span>
+
+            <!-- Eliminar -->
+            <span>
+              <button (click)="removeService(i)">X</button>
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ========================= -->
+      <!-- 3. TOTAL -->
+      <!-- ========================= -->
       <div class="total-box">
         <span>Total</span>
         <h2>$0</h2>
       </div>
 
-      <!-- Botón -->
+      <!-- BOTÓN -->
       <button class="btn-primary">
         Registrar Venta
       </button>
@@ -105,61 +153,64 @@
     </div>
 
     <!-- ========================= -->
-    <!-- Historial -->
+    <!-- HISTORIAL -->
     <!-- ========================= -->
     <div *ngIf="view === 'history'" class="card fade-in">
 
       <h3>Historial de Ventas</h3>
 
-      <!-- Vacío -->
-      <div class="empty">
+      <div class="empty" *ngIf="!sales || sales.length === 0">
         No hay ventas registradas
       </div>
 
-      <!-- Tabla -->
-      <div class="tabla">
+      <div class="tabla" *ngIf="sales && sales.length > 0">
 
-        <!-- Header -->
         <div class="fila header">
           <span>Fecha</span>
           <span>Cliente</span>
           <span>Total</span>
-          <span>Pago</span>
-          <span></span>
+          <span>Método de Pago</span>
+          <span>Detalle</span>
         </div>
 
-        <!-- Venta 1 -->
-        <div class="fila">
-          <span>08/04</span>
-          <span>Ana</span>
-          <span>$50.000</span>
-          <span>Efectivo</span>
+        <ng-container *ngFor="let sale of sales">
 
-          <button class="btn-detalle" (click)="toggleDetail(1)">
-            Ver
-          </button>
-        </div>
+          <div class="fila">
+            <span>{{ sale.sale_datetime }}</span>
+            <span>{{ sale.client_name }}</span>
+            <span>{{ sale.total | currency:'COP' }}</span>
+            <span>{{ sale.payment_type }}</span>
 
-        <div class="detalle" *ngIf="activeSale === 1">
-          <p>• Corte - $20.000</p>
-          <p>• Uñas - $30.000</p>
-        </div>
+            <button class="btn-detalle" (click)="toggleDetail(sale.sale_id)">
+              Ver detalle
+            </button>
+          </div>
 
-        <!-- Venta 2 -->
-        <div class="fila">
-          <span>07/04</span>
-          <span>-</span>
-          <span>$80.000</span>
-          <span>Tarjeta</span>
+          <div class="detalle" *ngIf="activeSale === sale.sale_id">
 
-          <button class="btn-detalle" (click)="toggleDetail(2)">
-            Ver
-          </button>
-        </div>
+            <div class="tabla-detalle">
 
-        <div class="detalle" *ngIf="activeSale === 2">
-          <p>• Tinte - $80.000</p>
-        </div>
+              <div class="fila header">
+                <span>Servicio</span>
+                <span>Empleado</span>
+                <span>Cantidad</span>
+                <span>Precio Unitario</span>
+                <span>Subtotal</span>
+              </div>
+
+              <div class="fila" *ngFor="let d of sale.details">
+                <span>{{ d.service_name }}</span>
+                <span>{{ d.employee_name }}</span>
+                <span>{{ d.quantity }}</span>
+                <span>{{ d.unit_price | currency:'COP' }}</span>
+                <span>{{ d.subtotal | currency:'COP' }}</span>
+              </div>
+
+            </div>
+
+          </div>
+
+        </ng-container>
 
       </div>
 

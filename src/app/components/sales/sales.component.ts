@@ -10,19 +10,32 @@ import { CommonModule } from '@angular/common';
 })
 export class SalesComponent {
 
-  // Control de vista (crear o historial)
+  // Control de vista
   view: 'create' | 'history' = 'create';
 
-  // Servicio seleccionado (visual)
-  selectedService: number | null = null;
+  // Datos (vendrán del backend)
+  sales: any[] = [];
+  clients: any[] = [];
+  services: any[] = [];
+  employees: any[] = [];
 
-  selectService(id: number) {
-    this.selectedService = this.selectedService === id ? null : id;
-  }
+  // Servicios seleccionados (estructura tipo sale_details)
+  selectedServices: any[] = [];
 
-  // Venta activa para mostrar detalle
+  // UI
   activeSale: number | null = null;
 
+  // Agregar servicio
+  addService(service: any) {
+    this.selectedServices.push(service);
+  }
+
+  // Eliminar servicio
+  removeService(index: number) {
+    this.selectedServices.splice(index, 1);
+  }
+
+  // Mostrar detalle
   toggleDetail(id: number) {
     this.activeSale = this.activeSale === id ? null : id;
   }

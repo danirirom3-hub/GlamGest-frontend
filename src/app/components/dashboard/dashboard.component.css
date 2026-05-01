@@ -1,11 +1,18 @@
 /* ========================= */
 /* CONTENEDOR GENERAL */
 /* ========================= */
+body {
+  margin: 0;
+}
+
 .dashboard {
   display: flex;
   height: 100vh;
   font-family: 'Poppins', sans-serif;
-  background: #f8fafc;
+
+  /* 🔥 CAMBIO CLAVE: fondo azul suave */
+  background: linear-gradient(135deg, #f3f4ff, #eef2ff);
+
   overflow: hidden;
 }
 
@@ -21,7 +28,6 @@
   justify-content: space-between;
   padding: 25px 20px;
   animation: slideIn 0.4s ease;
-  transition: all 0.3s ease;
 }
 
 /* LOGO */
@@ -70,7 +76,7 @@
 }
 
 /* ========================= */
-/* LOGOUT BUTTON MEJORADO */
+/* LOGOUT */
 /* ========================= */
 .logout-btn {
   width: 100%;
@@ -83,21 +89,10 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
 }
 
 .logout-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(239, 68, 68, 0.3);
-}
-
-.logout-btn:active {
-  transform: scale(0.98);
 }
 
 /* FOOTER */
@@ -107,16 +102,23 @@
   color: #9ca3af;
 }
 
+/* ========================= */
 /* CONTENIDO */
+/* ========================= */
 .contenido {
   flex: 1;
+
+  /* 🔥 CLAVE: quitamos gris */
+  background: transparent;
+
   padding: 30px;
   overflow-y: auto;
   animation: fadeIn 0.4s ease;
-  transition: padding 0.3s ease;
 }
 
+/* ========================= */
 /* ANIMACIONES */
+/* ========================= */
 @keyframes slideIn {
   from {
     transform: translateX(-40px);
@@ -134,24 +136,8 @@
 }
 
 /* ========================= */
-/* MEDIA QUERIES RESPONSIVE */
+/* RESPONSIVE */
 /* ========================= */
-@media (max-width: 1024px) {
-  .sidebar {
-    width: 200px;
-    padding: 20px 15px;
-  }
-
-  .menu a {
-    font-size: 13px;
-    padding: 10px 12px;
-  }
-
-  .brand h2 {
-    font-size: 18px;
-  }
-}
-
 @media (max-width: 768px) {
   .dashboard {
     flex-direction: column;
@@ -175,43 +161,7 @@
     gap: 5px;
   }
 
-  .menu a {
-    flex: 0 0 auto;
-    font-size: 12px;
-    padding: 8px 10px;
-  }
-
   .contenido {
     padding: 15px;
-    height: calc(100vh - 60px);
-  }
-
-  .logout-btn {
-    margin-top: 10px;
-    padding: 10px;
-    font-size: 12px;
-    border-radius: 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  .brand h2 {
-    font-size: 16px;
-  }
-
-  .menu a {
-    font-size: 11px;
-    padding: 6px 8px;
-  }
-
-  .contenido {
-    padding: 10px;
-  }
-
-  .logout-btn {
-    width: auto;
-    padding: 8px 10px;
-    font-size: 11px;
-    border-radius: 8px;
   }
 }
