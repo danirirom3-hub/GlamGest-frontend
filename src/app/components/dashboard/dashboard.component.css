@@ -9,10 +9,7 @@ body {
   display: flex;
   height: 100vh;
   font-family: 'Poppins', sans-serif;
-
-  /* 🔥 CAMBIO CLAVE: fondo azul suave */
   background: linear-gradient(135deg, #f3f4ff, #eef2ff);
-
   overflow: hidden;
 }
 
@@ -89,6 +86,7 @@ body {
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
+  transition: 0.2s ease;
 }
 
 .logout-btn:hover {
@@ -107,10 +105,7 @@ body {
 /* ========================= */
 .contenido {
   flex: 1;
-
-  /* 🔥 CLAVE: quitamos gris */
   background: transparent;
-
   padding: 30px;
   overflow-y: auto;
   animation: fadeIn 0.4s ease;
@@ -159,6 +154,18 @@ body {
     margin-top: 0;
     overflow-x: auto;
     gap: 5px;
+  }
+
+  
+  .logout-btn {
+    width: auto;
+    padding: 10px 12px;
+    margin-top: 0;
+    white-space: nowrap;
+  }
+
+  .footer {
+    display: none;
   }
 
   .contenido {

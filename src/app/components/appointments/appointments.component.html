@@ -2,6 +2,7 @@
 
   <div class="container">
 
+    <!-- HEADER -->
     <div class="header">
       <h2>Citas</h2>
       <p>Gestiona la agenda del salón</p>
@@ -9,18 +10,23 @@
 
     <!-- TABS -->
     <div class="tabs">
+      <button [class.active]="view === 'create'" (click)="view = 'create'">
+        Nueva Cita
+      </button>
 
-      <button [class.active]="view === 'create'" (click)="view = 'create'">Nueva Cita</button>
-      <button [class.active]="view === 'list'" (click)="view = 'list'">Agenda</button>
-      <button [class.active]="view === 'calendar'" (click)="view = 'calendar'">Calendario</button>
+      <button [class.active]="view === 'list'" (click)="view = 'list'">
+        Agenda
+      </button>
 
+      <button [class.active]="view === 'calendar'" (click)="view = 'calendar'">
+        Calendario
+      </button>
     </div>
 
     <!-- CREATE -->
     <div *ngIf="view === 'create'" class="card">
 
       <div class="grid">
-
         <input type="text" [(ngModel)]="selectedClient" placeholder="Cliente">
 
         <select [(ngModel)]="selectedEmployee">
@@ -32,15 +38,26 @@
 
         <input type="date" [(ngModel)]="selectedDate">
         <input type="time" [(ngModel)]="selectedTime">
-
       </div>
 
       <div class="servicios-grid">
+        <div class="servicio-item"
+             [class.activo]="selectedService === 1"
+             (click)="selectService(1)">
+          Corte
+        </div>
 
-        <div class="servicio-item" [class.activo]="selectedService === 1" (click)="selectService(1)">Corte</div>
-        <div class="servicio-item" [class.activo]="selectedService === 2" (click)="selectService(2)">Uñas</div>
-        <div class="servicio-item" [class.activo]="selectedService === 3" (click)="selectService(3)">Tinte</div>
+        <div class="servicio-item"
+             [class.activo]="selectedService === 2"
+             (click)="selectService(2)">
+          Uñas
+        </div>
 
+        <div class="servicio-item"
+             [class.activo]="selectedService === 3"
+             (click)="selectService(3)">
+          Tinte
+        </div>
       </div>
 
       <button class="btn-primary" (click)="scheduleAppointment()">
@@ -56,38 +73,37 @@
     <!-- LIST -->
     <div *ngIf="view === 'list'" class="card">
 
-      <div class="grid filtros">
-
-        <input type="text" placeholder="Buscar cliente" [(ngModel)]="filterClient">
-        <input type="text" placeholder="Buscar empleado" [(ngModel)]="filterEmployee">
+      <div class="grid">
+        <input placeholder="Cliente" [(ngModel)]="filterClient">
+        <input placeholder="Empleado" [(ngModel)]="filterEmployee">
         <input type="date" [(ngModel)]="filterDate">
-
       </div>
 
-      <div *ngIf="appointments.length === 0" class="empty">
+      <div class="empty" *ngIf="filteredAppointments().length === 0">
         No hay citas registradas
       </div>
 
-      <div class="cita-card" *ngFor="let c of filteredAppointments()">
+      <div *ngFor="let c of filteredAppointments()" class="cita-card">
 
-        <div>
+        <div class="info">
           <h4>{{ c.client }}</h4>
           <p>{{ c.service }} • {{ c.time }}</p>
-          <span>Empleado: {{ c.employee }}</span><br>
-          <small>{{ c.status }}</small>
+          <small>{{ c.employee }} | {{ c.status }}</small>
         </div>
+
+        <button class="btn-primary small"
+                [disabled]="c.status === 'sent_to_cash'"
+                (click)="sendToCash(c)">
+          {{ c.status === 'sent_to_cash' ? 'En caja' : 'Pasar a caja' }}
+        </button>
 
       </div>
 
     </div>
 
     <!-- CALENDAR -->
-    <div *ngIf="view === 'calendar'" class="card">
-
-      <h3>Calendario</h3>
-
+    <div *ngIf="view === 'calendar'" class="calendar-wrapper">
       <full-calendar [options]="calendarOptions"></full-calendar>
-
     </div>
 
   </div>

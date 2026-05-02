@@ -5,6 +5,19 @@ import { FormsModule } from '@angular/forms';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import timeGridPlugin from '@fullcalendar/timegrid';
+
+import esLocale from '@fullcalendar/core/locales/es';
+
+interface Appointment {
+  id: number;
+  client: string;
+  employee: string;
+  service: string;
+  date: string;
+  time: string;
+  status: 'pending' | 'sent_to_cash';
+}
 
 @Component({
   selector: 'app-appointments',
@@ -26,60 +39,79 @@ export class AppointmentsComponent {
 
   showConfirmation = false;
 
-  appointments: any[] = [];
+  appointments: Appointment[] = [];
+  private idCounter = 1;
 
-  // filtros
   filterClient = '';
   filterEmployee = '';
   filterDate = '';
 
   calendarOptions: any = {
-    plugins: [dayGridPlugin, interactionPlugin],
+    plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
+
+    locale: esLocale,
     initialView: 'dayGridMonth',
-    events: []
+
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+    },
+
+    buttonText: {
+      today: 'Hoy',
+      month: 'Mes',
+      week: 'Semana',
+      day: 'Día'
+    },
+
+    height: 'auto',
+    expandRows: true,
+    eventDisplay: 'block',
+
+    events: [],
+
+    eventDidMount: (info: any) => {
+      info.el.style.transition = 'all 0.2s ease';
+    }
   };
 
-  selectService(id: number) {
-    this.selectedService = this.selectedService === id ? null : id;
-  }
+  scheduleAppointment(): void {
 
-  scheduleAppointment() {
+    if (!this.selectedClient ||
+        !this.selectedEmployee ||
+        !this.selectedDate ||
+        !this.selectedTime) return;
 
-    if (!this.selectedClient || !this.selectedEmployee || !this.selectedDate || !this.selectedTime) {
-      return;
-    }
-
-    const newAppointment = {
+    const newApp: Appointment = {
+      id: this.idCounter++,
       client: this.selectedClient,
       employee: this.selectedEmployee,
       service: this.getServiceName(),
       date: this.selectedDate,
       time: this.selectedTime,
-      status: 'active'
+      status: 'pending'
     };
 
-    this.appointments.push(newAppointment);
+    this.appointments.push(newApp);
 
     this.calendarOptions.events = [
       ...this.calendarOptions.events,
       {
-        title: `${newAppointment.client} - ${newAppointment.service} (${newAppointment.employee})`,
-        date: newAppointment.date
+        id: newApp.id,
+        title: `${newApp.client} - ${newApp.service}`,
+        start: `${newApp.date}T${newApp.time}`
       }
     ];
 
     this.showConfirmation = true;
-    setTimeout(() => this.showConfirmation = false, 2500);
+    setTimeout(() => this.showConfirmation = false, 2000);
 
     this.resetForm();
   }
 
-  resetForm() {
-    this.selectedClient = '';
-    this.selectedEmployee = '';
-    this.selectedDate = '';
-    this.selectedTime = '';
-    this.selectedService = null;
+  sendToCash(app: Appointment): void {
+    app.status = 'sent_to_cash';
   }
 
   getServiceName(): string {
@@ -91,7 +123,19 @@ export class AppointmentsComponent {
     }
   }
 
-  filteredAppointments() {
+  selectService(id: number): void {
+    this.selectedService = this.selectedService === id ? null : id;
+  }
+
+  resetForm(): void {
+    this.selectedClient = '';
+    this.selectedEmployee = '';
+    this.selectedDate = '';
+    this.selectedTime = '';
+    this.selectedService = null;
+  }
+
+  filteredAppointments(): Appointment[] {
     return this.appointments.filter(a =>
       (!this.filterClient || a.client.toLowerCase().includes(this.filterClient.toLowerCase())) &&
       (!this.filterEmployee || a.employee.toLowerCase().includes(this.filterEmployee.toLowerCase())) &&

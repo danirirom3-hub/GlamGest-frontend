@@ -1,5 +1,4 @@
 <div class="page">
-
   <div class="container">
 
     <!-- Header -->
@@ -10,15 +9,10 @@
 
     <!-- Tabs -->
     <div class="tabs">
-      <button 
-        [class.active]="view === 'create'" 
-        (click)="view = 'create'">
+      <button [class.active]="view === 'create'" (click)="view = 'create'">
         Nueva Venta
       </button>
-
-      <button 
-        [class.active]="view === 'history'" 
-        (click)="view = 'history'">
+      <button [class.active]="view === 'history'" (click)="view = 'history'">
         Historial de Ventas
       </button>
     </div>
@@ -32,7 +26,6 @@
 
       <div class="grid">
 
-        <!-- Cliente -->
         <div class="form-group">
           <label>Cliente</label>
           <select>
@@ -43,7 +36,6 @@
           </select>
         </div>
 
-        <!-- Método de pago -->
         <div class="form-group">
           <label>Método de pago</label>
           <select>
@@ -56,41 +48,30 @@
 
       </div>
 
-      <!-- ========================= -->
-      <!-- 1. AGREGAR SERVICIOS -->
-      <!-- ========================= -->
+      <!-- Servicios -->
       <div class="form-group">
         <label>Servicios disponibles</label>
 
         <div class="tabla-servicios">
-
           <div class="fila header">
             <span>Servicio</span>
             <span>Precio</span>
             <span>Seleccionar</span>
           </div>
 
-          <div 
-            class="fila"
-            *ngFor="let service of services"
-            (click)="addService(service)"
-          >
+          <div class="fila" *ngFor="let service of services" (click)="addService(service)">
             <span>{{ service.name }}</span>
             <span>{{ service.price | currency:'COP' }}</span>
             <span>Agregar</span>
           </div>
-
         </div>
       </div>
 
-      <!-- ========================= -->
-      <!-- 2. DETALLE (FACTURA) -->
-      <!-- ========================= -->
+      <!-- Detalle -->
       <div class="form-group">
         <label>Detalle de la venta</label>
 
         <div class="tabla-servicios">
-
           <div class="fila header">
             <span>Servicio</span>
             <span>Empleado</span>
@@ -102,10 +83,8 @@
 
           <div class="fila" *ngFor="let item of selectedServices; let i = index">
 
-            <!-- Servicio -->
             <span>{{ item.name }}</span>
 
-            <!-- Empleado -->
             <span>
               <select>
                 <option value="">Seleccionar</option>
@@ -115,46 +94,34 @@
               </select>
             </span>
 
-            <!-- Cantidad -->
             <span>
               <input type="number" min="1" value="1">
             </span>
 
-            <!-- Precio -->
+            <span>{{ item.price | currency:'COP' }}</span>
             <span>{{ item.price | currency:'COP' }}</span>
 
-            <!-- Subtotal (visual) -->
-            <span>{{ item.price | currency:'COP' }}</span>
-
-            <!-- Eliminar -->
             <span>
               <button (click)="removeService(i)">X</button>
             </span>
 
           </div>
-
         </div>
-
       </div>
 
-      <!-- ========================= -->
-      <!-- 3. TOTAL -->
-      <!-- ========================= -->
+      <!-- Total -->
       <div class="total-box">
         <span>Total</span>
         <h2>$0</h2>
       </div>
 
-      <!-- BOTÓN -->
       <button class="btn-primary">
         Registrar Venta
       </button>
 
     </div>
 
-    <!-- ========================= -->
     <!-- HISTORIAL -->
-    <!-- ========================= -->
     <div *ngIf="view === 'history'" class="card fade-in">
 
       <h3>Historial de Ventas</h3>
@@ -207,11 +174,9 @@
               </div>
 
             </div>
-
           </div>
 
         </ng-container>
-
       </div>
 
     </div>
