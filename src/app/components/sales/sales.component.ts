@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { CashService } from '../../services/cash.service';
 
 @Component({
   selector: 'app-sales',
@@ -10,6 +11,8 @@ import { CommonModule } from '@angular/common';
 })
 export class SalesComponent {
 
+  constructor(private cashService: CashService) {}
+
   view: 'create' | 'history' = 'create';
 
   sales: any[] = [];
@@ -17,16 +20,33 @@ export class SalesComponent {
   services: any[] = [];
   employees: any[] = [];
 
-  selectedServices: any[] = [];
+  items: any[] = [];
 
   activeSale: number | null = null;
 
+  ngOnInit() {
+    this.cashService.items$.subscribe(data => {
+      this.items = data;
+    });
+  }
+
+  // 👉 agregar manual (desde tabla)
   addService(service: any) {
-    this.selectedServices.push(service);
+    const item = {
+      service: service.name,
+      price: service.price,
+      source: 'manual'
+    };
+
+    this.cashService.addManualItem(item);
   }
 
   removeService(index: number) {
-    this.selectedServices.splice(index, 1);
+    this.cashService.removeItem(index);
+  }
+
+  getTotal(): number {
+    return this.items.reduce((sum, item) => sum + (item.price || 0), 0);
   }
 
   toggleDetail(id: number) {

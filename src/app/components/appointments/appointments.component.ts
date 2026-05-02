@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import { Router } from '@angular/router';
+import { CashService } from '../../services/cash.service';
+
 import { FullCalendarModule } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -38,6 +41,11 @@ interface Employee {
 })
 export class AppointmentsComponent {
 
+  constructor(
+    private cashService: CashService,
+    private router: Router
+  ) {}
+
   view: 'create' | 'list' | 'calendar' = 'create';
 
   selectedService: Service | null = null;
@@ -56,7 +64,6 @@ export class AppointmentsComponent {
   filterEmployee = '';
   filterDate = '';
 
-  /* 🔥 VACÍOS → backend llena esto */
   services: Service[] = [];
   employees: Employee[] = [];
 
@@ -124,8 +131,14 @@ export class AppointmentsComponent {
     this.resetForm();
   }
 
+  // 🔥 MÉTODO CLAVE (AQUÍ PASA TODO)
   sendToCash(app: Appointment): void {
+    this.cashService.addItemFromAppointment(app);
+
     app.status = 'sent_to_cash';
+
+    // 👉 redirige a ventas (caja)
+    this.router.navigate(['/ventas']);
   }
 
   selectService(service: Service): void {

@@ -81,9 +81,10 @@
             <span></span>
           </div>
 
-          <div class="fila" *ngFor="let item of selectedServices; let i = index">
+          <!-- 🔥 AQUÍ CAMBIA TODO -->
+          <div class="fila" *ngFor="let item of items; let i = index">
 
-            <span>{{ item.name }}</span>
+            <span>{{ item.service }}</span>
 
             <span>
               <select>
@@ -112,7 +113,7 @@
       <!-- Total -->
       <div class="total-box">
         <span>Total</span>
-        <h2>$0</h2>
+        <h2>{{ getTotal() | currency:'COP' }}</h2>
       </div>
 
       <button class="btn-primary">
@@ -121,7 +122,7 @@
 
     </div>
 
-    <!-- HISTORIAL -->
+    <!-- HISTORIAL (igual lo dejas) -->
     <div *ngIf="view === 'history'" class="card fade-in">
 
       <h3>Historial de Ventas</h3>

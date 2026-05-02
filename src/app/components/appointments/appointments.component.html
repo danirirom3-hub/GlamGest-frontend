@@ -19,10 +19,8 @@
     <div *ngIf="view === 'create'" class="card">
 
       <div class="grid">
-
         <input type="text" [(ngModel)]="selectedClient" placeholder="Cliente">
 
-        <!-- 🔥 EMPLEADOS DINÁMICOS -->
         <select [(ngModel)]="selectedEmployee">
           <option [ngValue]="null">Empleado</option>
           <option *ngFor="let e of employees" [ngValue]="e">
@@ -34,9 +32,7 @@
         <input type="time" [(ngModel)]="selectedTime">
       </div>
 
-      <!-- 🔥 SERVICIOS DINÁMICOS -->
       <div class="servicios-grid">
-
         <div class="servicio-item"
              *ngFor="let s of services"
              [class.activo]="selectedService === s"
@@ -47,10 +43,8 @@
         <div class="empty" *ngIf="!services || services.length === 0">
           No hay servicios disponibles
         </div>
-
       </div>
 
-      <!-- estado vacío empleados -->
       <div class="empty" *ngIf="!employees || employees.length === 0">
         No hay empleados disponibles
       </div>
@@ -86,6 +80,7 @@
           <small>{{ c.employee }} | {{ c.status }}</small>
         </div>
 
+        <!-- 🔥 AQUÍ ESTÁ EL CAMBIO REAL -->
         <button class="btn-primary small"
                 [disabled]="c.status === 'sent_to_cash'"
                 (click)="sendToCash(c)">
