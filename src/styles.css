@@ -1,39 +1,47 @@
 /* =========================
-   BASE
+   BASE GLOBAL
+========================= */
+body {
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* =========================
+   TEMA BASE (NEUTRO)
 ========================= */
 :root {
   --bg: #f8fafc;
   --text: #1e293b;
   --primary: #6366f1;
   --card: #ffffff;
-
-  /* CONTROL VISUAL GLOBAL */
-  --border: rgba(0, 0, 0, 0.08);
-  --shadow: rgba(0, 0, 0, 0.08);
 }
 
 /* =========================
-   DARK
+   TEMA OSCURO
 ========================= */
-body.dark {
+.dark {
   --bg: #0f172a;
   --text: #f1f5f9;
   --primary: #818cf8;
   --card: #1e293b;
-
-  --border: rgba(255, 255, 255, 0.08);
-  --shadow: rgba(0, 0, 0, 0.45);
 }
 
 /* =========================
-   BEAUTY (FEMENINO ELEGANTE)
+   BEAUTY FEMENINO ELEGANTE
 ========================= */
-body.barber {
-  --bg: #fff5f7;
-  --text: #3a1f2a;
-  --primary: #c2185b;
-  --card: #ffe4ec;
+.femenino {
+  --bg: #fff6f8;        /* fondo rosado MUY suave */
+  --text: #3a1f2a;      /* vino elegante para lectura */
+  --primary: #c2185b;   /* rosa profundo premium */
+  --card: #ffe4ec;      /* rosa claro limpio tipo spa */
+}
 
-  --border: rgba(194, 24, 91, 0.18);
-  --shadow: rgba(194, 24, 91, 0.12);
+/* =========================
+   (OPCIONAL) MEJOR TRANSICIÓN
+========================= */
+body {
+  transition: background 0.3s ease, color 0.3s ease;
 }

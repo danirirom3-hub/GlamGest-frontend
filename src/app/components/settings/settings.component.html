@@ -1,5 +1,4 @@
 <div class="settings-container">
-
   <div class="header">
     <h2>Personalización de la aplicación</h2>
     <p>Selecciona y aplica el tema visual del sistema</p>
@@ -7,42 +6,40 @@
 
   <div class="section">
     <h3>Tema visual</h3>
-    <p>Cambia la apariencia general del sistema</p>
-
     <div class="themes-grid">
 
-      <div class="theme-card" [class.active]="isActive('default')">
+      <!-- NEUTRO -->
+      <div class="theme-card" [class.active]="isActive('default')" (click)="setTheme('default')">
         <div class="preview default"></div>
-        <h4>Neutro</h4>
-        <button (click)="setTheme('default')">
-          Aplicar tema
-        </button>
+        <div class="theme-info">
+          <h4>Neutro</h4>
+          <span>Estilo limpio</span>
+        </div>
+        <button>Aplicar</button>
       </div>
 
-      <div class="theme-card" [class.active]="isActive('dark')">
+      <!-- OSCURO -->
+      <div class="theme-card" [class.active]="isActive('dark')" (click)="setTheme('dark')">
         <div class="preview dark"></div>
-        <h4>Oscuro</h4>
-        <button (click)="setTheme('dark')">
-          Aplicar tema
-        </button>
+        <div class="theme-info">
+          <h4>Oscuro</h4>
+          <span>Modo nocturno</span>
+        </div>
+        <button>Aplicar</button>
       </div>
 
-      <div class="theme-card" [class.active]="isActive('barber')">
-        <div class="preview barber"></div>
-        <h4>Barbería</h4>
-        <button (click)="setTheme('barber')">
-          Aplicar tema
-        </button>
-      </div>
+     <!-- FEMENINO -->
+<div class="theme-card" [class.active]="isActive('femenino')" (click)="setTheme('femenino')">
+  <div class="preview femenino"></div>
+
+  <div class="theme-info">
+    <h4>Femenino</h4>
+    <span>Elegante / spa / suave</span>
+  </div>
+
+  <button>Aplicar</button>
+</div>
 
     </div>
   </div>
-
-  <div class="section info">
-    <h3>Información</h3>
-    <p>
-      El tema se aplica en toda la aplicación y se guarda automáticamente.
-    </p>
-  </div>
-
 </div>

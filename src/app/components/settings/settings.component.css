@@ -5,6 +5,9 @@
   color: var(--text);
 }
 
+/* ========================= */
+/* HEADER */
+/* ========================= */
 .header h2 {
   margin: 0;
   font-size: 22px;
@@ -15,6 +18,9 @@
   opacity: 0.7;
 }
 
+/* ========================= */
+/* SECCIONES */
+/* ========================= */
 .section {
   margin-top: 25px;
 }
@@ -28,35 +34,49 @@
   margin-bottom: 15px;
 }
 
+/* ========================= */
+/* GRID DE TEMAS */
+/* ========================= */
 .themes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 15px;
 }
 
+/* ========================= */
+/* CARD DE TEMA */
+/* ========================= */
 .theme-card {
   background: var(--bg);
   border-radius: 16px;
   padding: 12px;
+  cursor: pointer;
   text-align: center;
   transition: 0.3s ease;
   border: 2px solid transparent;
 }
 
-.theme-card.active {
+.theme-card:hover {
+  transform: translateY(-5px);
   border-color: var(--primary);
 }
 
-.theme-card:hover {
-  transform: translateY(-5px);
+/* ACTIVO */
+.theme-card.active {
+  border-color: var(--primary);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
 }
 
+/* ========================= */
+/* PREVIEW */
+/* ========================= */
 .preview {
   height: 70px;
   border-radius: 12px;
   margin-bottom: 10px;
 }
 
+/* THEMES */
 .preview.default {
   background: linear-gradient(135deg, #f8fafc, #6366f1);
 }
@@ -65,28 +85,62 @@
   background: linear-gradient(135deg, #0f172a, #818cf8);
 }
 
-.preview.barber {
-  background: linear-gradient(135deg, #1a1a1a, #d4af37);
+.preview.femenino {
+  background: linear-gradient(135deg, #fff6f8, #c2185b);
 }
 
-button {
-  margin-top: 10px;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  background: var(--primary);
-  color: white;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
+/* ========================= */
+/* INFO SECTION */
+/* ========================= */
 .info {
   margin-top: 30px;
   padding: 15px;
   border-radius: 12px;
   background: var(--bg);
   opacity: 0.9;
+}
+
+/* ========================= */
+/* TEXTO PEQUEÑO */
+/* ========================= */
+small {
+  opacity: 0.7;
+  font-size: 12px;
+}
+
+/* ========================= */
+/* BOTÓN PREMIUM */
+/* ========================= */
+button {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  width: 100%;
+
+  border: 1px solid var(--border, rgba(0,0,0,0.08));
+
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+
+  color: var(--text);
+
+  transition: all 0.25s ease;
+}
+
+/* HOVER WOW */
+button:hover {
+  transform: translateY(-3px);
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
+
+/* CLICK */
+button:active {
+  transform: scale(0.96);
 }
