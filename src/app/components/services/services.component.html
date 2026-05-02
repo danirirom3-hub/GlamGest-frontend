@@ -1,117 +1,121 @@
-<div class="contenedor-servicios">
+<div class="page">
+  <div class="container">
 
-  <!-- FORMULARIO -->
-  <div class="form-card">
-    <div class="form-header">
-      <h2>{{ isEditing ? 'Editar servicio' : 'Nuevo servicio' }}</h2>
-      <span class="sub">Completa la información</span>
+    <!-- FORMULARIO -->
+    <div class="form-card">
+      <div class="form-header">
+        <h2>{{ isEditing ? 'Editar servicio' : 'Nuevo servicio' }}</h2>
+        <span class="sub">Completa la información del servicio</span>
+      </div>
+
+      <form (ngSubmit)="saveService()" class="form-grid">
+
+        <div class="input-group">
+          <label>Nombre del servicio</label>
+          <input
+            type="text"
+            placeholder="Ej: Corte de cabello"
+            name="name"
+            [(ngModel)]="service.name"
+          >
+        </div>
+
+        <div class="input-group">
+          <label>Precio</label>
+          <input
+            type="number"
+            placeholder="Ej: 20000"
+            name="price"
+            [(ngModel)]="service.price"
+          >
+        </div>
+
+        <div class="input-group">
+          <label>Duración (minutos)</label>
+          <input
+            type="number"
+            placeholder="Ej: 30"
+            name="durationMinutes"
+            [(ngModel)]="service.durationMinutes"
+          >
+        </div>
+
+        <div class="input-group full">
+          <label>Descripción</label>
+          <textarea
+            name="description"
+            placeholder="Describe el servicio..."
+            [(ngModel)]="service.description"
+          ></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-save" type="submit">
+            {{ isEditing ? 'Actualizar servicio' : 'Guardar servicio' }}
+          </button>
+
+          <button
+            class="btn-cancel"
+            type="button"
+            *ngIf="isEditing"
+            (click)="cancelEdit()"
+          >
+            Cancelar
+          </button>
+        </div>
+
+      </form>
+
+      <p class="mensaje">{{ message }}</p>
     </div>
 
-    <form (ngSubmit)="saveService()" class="form-grid">
+    <!-- FILTRO CLICKABLE -->
+    <div class="form-card filtro" (click)="toggleFiltro()">
+      <input 
+        type="checkbox" 
+        [checked]="showOnlyActive"
+        (click)="$event.stopPropagation()"
+        (change)="toggleFiltro()"
+      >
+      <span>Mostrar solo servicios activos</span>
+    </div>
 
-      <div class="input-group">
-        <label>Nombre</label>
-        <input
-          type="text"
-          placeholder="Ej: Corte de cabello"
-          name="name"
-          [(ngModel)]="service.name"
-        >
+    <!-- LISTADO -->
+    <div class="cards">
+
+      <div class="card" 
+           *ngFor="let item of filteredServices"
+           [class.inactivo]="!item.active">
+
+        <div class="card-header">
+          <h3>{{ item.name }}</h3>
+          <span class="precio">${{ item.price }}</span>
+        </div>
+
+        <div class="card-body">
+          <p class="duracion">Duración: {{ item.durationMinutes }} minutos</p>
+          <p class="descripcion">{{ item.description }}</p>
+        </div>
+
+        <div class="acciones">
+
+          <button class="btn-icon editar" (click)="editService(item)">
+            ✏️
+          </button>
+
+          <button class="btn-icon eliminar" (click)="toggleActive(item)">
+            {{ item.active ? 'OFF' : 'ON' }}
+          </button>
+
+        </div>
+
       </div>
 
-      <div class="input-group">
-        <label>Precio</label>
-        <input
-          type="number"
-          placeholder="$"
-          name="price"
-          [(ngModel)]="service.price"
-        >
+      <div *ngIf="filteredServices.length === 0" class="empty">
+        <p>No hay servicios registrados.</p>
       </div>
 
-      <div class="input-group">
-        <label>Duración (minutos)</label>
-        <input
-          type="number"
-          placeholder="Ej: 30"
-          name="durationMinutes"
-          [(ngModel)]="service.durationMinutes"
-        >
-      </div>
+    </div>
 
-      <div class="input-group full">
-        <label>Descripción</label>
-        <textarea
-          name="description"
-          placeholder="Describe el servicio..."
-          [(ngModel)]="service.description"
-        ></textarea>
-      </div>
-
-      <div class="form-actions">
-        <button class="btn-save" type="submit">
-          {{ isEditing ? 'Actualizar servicio' : 'Guardar servicio' }}
-        </button>
-
-        <button
-          class="btn-cancel"
-          type="button"
-          *ngIf="isEditing"
-          (click)="cancelEdit()"
-        >
-          Cancelar
-        </button>
-      </div>
-
-    </form>
-
-    <p class="mensaje">{{ message }}</p>
   </div>
-
-  <!-- BUSCADOR -->
-  <div class="form-card search-card">
-    <div class="input-group full">
-      <label>Buscar servicio</label>
-
-      <div class="search-input">
-        <i class="fas fa-search"></i>
-        <input type="text" placeholder="Escribe el nombre del servicio">
-      </div>
-
-    </div>
-  </div>
-
-  <!-- LISTADO -->
-  <div class="cards">
-
-    <div class="card" *ngFor="let item of services">
-
-      <div class="card-header">
-        <h3>{{ item.name }}</h3>
-        <span class="precio">${{ item.price }}</span>
-      </div>
-
-      <div class="card-body">
-        <p class="duracion">{{ item.durationMinutes }} minutos</p>
-        <p class="descripcion">{{ item.description }}</p>
-      </div>
-
-      <div class="acciones">
-        <button class="btn-icon editar" type="button" (click)="editService(item)">
-          <i class="fas fa-pencil-alt"></i>
-        </button>
-
-        <button class="btn-icon eliminar" type="button" (click)="deleteService(item.id, item.name)">
-          <i class="fas fa-trash-alt"></i>
-        </button>
-      </div>
-
-    </div>
-
-    <div *ngIf="services.length === 0" class="empty-state">
-      <p>No hay servicios disponibles.</p>
-    </div>
-
-  </div>
-
 </div>

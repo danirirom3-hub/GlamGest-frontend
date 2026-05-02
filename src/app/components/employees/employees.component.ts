@@ -11,7 +11,6 @@ import { FormsModule } from '@angular/forms';
 })
 export class EmployeesComponent {
 
-  // Modelo básico (solo para que no rompa)
   employee = {
     id: 0,
     name: '',
@@ -19,13 +18,23 @@ export class EmployeesComponent {
     active: true
   };
 
-  // Lista mock (puedes dejarla vacía o con ejemplos)
   employees = [
     { id: 1, name: 'John Doe', phone: '123456789', active: true },
     { id: 2, name: 'Jane Smith', phone: '987654321', active: false }
   ];
 
-  // Métodos vacíos (solo para que Angular no tire error)
+  showOnlyActive = false;
+
+  get filteredEmployees() {
+    return this.showOnlyActive
+      ? this.employees.filter(e => e.active)
+      : this.employees;
+  }
+
+  toggleFilter() {
+    this.showOnlyActive = !this.showOnlyActive;
+  }
+
   saveEmployee() {
     console.log('Save clicked');
   }

@@ -1,7 +1,8 @@
 <div class="contenedor-clientes">
 
-  <!-- Buscador y botón -->
+  <!-- HEADER: BUSCADOR + NUEVO CLIENTE -->
   <div class="header-clientes">
+
     <input 
       type="text" 
       [(ngModel)]="searchText" 
@@ -11,45 +12,12 @@
     <button class="btn-nuevo" (click)="resetForm(); isEditing=false;">
       Nuevo Cliente
     </button>
-  </div>
-
-  <!-- Lista -->
-  <div class="cards" *ngIf="clients.length > 0; else vacio">
-
-    <div class="card" *ngFor="let client of filteredClients()">
-
-      <div class="card-header">
-        <h3>{{ client.name }} {{ client.lastName }}</h3>
-        <span class="correo">{{ client.email }}</span>
-      </div>
-
-      <div class="card-body">
-        <p><strong>Tel:</strong> {{ client.phone }}</p>
-      </div>
-
-      <div class="acciones">
-        <button class="btn-icon editar" (click)="editClient(client)">
-          <i class="fas fa-pencil-alt"></i>
-        </button>
-        <button class="btn-icon eliminar" (click)="deleteClient(client)">
-          <i class="fas fa-trash-alt"></i>
-        </button>
-      </div>
-
-    </div>
 
   </div>
 
-  <!-- Vacío -->
-  <ng-template #vacio>
-    <div class="empty-state">
-      <h3>No hay clientes registrados</h3>
-      <p>Agrega tu primer cliente para empezar a gestionar.</p>
-    </div>
-  </ng-template>
-
-  <!-- Formulario -->
+  <!-- FORMULARIO (ARRIBA AHORA) -->
   <div class="form-card">
+
     <h2>{{ isEditing ? 'Editar cliente' : 'Nuevo cliente' }}</h2>
 
     <div class="form-grid">
@@ -85,5 +53,41 @@
     </div>
 
   </div>
+
+  <!-- LISTA DE CLIENTES (ABAJO AHORA) -->
+  <div class="cards" *ngIf="clients.length > 0; else vacio">
+
+    <div class="card" *ngFor="let client of filteredClients()">
+
+      <div class="card-header">
+        <h3>{{ client.name }} {{ client.lastName }}</h3>
+        <span class="correo">{{ client.email }}</span>
+      </div>
+
+      <div class="card-body">
+        <p><strong>Tel:</strong> {{ client.phone }}</p>
+      </div>
+
+      <div class="acciones">
+        <button class="btn-icon editar" (click)="editClient(client)">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+
+        <button class="btn-icon eliminar" (click)="deleteClient(client)">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- VACÍO -->
+  <ng-template #vacio>
+    <div class="empty-state">
+      <h3>No hay clientes registrados</h3>
+      <p>Agrega tu primer cliente para empezar a gestionar.</p>
+    </div>
+  </ng-template>
 
 </div>
