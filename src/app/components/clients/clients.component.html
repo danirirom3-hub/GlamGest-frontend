@@ -1,6 +1,6 @@
 <div class="contenedor-clientes">
 
-  <!-- HEADER: BUSCADOR + NUEVO CLIENTE -->
+  <!-- HEADER -->
   <div class="header-clientes">
 
     <input 
@@ -9,13 +9,13 @@
       placeholder="Buscar por nombre, correo o teléfono..."
     >
 
-    <button class="btn-nuevo" (click)="resetForm(); isEditing=false;">
+    <button class="btn-nuevo" (click)="onNew()">
       Nuevo Cliente
     </button>
 
   </div>
 
-  <!-- FORMULARIO (ARRIBA AHORA) -->
+  <!-- FORMULARIO -->
   <div class="form-card">
 
     <h2>{{ isEditing ? 'Editar cliente' : 'Nuevo cliente' }}</h2>
@@ -24,27 +24,27 @@
 
       <div class="input-group">
         <label>Nombre</label>
-        <input type="text" [(ngModel)]="newClient.name" placeholder="Ej: Daniela">
+        <input type="text" [(ngModel)]="client.name" placeholder="Nombre">
       </div>
 
       <div class="input-group">
         <label>Apellido</label>
-        <input type="text" [(ngModel)]="newClient.lastName" placeholder="Ej: Rincón">
+        <input type="text" [(ngModel)]="client.lastName" placeholder="Apellido">
       </div>
 
       <div class="input-group">
         <label>Correo</label>
-        <input type="email" [(ngModel)]="newClient.email" placeholder="Ej: correo@mail.com">
+        <input type="email" [(ngModel)]="client.email" placeholder="Correo">
       </div>
 
       <div class="input-group">
         <label>Teléfono</label>
-        <input type="text" [(ngModel)]="newClient.phone" placeholder="Ej: 3001234567">
+        <input type="text" [(ngModel)]="client.phone" placeholder="Teléfono">
       </div>
 
     </div>
 
-    <button class="btn-save" (click)="saveClient()">
+    <button class="btn-save" (click)="onSubmit()">
       {{ isEditing ? 'Actualizar cliente' : 'Guardar cliente' }}
     </button>
 
@@ -54,26 +54,26 @@
 
   </div>
 
-  <!-- LISTA DE CLIENTES (ABAJO AHORA) -->
-  <div class="cards" *ngIf="clients.length > 0; else vacio">
+  <!-- LISTA -->
+  <div class="cards" *ngIf="clients && clients.length > 0; else vacio">
 
-    <div class="card" *ngFor="let client of filteredClients()">
+    <div class="card" *ngFor="let c of clients">
 
       <div class="card-header">
-        <h3>{{ client.name }} {{ client.lastName }}</h3>
-        <span class="correo">{{ client.email }}</span>
+        <h3>{{ c.name }} {{ c.lastName }}</h3>
+        <span class="correo">{{ c.email }}</span>
       </div>
 
       <div class="card-body">
-        <p><strong>Tel:</strong> {{ client.phone }}</p>
+        <p><strong>Tel:</strong> {{ c.phone }}</p>
       </div>
 
       <div class="acciones">
-        <button class="btn-icon editar" (click)="editClient(client)">
+        <button class="btn-icon editar" (click)="onEdit(c)">
           <i class="fas fa-pencil-alt"></i>
         </button>
 
-        <button class="btn-icon eliminar" (click)="deleteClient(client)">
+        <button class="btn-icon eliminar" (click)="onDelete(c)">
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>

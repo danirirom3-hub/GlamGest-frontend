@@ -19,6 +19,16 @@ interface Appointment {
   status: 'pending' | 'sent_to_cash';
 }
 
+interface Service {
+  id: number;
+  name: string;
+}
+
+interface Employee {
+  id: number;
+  name: string;
+}
+
 @Component({
   selector: 'app-appointments',
   standalone: true,
@@ -30,10 +40,10 @@ export class AppointmentsComponent {
 
   view: 'create' | 'list' | 'calendar' = 'create';
 
-  selectedService: number | null = null;
+  selectedService: Service | null = null;
+  selectedEmployee: Employee | null = null;
 
   selectedClient = '';
-  selectedEmployee = '';
   selectedDate = '';
   selectedTime = '';
 
@@ -46,9 +56,12 @@ export class AppointmentsComponent {
   filterEmployee = '';
   filterDate = '';
 
+  /* 🔥 VACÍOS → backend llena esto */
+  services: Service[] = [];
+  employees: Employee[] = [];
+
   calendarOptions: any = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-
     locale: esLocale,
     initialView: 'dayGridMonth',
 
@@ -81,13 +94,14 @@ export class AppointmentsComponent {
     if (!this.selectedClient ||
         !this.selectedEmployee ||
         !this.selectedDate ||
-        !this.selectedTime) return;
+        !this.selectedTime ||
+        !this.selectedService) return;
 
     const newApp: Appointment = {
       id: this.idCounter++,
       client: this.selectedClient,
-      employee: this.selectedEmployee,
-      service: this.getServiceName(),
+      employee: this.selectedEmployee.name,
+      service: this.selectedService.name,
       date: this.selectedDate,
       time: this.selectedTime,
       status: 'pending'
@@ -114,22 +128,14 @@ export class AppointmentsComponent {
     app.status = 'sent_to_cash';
   }
 
-  getServiceName(): string {
-    switch (this.selectedService) {
-      case 1: return 'Corte';
-      case 2: return 'Uñas';
-      case 3: return 'Tinte';
-      default: return 'Servicio';
-    }
-  }
-
-  selectService(id: number): void {
-    this.selectedService = this.selectedService === id ? null : id;
+  selectService(service: Service): void {
+    this.selectedService =
+      this.selectedService?.id === service.id ? null : service;
   }
 
   resetForm(): void {
     this.selectedClient = '';
-    this.selectedEmployee = '';
+    this.selectedEmployee = null;
     this.selectedDate = '';
     this.selectedTime = '';
     this.selectedService = null;

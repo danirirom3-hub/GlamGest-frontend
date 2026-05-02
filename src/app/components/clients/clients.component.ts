@@ -2,6 +2,15 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
+interface Client {
+  id?: number;
+  name: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address?: string;
+}
+
 @Component({
   selector: 'app-clients',
   standalone: true,
@@ -11,8 +20,8 @@ import { CommonModule } from '@angular/common';
 })
 export class ClientsComponent {
 
-  // Datos del formulario
-  newClient = {
+  /* 🔥 modelo del formulario */
+  client: Client = {
     name: '',
     lastName: '',
     email: '',
@@ -20,93 +29,56 @@ export class ClientsComponent {
     address: ''
   };
 
-  // Lista de clientes
-  clients = [
-    {
-      name: 'Daniela',
-      lastName: 'Rincón',
-      email: 'daniela@mail.com',
-      phone: '3001234567',
-      address: 'Fusagasugá'
-    },
-    {
-      name: 'Felipe',
-      lastName: 'Hernandez',
-      email: 'felipe@mail.com',
-      phone: '3009876543',
-      address: 'Bogotá'
-    }
-  ];
+  /* 🔥 datos vienen del backend */
+  clients: Client[] = [];
 
-  // Texto del buscador
+  /* 🔥 estado UI */
   searchText: string = '';
-
-  // Saber si está editando
   isEditing: boolean = false;
-
-  // Mensaje de confirmación
   showConfirmation: boolean = false;
 
-  // Filtra clientes por nombre, correo o teléfono
-  filteredClients() {
-    if (!this.searchText) {
-      return this.clients;
-    }
+  /* ========================= */
+  /* 🎯 EVENTOS (solo UI) */
+  /* ========================= */
 
-    const text = this.searchText.toLowerCase();
-
-    return this.clients.filter(client =>
-      client.name.toLowerCase().includes(text) ||
-      client.lastName.toLowerCase().includes(text) ||
-      client.email.toLowerCase().includes(text) ||
-      client.phone.includes(text)
-    );
-  }
-
-  // Guarda cliente
-  saveClient() {
-    this.showConfirmation = true;
-
-    setTimeout(() => {
-      this.showConfirmation = false;
-    }, 3000);
-
+  onSubmit(): void {
+    console.log('submit', this.client);
+    this.showTempMessage();
     this.resetForm();
   }
 
-  // Activa edición
-  editClient(client?: any) {
+  onEdit(client: Client): void {
+    console.log('edit', client);
+    this.client = { ...client };
     this.isEditing = true;
-
-    if (client) {
-      this.newClient = { ...client };
-    }
   }
 
-  // Elimina cliente
-  deleteClient(client?: any) {
-    this.showConfirmation = true;
-
-    setTimeout(() => {
-      this.showConfirmation = false;
-    }, 2000);
-
-    if (client) {
-      this.clients = this.clients.filter(c => c !== client);
-    }
+  onDelete(client: Client): void {
+    console.log('delete', client);
+    this.showTempMessage();
   }
 
-  // Limpia formulario
-  resetForm() {
-    this.newClient = {
+  onNew(): void {
+    this.resetForm();
+    this.isEditing = false;
+  }
+
+  /* ========================= */
+  /* 🔄 UI helpers */
+  /* ========================= */
+
+  resetForm(): void {
+    this.client = {
       name: '',
       lastName: '',
       email: '',
       phone: '',
       address: ''
     };
-
-    this.isEditing = false;
   }
 
+  showTempMessage(): void {
+    this.showConfirmation = true;
+    setTimeout(() => this.showConfirmation = false, 2000);
+  }
 }

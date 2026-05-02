@@ -1,19 +1,18 @@
 <div class="container">
   <h2>Gestión de Empleados</h2>
 
-  <!-- FILTRO -->
-  <div class="filter-bar" (click)="toggleFilter()">
+  <!-- FILTRO (solo visual) -->
+  <div class="filter-bar">
     <input 
       type="checkbox" 
-      [checked]="showOnlyActive"
-      (click)="$event.stopPropagation()"
-      (change)="toggleFilter()"
+      [(ngModel)]="showOnlyActive"
+      name="filterActive"
     >
     <span>Mostrar solo empleados activos</span>
   </div>
 
   <!-- FORMULARIO -->
-  <form (ngSubmit)="saveEmployee()" #employeeForm="ngForm" class="form">
+  <form (ngSubmit)="onSubmit()" #employeeForm="ngForm" class="form">
 
     <div class="form-group">
       <label for="name">Nombre</label>
@@ -46,8 +45,10 @@
         name="active"
         [(ngModel)]="employee.active" 
         class="form-control">
+
         <option [ngValue]="true">Activo</option>
         <option [ngValue]="false">Inactivo</option>
+
       </select>
     </div>
 
@@ -56,7 +57,7 @@
         Guardar
       </button>
 
-      <button type="button" class="btn btn-secondary" (click)="resetForm()">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">
         Cancelar
       </button>
     </div>
@@ -67,7 +68,13 @@
 
   <h3>Lista de Empleados</h3>
 
-  <table class="table">
+  <!-- ESTADO VACÍO -->
+  <div class="empty" *ngIf="!employees || employees.length === 0">
+    No hay empleados disponibles
+  </div>
+
+  <!-- TABLA -->
+  <table class="table" *ngIf="employees && employees.length > 0">
     <thead>
       <tr>
         <th>Nombre</th>
@@ -78,7 +85,7 @@
     </thead>
 
     <tbody>
-      <tr *ngFor="let emp of filteredEmployees">
+      <tr *ngFor="let emp of employees">
         <td>{{ emp.name }}</td>
         <td>{{ emp.phone }}</td>
         <td>
@@ -87,11 +94,11 @@
           </span>
         </td>
         <td>
-          <button class="btn btn-warning btn-sm" (click)="editEmployee(emp)">
+          <button class="btn btn-warning btn-sm" (click)="onEdit(emp)">
             Editar
           </button>
 
-          <button class="btn btn-danger btn-sm" (click)="deleteEmployee(emp.id)">
+          <button class="btn btn-danger btn-sm" (click)="onDelete(emp.id)">
             Eliminar
           </button>
         </td>

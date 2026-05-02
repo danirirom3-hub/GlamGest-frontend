@@ -2,6 +2,13 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+interface Employee {
+  id: number;
+  name: string;
+  phone: string;
+  active: boolean;
+}
+
 @Component({
   selector: 'app-employees',
   standalone: true,
@@ -11,43 +18,45 @@ import { FormsModule } from '@angular/forms';
 })
 export class EmployeesComponent {
 
-  employee = {
+  /* 🔥 modelo del formulario */
+  employee: Employee = {
     id: 0,
     name: '',
     phone: '',
     active: true
   };
 
-  employees = [
-    { id: 1, name: 'John Doe', phone: '123456789', active: true },
-    { id: 2, name: 'Jane Smith', phone: '987654321', active: false }
-  ];
+  /* 🔥 datos vienen del backend */
+  employees: Employee[] = [];
 
+  /* 🔥 estado visual */
   showOnlyActive = false;
 
-  get filteredEmployees() {
-    return this.showOnlyActive
-      ? this.employees.filter(e => e.active)
-      : this.employees;
+  /* ========================= */
+  /* 🎯 EVENTOS (sin lógica) */
+  /* ========================= */
+
+  onSubmit(): void {
+    console.log('submit', this.employee);
   }
 
-  toggleFilter() {
-    this.showOnlyActive = !this.showOnlyActive;
+  onEdit(emp: Employee): void {
+    console.log('edit', emp);
   }
 
-  saveEmployee() {
-    console.log('Save clicked');
+  onDelete(id: number): void {
+    console.log('delete', id);
   }
 
-  editEmployee(emp: any) {
-    console.log('Edit:', emp);
+  onCancel(): void {
+    this.resetForm();
   }
 
-  deleteEmployee(id: number) {
-    console.log('Delete:', id);
-  }
+  /* ========================= */
+  /* 🔄 UTILIDAD UI */
+  /* ========================= */
 
-  resetForm() {
+  resetForm(): void {
     this.employee = {
       id: 0,
       name: '',
