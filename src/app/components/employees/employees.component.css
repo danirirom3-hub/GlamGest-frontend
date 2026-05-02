@@ -1,9 +1,13 @@
+/* ========================= */
+/* CONTENEDOR */
+/* ========================= */
 .container {
   min-height: 100vh;
   padding: 40px;
-  background: linear-gradient(135deg, #f3f4ff, #eef2ff);
+  background: var(--bg);
   font-family: 'Poppins', sans-serif;
   box-sizing: border-box;
+  transition: 0.3s ease;
 }
 
 /* ========================= */
@@ -13,8 +17,9 @@ h2, h3 {
   font-size: 26px;
   font-weight: 700;
   margin-bottom: 18px;
-  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  background: linear-gradient(90deg, var(--primary), #7c3aed);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -25,7 +30,7 @@ h2, h3 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 18px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--card);
   padding: 28px;
   border-radius: 22px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.08);
@@ -54,7 +59,8 @@ h2, h3 {
 label {
   font-size: 13px;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
+  opacity: 0.8;
   margin-bottom: 6px;
 }
 
@@ -62,16 +68,17 @@ label {
   height: 44px;
   padding: 0 12px;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: var(--bg);
+  color: var(--text);
   font-size: 14px;
   outline: none;
   transition: all 0.2s ease;
 }
 
 .form-control:focus {
-  border-color: #6366f1;
-  background: #fff;
+  border-color: var(--primary);
+  background: var(--card);
   box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
   transform: translateY(-1px);
 }
@@ -99,30 +106,31 @@ label {
   transform: translateY(-2px);
 }
 
-/* principal */
+/* PRINCIPAL */
 .btn-primary {
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  background: var(--primary);
   color: white;
 }
 
 .btn-primary:hover {
-  box-shadow: 0 15px 30px rgba(79,70,229,0.35);
+  opacity: 0.9;
 }
 
-/* secundario */
+/* SECUNDARIO */
 .btn-secondary {
-  background: #e5e7eb;
+  background: rgba(107,114,128,0.15);
+  color: var(--text);
 }
 
-/* warning */
+/* WARNING */
 .btn-warning {
-  background: #dbeafe;
+  background: rgba(59,130,246,0.15);
   color: #2563eb;
 }
 
-/* danger */
+/* DANGER */
 .btn-danger {
-  background: #fee2e2;
+  background: rgba(239,68,68,0.15);
   color: #dc2626;
 }
 
@@ -137,7 +145,7 @@ label {
 
 /* filas tipo card */
 .table tbody tr {
-  background: white;
+  background: var(--card);
   border-radius: 18px;
   box-shadow: 0 15px 35px rgba(0,0,0,0.06);
   transition: all 0.3s ease;
@@ -150,6 +158,7 @@ label {
 
 .table td {
   padding: 16px;
+  color: var(--text);
 }
 
 /* acciones */
@@ -159,7 +168,7 @@ label {
 }
 
 /* ========================= */
-/* FILTRO (ELEGANTE, NO BASTO) */
+/* FILTRO */
 /* ========================= */
 .filter-bar {
   display: flex;
@@ -171,10 +180,10 @@ label {
 
   border-radius: 14px;
 
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--card);
+  border: 1px solid rgba(0,0,0,0.08);
 
-  color: #374151;
+  color: var(--text);
   font-weight: 500;
   font-size: 14px;
 
@@ -186,7 +195,7 @@ label {
 }
 
 .filter-bar:hover {
-  border-color: #6366f1;
+  border-color: var(--primary);
   box-shadow: 0 12px 25px rgba(99,102,241,0.15);
   transform: translateY(-2px);
 }
@@ -194,6 +203,6 @@ label {
 .filter-bar input {
   width: 16px;
   height: 16px;
-  accent-color: #6366f1;
+  accent-color: var(--primary);
   cursor: pointer;
 }

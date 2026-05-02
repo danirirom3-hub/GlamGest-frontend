@@ -6,9 +6,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #f8fafc; /* mismo fondo del dashboard */
+  background: var(--bg);
   font-family: 'Poppins', sans-serif;
   padding: 20px;
+  transition: 0.3s ease;
 }
 
 /* ========================= */
@@ -16,13 +17,14 @@
 /* ========================= */
 .card {
   width: 100%;
-  max-width: 520px; /* más amplia */
-  background: #ffffff;
+  max-width: 520px;
+  background: var(--card);
   padding: 50px 45px;
   border-radius: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid rgba(0,0,0,0.08);
   text-align: center;
   animation: fadeIn 0.4s ease;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
 }
 
 /* ========================= */
@@ -31,12 +33,12 @@
 .brand h1 {
   font-size: 32px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text);
   margin-bottom: 10px;
 }
 
 .brand span {
-  color: #6366f1; /* MISMO color del dashboard */
+  color: var(--primary);
 }
 
 /* ========================= */
@@ -44,7 +46,8 @@
 /* ========================= */
 .frase {
   font-size: 15px;
-  color: #6b7280;
+  color: var(--text);
+  opacity: 0.7;
   margin-bottom: 35px;
   line-height: 1.6;
 }
@@ -59,33 +62,61 @@
 }
 
 .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
   padding: 14px;
   border-radius: 10px;
   font-size: 14px;
   cursor: pointer;
+  border: none;
+
   transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-/* PRINCIPAL (igual estilo activo sidebar) */
+/* ICONOS */
+.btn lucide-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* ========================= */
+/* PRINCIPAL */
+/* ========================= */
 .primary {
-  background: #6366f1;
+  background: var(--primary);
   color: white;
-  border: none;
 }
 
 .primary:hover {
-  background: #4f46e5;
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99,102,241,0.3);
 }
 
+.primary:active {
+  transform: scale(0.97);
+}
+
+/* ========================= */
 /* SECUNDARIO */
+/* ========================= */
 .secondary {
-  background: #f1f5f9;
-  border: none;
-  color: #374151;
+  background: rgba(107,114,128,0.15);
+  color: var(--text);
 }
 
 .secondary:hover {
-  background: #e5e7eb;
+  background: rgba(107,114,128,0.25);
+  transform: translateY(-2px);
+}
+
+.secondary:active {
+  transform: scale(0.97);
 }
 
 /* ========================= */
@@ -124,71 +155,4 @@
     font-size: 13px;
     padding: 12px;
   }
-}
-
-/* ========================= */
-/* BOTONES */
-/* ========================= */
-.acciones {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-
-  padding: 14px;
-  border-radius: 10px;
-  font-size: 14px;
-  cursor: pointer;
-  border: none;
-
-  transition: all 0.25s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-/* ICONOS */
-.btn lucide-icon {
-  width: 18px;
-  height: 18px;
-}
-
-/* PRINCIPAL */
-.primary {
-  background: #6366f1;
-  color: white;
-}
-
-/* ANIMACIÓN HOVER */
-.primary:hover {
-  background: #4f46e5;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
-}
-
-/* CLICK */
-.primary:active {
-  transform: scale(0.97);
-}
-
-/* SECUNDARIO */
-.secondary {
-  background: #f1f5f9;
-  color: #374151;
-}
-
-/* HOVER */
-.secondary:hover {
-  background: #e5e7eb;
-  transform: translateY(-2px);
-}
-
-/* CLICK */
-.secondary:active {
-  transform: scale(0.97);
 }

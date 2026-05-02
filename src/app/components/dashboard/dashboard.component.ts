@@ -6,7 +6,8 @@ import {
   Users, 
   ShoppingCart, 
   Calendar, 
-  User 
+  User,
+  Settings   // 👈 NUEVO
 } from 'lucide-angular';
 import { AuthService } from '../../services/auth.service';
 
@@ -19,13 +20,13 @@ import { AuthService } from '../../services/auth.service';
 })
 export class DashboardComponent {
 
-  // Icons for sidebar menu
   icons = {
     Scissors,
     Users,
     ShoppingCart,
     Calendar,
-    User // 👈 agregado para Employees
+    User,
+    Settings // 👈 agregado
   };
 
   constructor(
@@ -33,7 +34,6 @@ export class DashboardComponent {
     private router: Router
   ) {}
 
-  // Logout method
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);

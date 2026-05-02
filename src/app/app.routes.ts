@@ -15,9 +15,10 @@ import { ServicesComponent } from './components/services/services.component';
 import { ClientsComponent } from './components/clients/clients.component';
 import { SalesComponent } from './components/sales/sales.component';
 import { AppointmentsComponent } from './components/appointments/appointments.component';
-
-// ✅ SOLO ESTE IMPORT NUEVO
 import { EmployeesComponent } from './components/employees/employees.component';
+
+// ⚙️ SETTINGS
+import { SettingsComponent } from './components/settings/settings.component';
 
 export const routes: Routes = [
 
@@ -31,16 +32,17 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [AuthGuard],   
+    canActivate: [AuthGuard],
     children: [
       { path: 'services', component: ServicesComponent },
       { path: 'clients', component: ClientsComponent },
-
-      // ✅ SOLO ESTA LÍNEA NUEVA
       { path: 'employees', component: EmployeesComponent },
-
       { path: 'sales', component: SalesComponent },
       { path: 'appointments', component: AppointmentsComponent },
+
+      // ⚙️ SETTINGS
+      { path: 'settings', component: SettingsComponent },
+
       { path: '', redirectTo: 'services', pathMatch: 'full' }
     ]
   },
