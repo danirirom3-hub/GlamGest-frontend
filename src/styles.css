@@ -1,41 +1,39 @@
 /* =========================
-   BASE GLOBAL
+   BASE
 ========================= */
 :root {
   --bg: #f8fafc;
   --text: #1e293b;
   --primary: #6366f1;
   --card: #ffffff;
+
+  /* CONTROL VISUAL GLOBAL */
+  --border: rgba(0, 0, 0, 0.08);
+  --shadow: rgba(0, 0, 0, 0.08);
 }
 
 /* =========================
-   BASE BODY
+   DARK
 ========================= */
-body {
-  font-family: 'Poppins', 'Segoe UI', sans-serif;
-  margin: 0;
-  padding: 0;
-  background: var(--bg);
-  color: var(--text);
-  transition: background 0.3s ease, color 0.3s ease;
-}
-
-/* =========================
-   TEMA OSCURO
-========================= */
-.dark {
+body.dark {
   --bg: #0f172a;
   --text: #f1f5f9;
   --primary: #818cf8;
   --card: #1e293b;
+
+  --border: rgba(255, 255, 255, 0.08);
+  --shadow: rgba(0, 0, 0, 0.45);
 }
 
 /* =========================
-   TEMA BARBERÍA
+   BEAUTY (FEMENINO ELEGANTE)
 ========================= */
-.barber {
-  --bg: #1a1a1a;
-  --text: #f5f5f5;
-  --primary: #d4af37;
-  --card: #2a2a2a;
+body.barber {
+  --bg: #fff5f7;
+  --text: #3a1f2a;
+  --primary: #c2185b;
+  --card: #ffe4ec;
+
+  --border: rgba(194, 24, 91, 0.18);
+  --shadow: rgba(194, 24, 91, 0.12);
 }
