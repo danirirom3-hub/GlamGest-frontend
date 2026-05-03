@@ -24,22 +24,17 @@
 
       <div class="input-group">
         <label>Nombre</label>
-        <input type="text" [(ngModel)]="client.name" placeholder="Nombre">
-      </div>
-
-      <div class="input-group">
-        <label>Apellido</label>
-        <input type="text" [(ngModel)]="client.lastName" placeholder="Apellido">
+        <input type="text" [(ngModel)]="client.name" name="name" placeholder="Nombre">
       </div>
 
       <div class="input-group">
         <label>Correo</label>
-        <input type="email" [(ngModel)]="client.email" placeholder="Correo">
+        <input type="email" [(ngModel)]="client.email" name="email" placeholder="Correo">
       </div>
 
       <div class="input-group">
         <label>Teléfono</label>
-        <input type="text" [(ngModel)]="client.phone" placeholder="Teléfono">
+        <input type="text" [(ngModel)]="client.phone" name="phone" placeholder="Teléfono">
       </div>
 
     </div>
@@ -48,8 +43,8 @@
       {{ isEditing ? 'Actualizar cliente' : 'Guardar cliente' }}
     </button>
 
-    <div class="alerta" *ngIf="showConfirmation">
-      Acción realizada correctamente
+    <div class="alerta" *ngIf="mensaje">
+      {{ mensaje }}
     </div>
 
   </div>
@@ -60,7 +55,7 @@
     <div class="card" *ngFor="let c of clients">
 
       <div class="card-header">
-        <h3>{{ c.name }} {{ c.lastName }}</h3>
+        <h3>{{ c.name }}</h3>
         <span class="correo">{{ c.email }}</span>
       </div>
 
