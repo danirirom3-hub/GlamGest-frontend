@@ -69,7 +69,7 @@
       <p class="mensaje">{{ message }}</p>
     </div>
 
-    <!-- FILTRO CLICKABLE -->
+    <!-- FILTRO -->
     <div class="form-card filtro" (click)="toggleFiltro()">
       <input 
         type="checkbox" 
@@ -100,11 +100,13 @@
         <div class="acciones">
 
           <button class="btn-icon editar" (click)="editService(item)">
-            ✏️
+            <i class="fa-solid fa-pen"></i>
           </button>
 
-          <button class="btn-icon eliminar" (click)="toggleActive(item)">
-            {{ item.active ? 'OFF' : 'ON' }}
+          <button class="btn-icon estado" (click)="toggleActive(item)">
+            <i class="fa-solid"
+               [class.fa-toggle-on]="item.active"
+               [class.fa-toggle-off]="!item.active"></i>
           </button>
 
         </div>
@@ -112,7 +114,7 @@
       </div>
 
       <div *ngIf="filteredServices.length === 0" class="empty">
-        <p>No hay servicios registrados.</p>
+        No hay servicios registrados.
       </div>
 
     </div>

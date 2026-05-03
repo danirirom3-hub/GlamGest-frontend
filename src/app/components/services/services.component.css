@@ -1,5 +1,5 @@
 /* ========================= */
-/* 🌈 FONDO GENERAL */
+/* 🌍 BASE */
 /* ========================= */
 .page {
   min-height: 100vh;
@@ -9,14 +9,13 @@
   box-sizing: border-box;
 }
 
-/* contenedor */
 .container {
   max-width: 1000px;
   margin: auto;
 }
 
 /* ========================= */
-/* 🧊 CARD FORM */
+/* 🧊 CARD GENERAL */
 /* ========================= */
 .form-card {
   background: var(--card);
@@ -24,15 +23,18 @@
   border-radius: 22px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.08);
   margin-bottom: 25px;
+  position: relative;
+  z-index: 1;
 }
 
-/* header */
+/* ========================= */
+/* HEADER */
+/* ========================= */
 .form-header h2 {
   font-size: 24px;
   font-weight: 700;
   background: linear-gradient(90deg, var(--primary), #7c3aed);
   -webkit-background-clip: text;
-  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -43,14 +45,13 @@
 }
 
 /* ========================= */
-/* GRID */
+/* FORM GRID */
 /* ========================= */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 18px;
   margin-top: 20px;
-  align-items: start;
 }
 
 @media (max-width: 768px) {
@@ -79,7 +80,6 @@
   margin-bottom: 6px;
 }
 
-/* inputs */
 .input-group input,
 .input-group textarea {
   width: 100%;
@@ -91,33 +91,27 @@
   color: var(--text);
   font-size: 14px;
   outline: none;
-  transition: 0.2s;
   box-sizing: border-box;
+  transition: border 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .input-group textarea {
-  height: 100px;
+  min-height: 110px;
   padding: 10px 12px;
   resize: none;
+  line-height: 1.4;
 }
 
+/* FOCUS LIMPIO (sin exagerar ni romper layout) */
 .input-group input:focus,
 .input-group textarea:focus {
   border-color: var(--primary);
   background: var(--card);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
-}
-
-/* placeholder */
-input::placeholder,
-textarea::placeholder {
-  color: var(--text);
-  opacity: 0.5;
-  font-size: 13px;
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.15);
 }
 
 /* ========================= */
-/* BOTONES */
+/* BOTONES FORM */
 /* ========================= */
 .form-actions {
   grid-column: 1 / -1;
@@ -135,12 +129,13 @@ textarea::placeholder {
   color: white;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.3s;
+  transition: background 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
+/* 🔥 SIN translate para evitar saltos */
 .btn-save:hover {
-  opacity: 0.9;
-  transform: translateY(-2px);
+  filter: brightness(1.05);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
 }
 
 .btn-cancel {
@@ -150,6 +145,11 @@ textarea::placeholder {
   background: rgba(107,114,128,0.15);
   color: var(--text);
   cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background: rgba(107,114,128,0.25);
 }
 
 /* ========================= */
@@ -159,14 +159,13 @@ textarea::placeholder {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--card);
   cursor: pointer;
-  transition: 0.2s;
   color: var(--text);
+  transition: background 0.2s ease;
 }
 
 .filtro:hover {
-  background: var(--bg);
+  background: rgba(0,0,0,0.03);
 }
 
 /* ========================= */
@@ -183,13 +182,17 @@ textarea::placeholder {
   padding: 18px;
   border-radius: 18px;
   box-shadow: 0 15px 30px rgba(0,0,0,0.06);
-  transition: 0.3s;
   border-left: 5px solid var(--primary);
   color: var(--text);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  position: relative;
+  isolation: isolate;
 }
 
+/* 🔥 animación suave sin romper layout */
 .card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 35px rgba(0,0,0,0.08);
 }
 
 .card.inactivo {
@@ -197,33 +200,36 @@ textarea::placeholder {
   border-left: 5px solid #9ca3af;
 }
 
+/* HEADER CARD */
 .card-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .precio {
   color: #10b981;
-  font-weight: bold;
+  font-weight: 600;
 }
 
+/* BODY */
 .card-body {
   margin-top: 10px;
 }
 
 .duracion {
   font-size: 13px;
-  color: var(--text);
   opacity: 0.7;
 }
 
 .descripcion {
   font-size: 13px;
-  color: var(--text);
   opacity: 0.9;
 }
 
-/* acciones */
+/* ========================= */
+/* ACCIONES */
+/* ========================= */
 .acciones {
   display: flex;
   justify-content: flex-end;
@@ -232,50 +238,43 @@ textarea::placeholder {
 }
 
 .btn-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
   background: var(--bg);
-  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* 🔥 SIN scale para evitar deformación */
 .btn-icon:hover {
-  transform: scale(1.1);
+  background: var(--card);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
 }
 
 /* editar */
 .editar {
   background: rgba(59,130,246,0.15);
+  color: #2563eb;
 }
 
-.editar:hover {
-  background: #2563eb;
-  color: white;
+/* estado */
+.estado {
+  background: rgba(16,185,129,0.15);
+  color: #10b981;
 }
 
-/* eliminar */
-.eliminar {
-  background: rgba(239,68,68,0.15);
-}
-
-.eliminar:hover {
-  background: #dc2626;
-  color: white;
-}
-
-/* mensaje */
-.mensaje {
-  margin-top: 10px;
-  font-size: 13px;
-  color: var(--primary);
-}
-
-/* vacío */
+/* ========================= */
+/* EMPTY */
+/* ========================= */
 .empty {
   text-align: center;
   padding: 20px;
-  color: var(--text);
   opacity: 0.5;
+  color: var(--text);
 }
