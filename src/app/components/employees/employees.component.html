@@ -1,5 +1,5 @@
 <div class="container">
-  <h2>Gestión de Empleados</h2>
+  <h2>{{ isEditing ? 'Editar empleado' : 'Gestión de Empleados' }}</h2>
 
   <!-- FILTRO (solo visual) -->
   <div class="filter-bar">
@@ -54,12 +54,16 @@
 
     <div class="form-group">
       <button type="submit" class="btn btn-primary" [disabled]="employeeForm.invalid">
-        Guardar
+        {{ isEditing ? 'Actualizar empleado' : 'Guardar empleado' }}
       </button>
 
       <button type="button" class="btn btn-secondary" (click)="onCancel()">
         Cancelar
       </button>
+    </div>
+
+    <div class="alerta" *ngIf="mensaje">
+      {{ mensaje }}
     </div>
 
   </form>
@@ -69,12 +73,12 @@
   <h3>Lista de Empleados</h3>
 
   <!-- ESTADO VACÍO -->
-  <div class="empty" *ngIf="!employees || employees.length === 0">
+  <div class="empty" *ngIf="!visibleEmployees || visibleEmployees.length === 0">
     No hay empleados disponibles
   </div>
 
   <!-- TABLA -->
-  <table class="table" *ngIf="employees && employees.length > 0">
+  <table class="table" *ngIf="visibleEmployees && visibleEmployees.length > 0">
     <thead>
       <tr>
         <th>Nombre</th>
@@ -85,7 +89,7 @@
     </thead>
 
     <tbody>
-      <tr *ngFor="let emp of employees">
+      <tr *ngFor="let emp of visibleEmployees">
         <td>{{ emp.name }}</td>
         <td>{{ emp.phone }}</td>
         <td>
