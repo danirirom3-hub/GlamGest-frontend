@@ -1,40 +1,48 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppointmentsService {
 
-  // URL base del endpoint de citas (tomada desde variables de entorno)
-  private apiUrl = `${environment.apiUrl}/citas`;
+  private apiUrl = `${environment.apiUrl}/appointments`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
-  // Crear una nueva cita
+  private getAuthHeaders(): HttpHeaders | undefined {
+    const token = this.authService.getToken();
+    return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
+  }
+
   createAppointment(data: any): Observable<any> {
-    return this.http.post(this.apiUrl, data);
+    const headers = this.getAuthHeaders();
+    return this.http.post(this.apiUrl, data, { headers });
   }
 
-  // Obtener todas las citas
   getAppointments(): Observable<any> {
-    return this.http.get(this.apiUrl);
+    const headers = this.getAuthHeaders();
+    return this.http.get(this.apiUrl, { headers });
   }
 
-  // Obtener una cita específica por su ID
   getAppointmentById(id: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${id}`);
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/${id}`, { headers });
   }
 
-  // Actualizar una cita existente
   updateAppointment(id: number, data: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, data);
+    const headers = this.getAuthHeaders();
+    return this.http.put(`${this.apiUrl}/${id}`, data, { headers });
   }
 
-  // Eliminar una cita por su ID
   deleteAppointment(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    const headers = this.getAuthHeaders();
+    return this.http.delete(`${this.apiUrl}/${id}`, { headers });
   }
 }
