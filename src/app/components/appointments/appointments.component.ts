@@ -145,7 +145,7 @@ export class AppointmentsComponent implements OnInit {
           service: this.getServiceName(app.serviceId),
           date: new Date(app.appointmentDatetime).toISOString().split('T')[0],
           time: new Date(app.appointmentDatetime).toTimeString().slice(0, 5),
-          details: app.notes || '', // 🔥 NUEVO
+          details: app.notes || '',
           status: app.status === 'Pending' ? 'pending' : 'sent_to_cash'
         }));
 
@@ -177,7 +177,7 @@ export class AppointmentsComponent implements OnInit {
       clientId: client.id,
       employeeId: employee.id,
       serviceId: service.id,
-      notes: this.details // 🔥 AQUÍ VA AL BACKEND
+      notes: this.details
     }).subscribe({
       next: (res: any) => {
         if (res?.successful) {
@@ -189,7 +189,7 @@ export class AppointmentsComponent implements OnInit {
             service: this.selectedService!.name,
             date: this.selectedDate,
             time: this.selectedTime,
-            details: this.details, // 🔥 LOCAL
+            details: this.details,
             status: 'pending'
           };
 
