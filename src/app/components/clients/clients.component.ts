@@ -106,16 +106,12 @@ export class ClientsComponent implements OnInit {
     }
 
     this.clientsService.deleteClient(client.id).subscribe({
-      next: (res: any) => {
-        if (res?.successful) {
-          this.clients = this.clients.filter((item) => item.id !== client.id);
-          this.mensaje = 'Cliente eliminado con éxito.';
+      next: () => {
+        this.clients = this.clients.filter((item) => item.id !== client.id);
+        this.mensaje = 'Cliente eliminado con éxito.';
 
-          if (this.editClientId === client.id) {
-            this.resetForm();
-          }
-        } else {
-          this.mensaje = res?.message || 'No se pudo eliminar el cliente.';
+        if (this.editClientId === client.id) {
+          this.resetForm();
         }
       },
       error: (err) => {
