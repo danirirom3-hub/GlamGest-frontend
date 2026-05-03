@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+
 import { CashService } from '../../services/cash.service';
 import { AppointmentsService } from '../../services/appointments.service';
 import { ClientsService } from '../../services/clients.service';
@@ -21,6 +22,7 @@ interface Appointment {
   service: string;
   date: string;
   time: string;
+  details?: string; // 🔥 NUEVO
   status: 'pending' | 'sent_to_cash';
 }
 
@@ -60,11 +62,11 @@ export class AppointmentsComponent implements OnInit {
   selectedClient = '';
   selectedDate = '';
   selectedTime = '';
+  details = ''; // 🔥 NUEVO
 
   showConfirmation = false;
 
   appointments: Appointment[] = [];
-  private idCounter = 1;
 
   filterClient = '';
   filterEmployee = '';
@@ -104,16 +106,38 @@ export class AppointmentsComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.loadAppointments();
-    this.loadClients();
-    this.loadEmployees();
-    this.loadServices();
+    // 🔥 CARGA ORDENADA (MUY IMPORTANTE)
+    this.loadInitialData();
+  }
+
+  loadInitialData(): void {
+    this.clientsService.getClients().subscribe({
+      next: (clientsRes: any) => {
+        this.clients = clientsRes?.data || clientsRes || [];
+
+        this.employeesService.getEmployees().subscribe({
+          next: (empRes: any) => {
+            this.employees = empRes?.data || empRes || [];
+
+            this.servicesService.getServices().subscribe({
+              next: (servRes: any) => {
+                this.services = servRes?.data || servRes || [];
+
+                // 👉 SOLO AQUÍ cargamos citas
+                this.loadAppointments();
+              }
+            });
+          }
+        });
+      }
+    });
   }
 
   loadAppointments(): void {
     this.appointmentsService.getAppointments().subscribe({
       next: (res: any) => {
         const apiAppointments = res?.data || res || [];
+
         this.appointments = apiAppointments.map((app: any) => ({
           id: app.id,
           client: this.getClientName(app.clientId),
@@ -121,45 +145,14 @@ export class AppointmentsComponent implements OnInit {
           service: this.getServiceName(app.serviceId),
           date: new Date(app.appointmentDatetime).toISOString().split('T')[0],
           time: new Date(app.appointmentDatetime).toTimeString().slice(0, 5),
+          details: app.notes || '', // 🔥 NUEVO
           status: app.status === 'Pending' ? 'pending' : 'sent_to_cash'
         }));
+
         this.updateCalendarEvents();
       },
       error: () => {
         this.appointments = [];
-      }
-    });
-  }
-
-  loadClients(): void {
-    this.clientsService.getClients().subscribe({
-      next: (res: any) => {
-        this.clients = res?.data || res || [];
-      },
-      error: () => {
-        this.clients = [];
-      }
-    });
-  }
-
-  loadEmployees(): void {
-    this.employeesService.getEmployees().subscribe({
-      next: (res: any) => {
-        this.employees = res?.data || res || [];
-      },
-      error: () => {
-        this.employees = [];
-      }
-    });
-  }
-
-  loadServices(): void {
-    this.servicesService.getServices().subscribe({
-      next: (res: any) => {
-        this.services = res?.data || res || [];
-      },
-      error: () => {
-        this.services = [];
       }
     });
   }
@@ -171,7 +164,6 @@ export class AppointmentsComponent implements OnInit {
 
     const appointmentDatetime = `${this.selectedDate}T${this.selectedTime}`;
 
-    // Encontrar IDs
     const client = this.clients.find(c => c.name === this.selectedClient);
     const employee = this.employees.find(e => e.name === this.selectedEmployee!.name);
     const service = this.services.find(s => s.name === this.selectedService!.name);
@@ -185,10 +177,11 @@ export class AppointmentsComponent implements OnInit {
       clientId: client.id,
       employeeId: employee.id,
       serviceId: service.id,
-      notes: ''
+      notes: this.details // 🔥 AQUÍ VA AL BACKEND
     }).subscribe({
       next: (res: any) => {
         if (res?.successful) {
+
           const newApp: Appointment = {
             id: res.data.id,
             client: this.selectedClient,
@@ -196,13 +189,16 @@ export class AppointmentsComponent implements OnInit {
             service: this.selectedService!.name,
             date: this.selectedDate,
             time: this.selectedTime,
+            details: this.details, // 🔥 LOCAL
             status: 'pending'
           };
 
           this.appointments.push(newApp);
           this.updateCalendarEvents();
+
           this.showConfirmation = true;
           setTimeout(() => this.showConfirmation = false, 2000);
+
           this.resetForm();
         }
       },
@@ -212,14 +208,24 @@ export class AppointmentsComponent implements OnInit {
     });
   }
 
-  // 🔥 MÉTODO CLAVE (AQUÍ PASA TODO)
   sendToCash(app: Appointment): void {
     this.cashService.addItemFromAppointment(app);
-
     app.status = 'sent_to_cash';
-
-    // 👉 redirige a ventas (caja)
     this.router.navigate(['/ventas']);
+  }
+
+  deleteAppointment(app: Appointment): void {
+    if (confirm('¿Estás seguro de que quieres eliminar esta cita?')) {
+      this.appointmentsService.deleteAppointment(app.id).subscribe({
+        next: () => {
+          this.appointments = this.appointments.filter(a => a.id !== app.id);
+          this.updateCalendarEvents();
+        },
+        error: (err) => {
+          console.error('Error deleting appointment', err);
+        }
+      });
+    }
   }
 
   selectService(service: Service): void {
@@ -232,6 +238,7 @@ export class AppointmentsComponent implements OnInit {
     this.selectedDate = '';
     this.selectedTime = '';
     this.selectedService = null;
+    this.details = ''; // 🔥 LIMPIAR
   }
 
   filteredAppointments(): Appointment[] {
@@ -246,7 +253,10 @@ export class AppointmentsComponent implements OnInit {
     this.calendarOptions.events = this.appointments.map(app => ({
       id: app.id,
       title: `${app.client} - ${app.service}`,
-      start: `${app.date}T${app.time}`
+      start: `${app.date}T${app.time}`,
+      extendedProps: {
+        details: app.details // 🔥 listo para tooltip futuro
+      }
     }));
   }
 

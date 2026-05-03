@@ -37,6 +37,14 @@
         <input type="time" [(ngModel)]="selectedTime">
       </div>
 
+      <!-- ✨ DETALLES -->
+      <div class="details-field">
+        <textarea 
+          [(ngModel)]="details"
+          placeholder="Agregar detalles de la cita (opcional)...">
+        </textarea>
+      </div>
+
       <div class="servicios-grid">
         <div class="servicio-item"
              *ngFor="let s of services"
@@ -82,15 +90,22 @@
         <div class="info">
           <h4>{{ c.client }}</h4>
           <p>{{ c.service }} • {{ c.time }}</p>
+
+          <!-- ✨ DETALLES EN LISTA -->
+          <p class="details-text" *ngIf="c.details">
+            {{ c.details }}
+          </p>
+
           <small>{{ c.employee }} | {{ c.status }}</small>
         </div>
 
-        <!-- 🔥 AQUÍ ESTÁ EL CAMBIO REAL -->
         <button class="btn-primary small"
                 [disabled]="c.status === 'sent_to_cash'"
                 (click)="sendToCash(c)">
           {{ c.status === 'sent_to_cash' ? 'En caja' : 'Pasar a caja' }}
         </button>
+
+        <button class="btn-danger small" (click)="deleteAppointment(c)">Eliminar</button>
 
       </div>
 
