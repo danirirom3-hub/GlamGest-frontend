@@ -2,7 +2,6 @@
 
   <div class="container">
 
-    <!-- Botón volver -->
     <div class="top-bar">
       <button routerLink="/home" class="btn-back">
         <lucide-icon [img]="icons.arrowLeft"></lucide-icon>
@@ -10,13 +9,11 @@
       </button>
     </div>
 
-    <!-- Header -->
     <div class="header">
       <h2>Glam<span>Gest</span></h2>
       <p>Registro de nuevos usuarios</p>
     </div>
 
-    <!-- Formulario -->
     <form class="form" (ngSubmit)="registerUser()" autocomplete="off">
 
       <div class="campo">
@@ -46,13 +43,18 @@
           required>
       </div>
 
-      <button class="btn" type="submit">
-        Registrar usuario
+      <button class="btn" type="submit" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Registrar usuario</span>
+        <span *ngIf="isLoading">Registrando...</span>
       </button>
 
     </form>
 
-    <p class="mensaje">{{ message }}</p>
+    <div *ngIf="message" 
+         [ngClass]="{'mensaje-success': messageType === 'success', 'mensaje-error': messageType === 'error'}" 
+         class="mensaje-base">
+      {{ message }}
+    </div>
 
   </div>
 

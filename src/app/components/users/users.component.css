@@ -38,22 +38,16 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-
   padding: 6px 12px;
   border-radius: 999px;
-
   background: var(--bg);
   border: 1px solid rgba(0,0,0,0.08);
-
   color: var(--primary);
   font-size: 12.5px;
   font-weight: 500;
-
   cursor: pointer;
-
   width: auto;
   height: auto;
-
   transition: all 0.2s ease;
 }
 
@@ -143,6 +137,16 @@
   outline: none;
 }
 
+/* botones general */
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 /* botón principal */
 .btn {
   margin-top: 10px;
@@ -152,28 +156,40 @@
   background: var(--primary);
   color: white;
   font-size: 14px;
-  cursor: pointer;
-  transition: 0.25s ease;
+  transition: all 0.25s ease;
 }
 
 /* hover botón */
-.btn:hover {
+.btn:not(:disabled):hover {
   opacity: 0.9;
   transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
 }
 
 /* click botón */
-.btn:active {
+.btn:not(:disabled):active {
   transform: scale(0.97);
 }
 
-/* mensaje */
-.mensaje {
+/* --- ESTILOS DE MENSAJES DINÁMICOS --- */
+.mensaje-base {
   margin-top: 15px;
   text-align: center;
   font-weight: 500;
-  color: #16a34a;
+  font-size: 13.5px;
+  padding: 10px;
+  border-radius: 8px;
+  animation: fadeIn 0.3s ease;
+}
+
+.mensaje-success {
+  color: #16a34a; /* Verde */
+  background: rgba(22, 163, 74, 0.1);
+}
+
+.mensaje-error {
+  color: #dc2626; /* Rojo */
+  background: rgba(220, 38, 38, 0.1);
 }
 
 /* animación */
@@ -190,28 +206,9 @@
 
 /* responsive */
 @media (max-width: 480px) {
-
-  .container {
-    padding: 25px 20px;
-  }
-
-  .header h2 {
-    font-size: 20px;
-  }
-
-  .btn {
-    padding: 12px;
-    font-size: 13px;
-  }
-
-  .btn-back {
-    font-size: 12px;
-    padding: 6px 10px;
-  }
-
-  .btn:hover,
-  .btn-back:hover {
-    transform: none;
-    box-shadow: none;
-  }
+  .container { padding: 25px 20px; }
+  .header h2 { font-size: 20px; }
+  .btn { padding: 12px; font-size: 13px; }
+  .btn-back { font-size: 12px; padding: 6px 10px; }
+  .btn:hover, .btn-back:hover { transform: none; box-shadow: none; }
 }
