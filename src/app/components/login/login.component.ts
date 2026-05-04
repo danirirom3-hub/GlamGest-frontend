@@ -22,8 +22,9 @@ export class LoginComponent {
   // Datos del usuario
   user = { email: '', password: '' };
 
-  // Mensaje en pantalla
+  // Mensaje y tipo para colores
   message: string = '';
+  messageType: 'success' | 'error' = 'success';
 
   constructor(
     private authService: AuthService,
@@ -36,6 +37,7 @@ export class LoginComponent {
 
     if (!this.user.email || !this.user.password) {
       this.message = 'Debes ingresar correo y contraseña.';
+      this.messageType = 'error';
       return;
     }
 
@@ -46,13 +48,20 @@ export class LoginComponent {
         if (token) {
           this.authService.saveToken(token);
           this.message = 'Login exitoso. Redirigiendo...';
-          this.router.navigate(['/dashboard']);
+          this.messageType = 'success';
+          
+          setTimeout(() => {
+            this.router.navigate(['/dashboard']);
+          }, 1500);
+          
         } else {
           this.message = res?.message || 'No se pudo iniciar sesión.';
+          this.messageType = 'error';
         }
       },
       error: (err) => {
         this.message = err?.error?.message || 'Usuario o contraseña incorrectos.';
+        this.messageType = 'error';
       }
     });
   }

@@ -37,7 +37,12 @@
       <button type="submit">Ingresar</button>
     </form>
 
-    <p class="mensaje">{{ message }}</p>
+    <!-- Mensaje dinámico -->
+    <div *ngIf="message" 
+         [ngClass]="{'mensaje-success': messageType === 'success', 'mensaje-error': messageType === 'error'}" 
+         class="mensaje-base">
+      {{ message }}
+    </div>
 
   </div>
 

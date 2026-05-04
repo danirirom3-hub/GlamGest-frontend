@@ -38,22 +38,16 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-
   padding: 6px 12px;
   border-radius: 999px;
-
   background: var(--bg);
   border: 1px solid rgba(0,0,0,0.08);
-
   color: var(--primary);
   font-size: 12.5px;
   font-weight: 500;
-
   cursor: pointer;
-
   width: auto;
   height: auto;
-
   transition: all 0.2s ease;
 }
 
@@ -162,12 +156,25 @@ button[type="submit"]:active {
   transform: scale(0.97);
 }
 
-/* Mensaje de estado */
-.mensaje {
+/* --- ESTILOS DE MENSAJES DINÁMICOS --- */
+.mensaje-base {
   margin-top: 15px;
   text-align: center;
   font-weight: 500;
-  color: #16a34a;
+  font-size: 13.5px;
+  padding: 10px;
+  border-radius: 8px;
+  animation: fadeIn 0.3s ease;
+}
+
+.mensaje-success {
+  color: #16a34a; /* Verde */
+  background: rgba(22, 163, 74, 0.1);
+}
+
+.mensaje-error {
+  color: #dc2626; /* Rojo */
+  background: rgba(220, 38, 38, 0.1);
 }
 
 /* Animación de entrada */
@@ -184,38 +191,13 @@ button[type="submit"]:active {
 
 /* Responsive */
 @media (max-width: 480px) {
-
   .login-container {
     padding: 25px 20px;
   }
-
-  .titulo {
-    font-size: 22px;
-  }
-
-  .subtitulo {
-    font-size: 13px;
-  }
-
-  .input-group input,
-  .input-group select {
-    font-size: 13px;
-    padding: 10px;
-  }
-
-  button[type="submit"] {
-    padding: 12px;
-    font-size: 13px;
-  }
-
-  .btn-back {
-    font-size: 12px;
-    padding: 6px 10px;
-  }
-
-  button[type="submit"]:hover,
-  .btn-back:hover {
-    transform: none;
-    box-shadow: none;
-  }
+  .titulo { font-size: 22px; }
+  .subtitulo { font-size: 13px; }
+  .input-group input { font-size: 13px; padding: 10px; }
+  button[type="submit"] { padding: 12px; font-size: 13px; }
+  .btn-back { font-size: 12px; padding: 6px 10px; }
+  button[type="submit"]:hover, .btn-back:hover { transform: none; box-shadow: none; }
 }
