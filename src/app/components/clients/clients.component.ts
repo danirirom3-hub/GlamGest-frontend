@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ClientsService } from '../../services/clients.service';
 
+/* Modelo de cliente */
 interface Client {
   id?: number;
   name: string;
@@ -20,17 +21,17 @@ interface Client {
 })
 export class ClientsComponent implements OnInit {
 
-  /* 🔥 modelo del formulario */
+  /* Datos del formulario */
   client: Client = {
     name: '',
     email: '',
     phone: ''
   };
 
-  /* 🔥 datos vienen del backend */
+  /* Lista de clientes */
   clients: Client[] = [];
 
-  /* 🔥 estado UI */
+  /* Estado de la UI */
   searchText: string = '';
   isEditing: boolean = false;
   editClientId: number | null = null;
@@ -42,6 +43,7 @@ export class ClientsComponent implements OnInit {
     this.cargarClientes();
   }
 
+  /* Obtener clientes del backend */
   cargarClientes(): void {
     this.clientsService.getClients().subscribe({
       next: (res: any) => {
@@ -53,6 +55,7 @@ export class ClientsComponent implements OnInit {
     });
   }
 
+  /* Crear o actualizar cliente */
   onSubmit(): void {
     this.mensaje = '';
 
@@ -83,6 +86,7 @@ export class ClientsComponent implements OnInit {
     });
   }
 
+  /* Cargar cliente en el formulario para editar */
   onEdit(client: Client): void {
     this.isEditing = true;
     this.editClientId = client.id ?? null;
@@ -94,6 +98,7 @@ export class ClientsComponent implements OnInit {
     this.mensaje = 'Completa los campos y presiona actualizar cliente.';
   }
 
+  /* Eliminar cliente */
   onDelete(client: Client): void {
     if (client.id == null) {
       this.mensaje = 'No se pudo eliminar el cliente.';
@@ -120,11 +125,13 @@ export class ClientsComponent implements OnInit {
     });
   }
 
+  /* Preparar formulario para nuevo cliente */
   onNew(): void {
     this.resetForm();
     this.isEditing = false;
   }
 
+  /* Actualizar cliente existente */
   actualizarCliente(): void {
     if (this.editClientId == null) {
       this.mensaje = 'No se seleccionó ningún cliente para editar.';
@@ -150,10 +157,7 @@ export class ClientsComponent implements OnInit {
     });
   }
 
-  /* ========================= */
-  /* 🔄 UI helpers */
-  /* ========================= */
-
+  /* Reset del formulario */
   resetForm(): void {
     this.isEditing = false;
     this.editClientId = null;

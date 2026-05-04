@@ -7,7 +7,7 @@ import {
   ShoppingCart, 
   Calendar, 
   User,
-  Settings   // 👈 NUEVO
+  Settings
 } from 'lucide-angular';
 import { AuthService } from '../../services/auth.service';
 
@@ -20,13 +20,14 @@ import { AuthService } from '../../services/auth.service';
 })
 export class DashboardComponent {
 
+  /* Iconos usados en el menú */
   icons = {
     Scissors,
     Users,
     ShoppingCart,
     Calendar,
     User,
-    Settings // 👈 agregado
+    Settings
   };
 
   constructor(
@@ -34,6 +35,7 @@ export class DashboardComponent {
     private router: Router
   ) {}
 
+  /* Cierra sesión y redirige al login */
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);

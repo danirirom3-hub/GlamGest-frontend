@@ -37,7 +37,7 @@
         <input type="time" [(ngModel)]="selectedTime">
       </div>
 
-      <!-- ✨ DETALLES -->
+      <!-- DETALLES -->
       <div class="details-field">
         <textarea 
           [(ngModel)]="details"
@@ -91,7 +91,7 @@
           <h4>{{ c.client }}</h4>
           <p>{{ c.service }} • {{ c.time }}</p>
 
-          <!-- ✨ DETALLES EN LISTA -->
+          <!--DETALLES EN LISTA -->
           <p class="details-text" *ngIf="c.details">
             {{ c.details }}
           </p>

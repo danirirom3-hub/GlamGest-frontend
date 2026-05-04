@@ -1,6 +1,4 @@
-/* ========================= */
-/* CONTENEDOR GENERAL */
-/* ========================= */
+/* Layout base */
 body {
   margin: 0;
 }
@@ -14,9 +12,7 @@ body {
   transition: 0.3s ease;
 }
 
-/* ========================= */
-/* SIDEBAR */
-/* ========================= */
+/* Sidebar principal */
 .sidebar {
   width: 240px;
   background: var(--card);
@@ -28,7 +24,7 @@ body {
   animation: slideIn 0.4s ease;
 }
 
-/* LOGO */
+/* Logo */
 .brand h2 {
   font-size: 20px;
   text-align: center;
@@ -40,7 +36,7 @@ body {
   color: var(--primary);
 }
 
-/* MENU */
+/* Navegación */
 .menu {
   display: flex;
   flex-direction: column;
@@ -61,13 +57,14 @@ body {
   font-size: 14px;
 }
 
+/* Hover enlaces */
 .menu a:hover {
   background: var(--bg);
   opacity: 1;
   transform: translateX(4px);
 }
 
-/* ACTIVO */
+/* Enlace activo */
 .activo {
   background: var(--bg);
   color: var(--primary) !important;
@@ -75,9 +72,7 @@ body {
   opacity: 1;
 }
 
-/* ========================= */
-/* LOGOUT */
-/* ========================= */
+/* Botón logout */
 .logout-btn {
   width: 100%;
   margin-top: 20px;
@@ -92,12 +87,13 @@ body {
   transition: 0.2s ease;
 }
 
+/* Hover logout */
 .logout-btn:hover {
   transform: translateY(-2px);
   opacity: 0.9;
 }
 
-/* FOOTER */
+/* Footer */
 .footer {
   text-align: center;
   font-size: 12px;
@@ -105,9 +101,7 @@ body {
   opacity: 0.5;
 }
 
-/* ========================= */
-/* CONTENIDO */
-/* ========================= */
+/* Contenido principal */
 .contenido {
   flex: 1;
   background: var(--bg);
@@ -117,9 +111,7 @@ body {
   transition: 0.3s ease;
 }
 
-/* ========================= */
-/* ANIMACIONES */
-/* ========================= */
+/* Animación entrada sidebar */
 @keyframes slideIn {
   from {
     transform: translateX(-40px);
@@ -131,14 +123,13 @@ body {
   }
 }
 
+/* Fade general */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-/* ========================= */
-/* RESPONSIVE */
-/* ========================= */
+/* Responsive */
 @media (max-width: 768px) {
   .dashboard {
     flex-direction: column;

@@ -15,6 +15,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import esLocale from '@fullcalendar/core/locales/es';
 
+/* Modelo de cita en el front */
 interface Appointment {
   id: number;
   client: string;
@@ -22,15 +23,17 @@ interface Appointment {
   service: string;
   date: string;
   time: string;
-  details?: string; // 🔥 NUEVO
+  details?: string; // notas
   status: 'pending' | 'sent_to_cash';
 }
 
+/* Servicio */
 interface Service {
   id: number;
   name: string;
 }
 
+/* Empleado */
 interface Employee {
   id: number;
   name: string;
@@ -54,28 +57,34 @@ export class AppointmentsComponent implements OnInit {
     private servicesService: ServicesService
   ) {}
 
+  /* Vista actual */
   view: 'create' | 'list' | 'calendar' = 'create';
 
+  /* Selecciones del formulario */
   selectedService: Service | null = null;
   selectedEmployee: Employee | null = null;
 
   selectedClient = '';
   selectedDate = '';
   selectedTime = '';
-  details = ''; // 🔥 NUEVO
+  details = ''; // notas de la cita
 
   showConfirmation = false;
 
+  /* Lista de citas */
   appointments: Appointment[] = [];
 
+  /* Filtros */
   filterClient = '';
   filterEmployee = '';
   filterDate = '';
 
+  /* Datos base */
   services: Service[] = [];
   employees: Employee[] = [];
   clients: any[] = [];
 
+  /* Configuración de FullCalendar */
   calendarOptions: any = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
     locale: esLocale,
@@ -100,16 +109,18 @@ export class AppointmentsComponent implements OnInit {
 
     events: [],
 
+    /* pequeño efecto al renderizar eventos */
     eventDidMount: (info: any) => {
       info.el.style.transition = 'all 0.2s ease';
     }
   };
 
   ngOnInit(): void {
-    // 🔥 CARGA ORDENADA (MUY IMPORTANTE)
+    // cargar datos en orden para evitar dependencias vacías
     this.loadInitialData();
   }
 
+  /* Carga clientes, empleados y servicios antes de traer citas */
   loadInitialData(): void {
     this.clientsService.getClients().subscribe({
       next: (clientsRes: any) => {
@@ -123,7 +134,7 @@ export class AppointmentsComponent implements OnInit {
               next: (servRes: any) => {
                 this.services = servRes?.data || servRes || [];
 
-                // 👉 SOLO AQUÍ cargamos citas
+                // ya con todo listo, cargar citas
                 this.loadAppointments();
               }
             });
@@ -133,6 +144,7 @@ export class AppointmentsComponent implements OnInit {
     });
   }
 
+  /* Obtiene citas del backend y las adapta al modelo del front */
   loadAppointments(): void {
     this.appointmentsService.getAppointments().subscribe({
       next: (res: any) => {
@@ -157,6 +169,7 @@ export class AppointmentsComponent implements OnInit {
     });
   }
 
+  /* Crear nueva cita */
   scheduleAppointment(): void {
     if (!this.selectedClient || !this.selectedEmployee || !this.selectedDate || !this.selectedTime || !this.selectedService) {
       return;
@@ -208,12 +221,14 @@ export class AppointmentsComponent implements OnInit {
     });
   }
 
+  /* Enviar cita a caja */
   sendToCash(app: Appointment): void {
     this.cashService.addItemFromAppointment(app);
     app.status = 'sent_to_cash';
     this.router.navigate(['/ventas']);
   }
 
+  /* Eliminar cita */
   deleteAppointment(app: Appointment): void {
     if (confirm('¿Estás seguro de que quieres eliminar esta cita?')) {
       this.appointmentsService.deleteAppointment(app.id).subscribe({
@@ -228,19 +243,22 @@ export class AppointmentsComponent implements OnInit {
     }
   }
 
+  /* Selección de servicio */
   selectService(service: Service): void {
     this.selectedService = this.selectedService?.id === service.id ? null : service;
   }
 
+  /* Reset del formulario */
   resetForm(): void {
     this.selectedClient = '';
     this.selectedEmployee = null;
     this.selectedDate = '';
     this.selectedTime = '';
     this.selectedService = null;
-    this.details = ''; // 🔥 LIMPIAR
+    this.details = '';
   }
 
+  /* Filtro de citas */
   filteredAppointments(): Appointment[] {
     return this.appointments.filter(a =>
       (!this.filterClient || a.client.toLowerCase().includes(this.filterClient.toLowerCase())) &&
@@ -249,17 +267,19 @@ export class AppointmentsComponent implements OnInit {
     );
   }
 
+  /* Actualiza eventos del calendario */
   updateCalendarEvents(): void {
     this.calendarOptions.events = this.appointments.map(app => ({
       id: app.id,
       title: `${app.client} - ${app.service}`,
       start: `${app.date}T${app.time}`,
       extendedProps: {
-        details: app.details // 🔥 listo para tooltip futuro
+        details: app.details // útil para tooltips o modales
       }
     }));
   }
 
+  /* Helpers para obtener nombres */
   getClientName(clientId: number): string {
     const client = this.clients.find(c => c.id === clientId);
     return client?.name || 'Desconocido';
