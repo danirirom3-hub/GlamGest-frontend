@@ -2,13 +2,13 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { UsersComponent } from './components/users/users.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { FullCalendarModule } from '@fullcalendar/angular';
+import { FullCalendarModule } from '@fullcalendar/angular'; // se usará para agenda/calendario
 
 @Component({
   selector: 'app-root',
-  standalone: true,
+  standalone: true, // no usa módulos, todo se importa directamente
   imports: [
-    RouterOutlet,
+    RouterOutlet, // permite navegación por rutas
     UsersComponent,
     DashboardComponent,
   ],
@@ -16,5 +16,7 @@ import { FullCalendarModule } from '@fullcalendar/angular';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'glam-gest';
+
+  title = 'glam-gest'; // nombre base del sistema
+
 }

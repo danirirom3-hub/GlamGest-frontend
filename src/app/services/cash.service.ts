@@ -11,7 +11,7 @@ export class CashService {
 
   constructor() {}
 
-  // 👉 Desde citas
+  // Desde citas
   addItemFromAppointment(appointment: any) {
     const item = {
       client: appointment.client,
@@ -23,7 +23,7 @@ export class CashService {
     this.itemsSubject.next([...this.itemsSubject.value, item]);
   }
 
-  // 👉 Desde caja (extras)
+  // Desde caja (extras)
   addManualItem(item: any) {
     this.itemsSubject.next([...this.itemsSubject.value, item]);
   }

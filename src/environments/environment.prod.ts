@@ -1,5 +1,5 @@
 export const environment = {
-  // Indica que este es el entorno de producción
+  // Indica entorno de producción
   production: true,
 
   // URL del backend desplegado en producción

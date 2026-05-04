@@ -1,6 +1,4 @@
-/* =========================
-   BASE GLOBAL
-========================= */
+/* estilos base globales */
 body {
   font-family: 'Poppins', 'Segoe UI', sans-serif;
   margin: 0;
@@ -9,9 +7,7 @@ body {
   color: var(--text);
 }
 
-/* =========================
-   TEMA BASE (NEUTRO)
-========================= */
+/* variables del tema por defecto */
 :root {
   --bg: #f8fafc;
   --text: #1e293b;
@@ -19,9 +15,7 @@ body {
   --card: #ffffff;
 }
 
-/* =========================
-   TEMA OSCURO
-========================= */
+/* variables para modo oscuro */
 .dark {
   --bg: #0f172a;
   --text: #f1f5f9;
@@ -29,19 +23,15 @@ body {
   --card: #1e293b;
 }
 
-/* =========================
-   BEAUTY FEMENINO ELEGANTE
-========================= */
+/* tema femenino tipo spa */
 .femenino {
-  --bg: #fff6f8;        /* fondo rosado MUY suave */
-  --text: #3a1f2a;      /* vino elegante para lectura */
-  --primary: #c2185b;   /* rosa profundo premium */
-  --card: #ffe4ec;      /* rosa claro limpio tipo spa */
+  --bg: #fff6f8;
+  --text: #3a1f2a;
+  --primary: #c2185b;
+  --card: #ffe4ec;
 }
 
-/* =========================
-   (OPCIONAL) MEJOR TRANSICIÓN
-========================= */
+/* transición suave al cambiar tema */
 body {
   transition: background 0.3s ease, color 0.3s ease;
 }

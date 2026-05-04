@@ -16,8 +16,6 @@ import { ClientsComponent } from './components/clients/clients.component';
 import { SalesComponent } from './components/sales/sales.component';
 import { AppointmentsComponent } from './components/appointments/appointments.component';
 import { EmployeesComponent } from './components/employees/employees.component';
-
-// ⚙️ SETTINGS
 import { SettingsComponent } from './components/settings/settings.component';
 
 export const routes: Routes = [
@@ -39,8 +37,6 @@ export const routes: Routes = [
       { path: 'employees', component: EmployeesComponent },
       { path: 'sales', component: SalesComponent },
       { path: 'appointments', component: AppointmentsComponent },
-
-      // ⚙️ SETTINGS
       { path: 'settings', component: SettingsComponent },
 
       { path: '', redirectTo: 'services', pathMatch: 'full' }
