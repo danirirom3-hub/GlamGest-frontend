@@ -1,6 +1,4 @@
-/* ========================= */
-/* CONTENEDOR */
-/* ========================= */
+/* Contenedor principal */
 .home {
   min-height: 100vh;
   display: flex;
@@ -12,9 +10,7 @@
   transition: 0.3s ease;
 }
 
-/* ========================= */
-/* TARJETA */
-/* ========================= */
+/* Card central */
 .card {
   width: 100%;
   max-width: 520px;
@@ -27,9 +23,7 @@
   box-shadow: 0 20px 40px rgba(0,0,0,0.08);
 }
 
-/* ========================= */
-/* LOGO */
-/* ========================= */
+/* Logo */
 .brand h1 {
   font-size: 32px;
   font-weight: 600;
@@ -41,9 +35,7 @@
   color: var(--primary);
 }
 
-/* ========================= */
-/* FRASE */
-/* ========================= */
+/* Texto descriptivo */
 .frase {
   font-size: 15px;
   color: var(--text);
@@ -52,15 +44,14 @@
   line-height: 1.6;
 }
 
-/* ========================= */
-/* BOTONES */
-/* ========================= */
+/* Contenedor de botones */
 .acciones {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
+/* Botón base */
 .btn {
   display: flex;
   align-items: center;
@@ -78,15 +69,13 @@
   overflow: hidden;
 }
 
-/* ICONOS */
+/* Iconos dentro del botón */
 .btn lucide-icon {
   width: 18px;
   height: 18px;
 }
 
-/* ========================= */
-/* PRINCIPAL */
-/* ========================= */
+/* Botón principal */
 .primary {
   background: var(--primary);
   color: white;
@@ -102,9 +91,7 @@
   transform: scale(0.97);
 }
 
-/* ========================= */
-/* SECUNDARIO */
-/* ========================= */
+/* Botón secundario */
 .secondary {
   background: rgba(107,114,128,0.15);
   color: var(--text);
@@ -119,17 +106,13 @@
   transform: scale(0.97);
 }
 
-/* ========================= */
-/* ANIMACIÓN */
-/* ========================= */
+/* Animación de entrada */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-/* ========================= */
-/* RESPONSIVE */
-/* ========================= */
+/* Ajustes responsive */
 @media (max-width: 768px) {
 
   .card {

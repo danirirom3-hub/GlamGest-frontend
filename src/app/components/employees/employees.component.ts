@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmployeesService } from '../../services/employees.service';
 
+/* Modelo de empleado */
 interface Employee {
   id: number;
   name: string;
@@ -19,7 +20,7 @@ interface Employee {
 })
 export class EmployeesComponent implements OnInit {
 
-  /* 🔥 modelo del formulario */
+  /* Datos del formulario */
   employee: Employee = {
     id: 0,
     name: '',
@@ -27,10 +28,10 @@ export class EmployeesComponent implements OnInit {
     active: true
   };
 
-  /* 🔥 datos vienen del backend */
+  /* Lista de empleados */
   employees: Employee[] = [];
 
-  /* 🔥 estado visual */
+  /* Estado de la vista */
   showOnlyActive = false;
   isEditing = false;
   mensaje = '';
@@ -41,10 +42,14 @@ export class EmployeesComponent implements OnInit {
     this.loadEmployees();
   }
 
+  /* Empleados visibles según filtro */
   get visibleEmployees(): Employee[] {
-    return this.showOnlyActive ? this.employees.filter(emp => emp.active) : this.employees;
+    return this.showOnlyActive
+      ? this.employees.filter(emp => emp.active)
+      : this.employees;
   }
 
+  /* Obtener empleados */
   loadEmployees(): void {
     this.employeesService.getEmployees().subscribe({
       next: (res: any) => {
@@ -57,6 +62,7 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
+  /* Crear o actualizar */
   onSubmit(): void {
     this.mensaje = '';
 
@@ -89,6 +95,7 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
+  /* Cargar datos en el formulario */
   onEdit(emp: Employee): void {
     this.isEditing = true;
     this.employee = {
@@ -100,6 +107,7 @@ export class EmployeesComponent implements OnInit {
     this.mensaje = 'Modifica los campos y presiona actualizar empleado.';
   }
 
+  /* Actualizar empleado */
   updateEmployee(): void {
     this.employeesService.updateEmployee(this.employee.id, {
       name: this.employee.name,
@@ -108,7 +116,9 @@ export class EmployeesComponent implements OnInit {
       next: (res: any) => {
         if (res?.successful) {
           const updated = res.data;
-          this.employees = this.employees.map(emp => emp.id === updated.id ? updated : emp);
+          this.employees = this.employees.map(emp =>
+            emp.id === updated.id ? updated : emp
+          );
           this.mensaje = 'Empleado actualizado con éxito.';
           this.resetForm();
         } else {
@@ -121,6 +131,7 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
+  /* Eliminar empleado */
   onDelete(id: number): void {
     const confirmar = window.confirm('¿Estás seguro de eliminar este empleado?');
     if (!confirmar) {
@@ -142,10 +153,12 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
+  /* Cancelar edición */
   onCancel(): void {
     this.resetForm();
   }
 
+  /* Reset del formulario */
   resetForm(): void {
     this.isEditing = false;
     this.employee = {

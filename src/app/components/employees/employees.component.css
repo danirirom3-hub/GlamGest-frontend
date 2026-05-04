@@ -1,6 +1,4 @@
-/* ========================= */
-/* CONTENEDOR */
-/* ========================= */
+/* Contenedor principal */
 .container {
   min-height: 100vh;
   padding: 40px;
@@ -10,9 +8,7 @@
   transition: 0.3s ease;
 }
 
-/* ========================= */
-/* TÍTULOS */
-/* ========================= */
+/* Títulos */
 h2, h3 {
   font-size: 26px;
   font-weight: 700;
@@ -23,9 +19,7 @@ h2, h3 {
   -webkit-text-fill-color: transparent;
 }
 
-/* ========================= */
-/* FORMULARIO */
-/* ========================= */
+/* Formulario */
 .form {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -38,24 +32,25 @@ h2, h3 {
   transition: all 0.3s ease;
 }
 
+/* Hover leve del formulario */
 .form:hover {
   transform: translateY(-2px);
 }
 
+/* Responsive formulario */
 @media (max-width: 768px) {
   .form {
     grid-template-columns: 1fr;
   }
 }
 
-/* ========================= */
-/* INPUTS */
-/* ========================= */
+/* Grupo de campos */
 .form-group {
   display: flex;
   flex-direction: column;
 }
 
+/* Labels */
 label {
   font-size: 13px;
   font-weight: 600;
@@ -64,6 +59,7 @@ label {
   margin-bottom: 6px;
 }
 
+/* Inputs */
 .form-control {
   height: 44px;
   padding: 0 12px;
@@ -76,6 +72,7 @@ label {
   transition: all 0.2s ease;
 }
 
+/* Focus inputs */
 .form-control:focus {
   border-color: var(--primary);
   background: var(--card);
@@ -83,15 +80,14 @@ label {
   transform: translateY(-1px);
 }
 
-/* ========================= */
-/* BOTONES */
-/* ========================= */
+/* Contenedor de botones */
 .form-group:last-child {
   grid-column: 1 / -1;
   display: flex;
   gap: 12px;
 }
 
+/* Botones base */
 .btn {
   flex: 1;
   padding: 13px;
@@ -102,11 +98,12 @@ label {
   transition: all 0.25s ease;
 }
 
+/* Hover botones */
 .btn:hover {
   transform: translateY(-2px);
 }
 
-/* PRINCIPAL */
+/* Botón principal */
 .btn-primary {
   background: var(--primary);
   color: white;
@@ -116,34 +113,32 @@ label {
   opacity: 0.9;
 }
 
-/* SECUNDARIO */
+/* Botón secundario */
 .btn-secondary {
   background: rgba(107,114,128,0.15);
   color: var(--text);
 }
 
-/* WARNING */
+/* Botón tipo warning */
 .btn-warning {
   background: rgba(59,130,246,0.15);
   color: #2563eb;
 }
 
-/* DANGER */
+/* Botón peligro */
 .btn-danger {
   background: rgba(239,68,68,0.15);
   color: #dc2626;
 }
 
-/* ========================= */
-/* TABLA */
-/* ========================= */
+/* Tabla */
 .table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 18px;
 }
 
-/* filas tipo card */
+/* Filas estilo card */
 .table tbody tr {
   background: var(--card);
   border-radius: 18px;
@@ -151,6 +146,7 @@ label {
   transition: all 0.3s ease;
 }
 
+/* Hover fila */
 .table tbody tr:hover {
   transform: translateY(-5px) scale(1.01);
   box-shadow: 0 20px 45px rgba(0,0,0,0.1);
@@ -161,15 +157,13 @@ label {
   color: var(--text);
 }
 
-/* acciones */
+/* Acciones en tabla */
 .table td:last-child {
   display: flex;
   gap: 10px;
 }
 
-/* ========================= */
-/* FILTRO */
-/* ========================= */
+/* Barra de filtros */
 .filter-bar {
   display: flex;
   align-items: center;
@@ -194,12 +188,14 @@ label {
   user-select: none;
 }
 
+/* Hover filtro */
 .filter-bar:hover {
   border-color: var(--primary);
   box-shadow: 0 12px 25px rgba(99,102,241,0.15);
   transform: translateY(-2px);
 }
 
+/* Checkbox del filtro */
 .filter-bar input {
   width: 16px;
   height: 16px;
