@@ -1,6 +1,4 @@
-/* ========================= */
-/* 🌍 BASE */
-/* ========================= */
+/* estilos base de la página */
 .page {
   min-height: 100vh;
   padding: 40px;
@@ -9,14 +7,13 @@
   box-sizing: border-box;
 }
 
+/* contenedor centrado */
 .container {
   max-width: 1000px;
   margin: auto;
 }
 
-/* ========================= */
-/* 🧊 CARD GENERAL */
-/* ========================= */
+/* tarjeta principal del formulario */
 .form-card {
   background: var(--card);
   padding: 25px;
@@ -27,9 +24,7 @@
   z-index: 1;
 }
 
-/* ========================= */
-/* HEADER */
-/* ========================= */
+/* título del formulario */
 .form-header h2 {
   font-size: 24px;
   font-weight: 700;
@@ -38,15 +33,14 @@
   -webkit-text-fill-color: transparent;
 }
 
+/* texto secundario */
 .sub {
   font-size: 13px;
   color: var(--text);
   opacity: 0.7;
 }
 
-/* ========================= */
-/* FORM GRID */
-/* ========================= */
+/* distribución del formulario */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -54,24 +48,25 @@
   margin-top: 20px;
 }
 
+/* responsive del formulario */
 @media (max-width: 768px) {
   .form-grid {
     grid-template-columns: 1fr;
   }
 }
 
-/* ========================= */
-/* INPUTS */
-/* ========================= */
+/* grupo de inputs */
 .input-group {
   display: flex;
   flex-direction: column;
 }
 
+/* campo que ocupa todo el ancho */
 .input-group.full {
   grid-column: 1 / -1;
 }
 
+/* label del input */
 .input-group label {
   font-size: 13px;
   font-weight: 600;
@@ -80,6 +75,7 @@
   margin-bottom: 6px;
 }
 
+/* inputs base */
 .input-group input,
 .input-group textarea {
   width: 100%;
@@ -95,6 +91,7 @@
   transition: border 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
+/* textarea con mayor altura */
 .input-group textarea {
   min-height: 110px;
   padding: 10px 12px;
@@ -102,7 +99,7 @@
   line-height: 1.4;
 }
 
-/* FOCUS LIMPIO (sin exagerar ni romper layout) */
+/* estado focus */
 .input-group input:focus,
 .input-group textarea:focus {
   border-color: var(--primary);
@@ -110,9 +107,7 @@
   box-shadow: 0 0 0 2px rgba(99,102,241,0.15);
 }
 
-/* ========================= */
-/* BOTONES FORM */
-/* ========================= */
+/* contenedor de botones del formulario */
 .form-actions {
   grid-column: 1 / -1;
   display: flex;
@@ -120,6 +115,7 @@
   margin-top: 10px;
 }
 
+/* botón principal */
 .btn-save {
   flex: 1;
   padding: 13px;
@@ -132,12 +128,13 @@
   transition: background 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
-/* 🔥 SIN translate para evitar saltos */
+/* hover sin mover layout */
 .btn-save:hover {
   filter: brightness(1.05);
   box-shadow: 0 6px 14px rgba(0,0,0,0.12);
 }
 
+/* botón secundario */
 .btn-cancel {
   padding: 13px;
   border-radius: 14px;
@@ -148,13 +145,12 @@
   transition: background 0.2s ease;
 }
 
+/* hover botón cancelar */
 .btn-cancel:hover {
   background: rgba(107,114,128,0.25);
 }
 
-/* ========================= */
-/* FILTRO */
-/* ========================= */
+/* filtro de lista */
 .filtro {
   display: flex;
   align-items: center;
@@ -168,15 +164,14 @@
   background: rgba(0,0,0,0.03);
 }
 
-/* ========================= */
-/* CARDS */
-/* ========================= */
+/* grid de tarjetas */
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
 }
 
+/* tarjeta individual */
 .card {
   background: var(--card);
   padding: 18px;
@@ -189,47 +184,49 @@
   isolation: isolate;
 }
 
-/* 🔥 animación suave sin romper layout */
+/* efecto hover */
 .card:hover {
   transform: translateY(-4px);
   box-shadow: 0 20px 35px rgba(0,0,0,0.08);
 }
 
+/* estado inactivo */
 .card.inactivo {
   opacity: 0.5;
   border-left: 5px solid #9ca3af;
 }
 
-/* HEADER CARD */
+/* cabecera de la tarjeta */
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+/* precio destacado */
 .precio {
   color: #10b981;
   font-weight: 600;
 }
 
-/* BODY */
+/* cuerpo de la tarjeta */
 .card-body {
   margin-top: 10px;
 }
 
+/* duración del servicio */
 .duracion {
   font-size: 13px;
   opacity: 0.7;
 }
 
+/* descripción */
 .descripcion {
   font-size: 13px;
   opacity: 0.9;
 }
 
-/* ========================= */
-/* ACCIONES */
-/* ========================= */
+/* acciones de la tarjeta */
 .acciones {
   display: flex;
   justify-content: flex-end;
@@ -237,6 +234,7 @@
   margin-top: 10px;
 }
 
+/* botón tipo icono */
 .btn-icon {
   width: 36px;
   height: 36px;
@@ -251,27 +249,25 @@
   transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* 🔥 SIN scale para evitar deformación */
+/* hover botón icono */
 .btn-icon:hover {
   background: var(--card);
   box-shadow: 0 6px 12px rgba(0,0,0,0.08);
 }
 
-/* editar */
+/* botón editar */
 .editar {
   background: rgba(59,130,246,0.15);
   color: #2563eb;
 }
 
-/* estado */
+/* botón estado */
 .estado {
   background: rgba(16,185,129,0.15);
   color: #10b981;
 }
 
-/* ========================= */
-/* EMPTY */
-/* ========================= */
+/* mensaje cuando no hay datos */
 .empty {
   text-align: center;
   padding: 20px;

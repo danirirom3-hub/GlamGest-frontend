@@ -21,6 +21,7 @@ interface Service {
 })
 export class ServicesComponent implements OnInit {
 
+  // modelo del formulario
   service: Service = {
     active: true,
     name: '',
@@ -29,13 +30,17 @@ export class ServicesComponent implements OnInit {
     durationMinutes: null
   };
 
+  // lista de servicios
   services: Service[] = [];
 
+  // estado de edición
   isEditing = false;
   editServiceId: number | null = null;
 
+  // mensaje para feedback al usuario
   message: string = '';
 
+  // filtro de activos
   showOnlyActive: boolean = true;
 
   constructor(private servicesService: ServicesService) {}
@@ -44,18 +49,19 @@ export class ServicesComponent implements OnInit {
     this.loadServices();
   }
 
-  // filtro de activos
+  // servicios visibles según filtro
   get filteredServices(): Service[] {
     return this.showOnlyActive
       ? this.services.filter(s => s.active)
       : this.services;
   }
 
-  // toggle del filtro completo
+  // cambia entre ver todos o solo activos
   toggleFiltro(): void {
     this.showOnlyActive = !this.showOnlyActive;
   }
 
+  // carga servicios desde backend
   loadServices(): void {
     this.servicesService.getServices().subscribe({
       next: (res: any) => {
@@ -68,10 +74,12 @@ export class ServicesComponent implements OnInit {
     });
   }
 
+  // crea o actualiza un servicio
   saveService(): void {
     this.message = '';
     this.service.active = true;
 
+    // validación básica
     if (!this.service.name || !this.service.price || !this.service.durationMinutes || !this.service.description) {
       this.message = 'Por favor completa todos los campos.';
       return;
@@ -82,6 +90,7 @@ export class ServicesComponent implements OnInit {
       return;
     }
 
+    // creación
     this.servicesService.createService(this.service).subscribe({
       next: (res: any) => {
         if (res?.successful) {
@@ -99,6 +108,7 @@ export class ServicesComponent implements OnInit {
     });
   }
 
+  // carga datos en el formulario para editar
   editService(service: Service): void {
     this.isEditing = true;
     this.editServiceId = service.id ?? null;
@@ -106,7 +116,7 @@ export class ServicesComponent implements OnInit {
     this.message = 'Editando servicio...';
   }
 
-  // borrado lógico
+  // cambia estado activo/inactivo (borrado lógico)
   toggleActive(service: Service): void {
 
     if (!service.id) {
@@ -131,6 +141,7 @@ export class ServicesComponent implements OnInit {
       next: (res: any) => {
         if (res?.successful) {
 
+          // actualización local del estado
           this.services = this.services.map(item =>
             item.id === service.id ? { ...item, active: !item.active } : item
           );
@@ -149,6 +160,7 @@ export class ServicesComponent implements OnInit {
     });
   }
 
+  // actualiza un servicio existente
   updateService(): void {
     if (this.editServiceId == null) {
       this.message = 'No hay un servicio seleccionado.';
@@ -170,6 +182,7 @@ export class ServicesComponent implements OnInit {
 
           const updated = res?.data || { id: this.editServiceId, ...payload };
 
+          // reemplazo en la lista
           this.services = this.services.map(item =>
             item.id === this.editServiceId ? updated : item
           );
@@ -185,11 +198,13 @@ export class ServicesComponent implements OnInit {
     });
   }
 
+  // cancela edición
   cancelEdit(): void {
     this.resetForm();
     this.message = 'Edición cancelada.';
   }
 
+  // reinicia el formulario
   private resetForm(): void {
     this.isEditing = false;
     this.editServiceId = null;

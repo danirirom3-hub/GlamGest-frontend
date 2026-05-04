@@ -1,6 +1,4 @@
-/* ========================= */
-/* 🌈 FONDO GENERAL */
-/* ========================= */
+/* Contenedor principal */
 .page {
   min-height: 100vh;
   padding: 40px;
@@ -10,9 +8,7 @@
   transition: padding 0.3s ease;
 }
 
-/* ========================= */
-/* 🧾 HEADER */
-/* ========================= */
+/* Header */
 .header h2 {
   font-size: 32px;
   font-weight: 700;
@@ -30,8 +26,7 @@
   font-size: 14px;
 }
 
-/* ========================= */
-/* 🔘 TABS */
+/* Tabs de navegación */
 .tabs {
   display: flex;
   gap: 12px;
@@ -66,8 +61,7 @@
   transform: scale(0.95);
 }
 
-/* ========================= */
-/* 🧊 CARD */
+/* Card contenedora */
 .card {
   background: var(--card);
   padding: 30px;
@@ -77,16 +71,14 @@
   border: 1px solid rgba(0,0,0,0.08);
 }
 
-/* ========================= */
-/* 📦 GRID */
+/* Grid general */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 15px;
 }
 
-/* ========================= */
-/* 🧾 FORM */
+/* Campos de formulario */
 .form-group {
   margin-bottom: 18px;
 }
@@ -115,8 +107,7 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
 }
 
-/* ========================= */
-/* 💅 SERVICIOS */
+/* Lista de servicios */
 .servicios-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -159,8 +150,7 @@ select:focus {
   transform: scale(0.95);
 }
 
-/* ========================= */
-/* 💰 TOTAL */
+/* Caja de total */
 .total-box {
   margin: 25px 0;
   padding: 18px;
@@ -173,8 +163,7 @@ select:focus {
   box-shadow: 0 15px 30px rgba(79, 70, 229, 0.4);
 }
 
-/* ========================= */
-/* 🚀 BOTÓN */
+/* Botón principal */
 .btn-primary {
   width: 100%;
   padding: 14px;
@@ -199,8 +188,7 @@ select:focus {
   transform: scale(0.95);
 }
 
-/* ========================= */
-/* 📊 TABLA */
+/* Tabla de datos */
 .tabla {
   margin-top: 20px;
 }
@@ -215,19 +203,20 @@ select:focus {
   color: var(--text);
 }
 
+/* Cabecera de tabla */
 .fila.header {
   font-weight: 600;
   background: var(--card);
   margin-bottom: 10px;
 }
 
+/* Hover filas */
 .fila:not(.header):hover {
   background: var(--bg);
   transform: scale(1.01);
 }
 
-/* ========================= */
-/* 👁 BOTÓN DETALLE */
+/* Botón ver detalle */
 .btn-detalle {
   padding: 6px 12px;
   border-radius: 10px;
@@ -245,8 +234,7 @@ select:focus {
   transform: scale(1.05);
 }
 
-/* ========================= */
-/* 📦 DETALLE VENTA */
+/* Contenedor detalle */
 .detalle {
   margin: 10px 0 15px 0;
   padding: 12px 18px;
@@ -255,8 +243,7 @@ select:focus {
   animation: slideDown 0.3s ease;
 }
 
-/* ========================= */
-/* 📭 VACÍO */
+/* Estado vacío */
 .empty {
   text-align: center;
   padding: 20px;
@@ -264,9 +251,7 @@ select:focus {
   opacity: 0.5;
 }
 
-/* ========================= */
-/* ✨ ANIMACIONES (NO TOCADAS) */
-/* ========================= */
+/* Animaciones */
 .fade-in {
   animation: fade 0.4s ease-in-out;
 }
@@ -293,9 +278,7 @@ select:focus {
   }
 }
 
-/* ========================= */
-/* 📱 RESPONSIVE (INTACTO LÓGICAMENTE) */
-/* ========================= */
+/* Responsive */
 @media (max-width: 1024px) {
   .grid {
     grid-template-columns: 1fr;
