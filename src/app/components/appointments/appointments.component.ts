@@ -70,6 +70,7 @@ export class AppointmentsComponent implements OnInit {
   details = ''; // notas de la cita
 
   showConfirmation = false;
+  isLoading = false; // Estado de carga
 
   /* Lista de citas */
   appointments: Appointment[] = [];
@@ -185,6 +186,8 @@ export class AppointmentsComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true; // Activar carga
+
     this.appointmentsService.createAppointment({
       appointmentDatetime,
       clientId: client.id,
@@ -193,6 +196,7 @@ export class AppointmentsComponent implements OnInit {
       notes: this.details
     }).subscribe({
       next: (res: any) => {
+        this.isLoading = false; // Desactivar carga
         if (res?.successful) {
 
           const newApp: Appointment = {
@@ -216,6 +220,7 @@ export class AppointmentsComponent implements OnInit {
         }
       },
       error: (err) => {
+        this.isLoading = false; // Desactivar carga en caso de error
         console.error('Error creating appointment:', err);
       }
     });

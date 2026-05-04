@@ -2,20 +2,17 @@
 
   <div class="container">
 
-    <!-- HEADER -->
     <div class="header">
       <h2>Citas</h2>
       <p>Gestiona la agenda del salón</p>
     </div>
 
-    <!-- TABS -->
     <div class="tabs">
       <button [class.active]="view === 'create'" (click)="view = 'create'">Nueva Cita</button>
       <button [class.active]="view === 'list'" (click)="view = 'list'">Agenda</button>
       <button [class.active]="view === 'calendar'" (click)="view = 'calendar'">Calendario</button>
     </div>
 
-    <!-- CREATE -->
     <div *ngIf="view === 'create'" class="card">
 
       <div class="grid">
@@ -37,7 +34,6 @@
         <input type="time" [(ngModel)]="selectedTime">
       </div>
 
-      <!-- DETALLES -->
       <div class="details-field">
         <textarea 
           [(ngModel)]="details"
@@ -62,8 +58,9 @@
         No hay empleados disponibles
       </div>
 
-      <button class="btn-primary" (click)="scheduleAppointment()">
-        Agendar cita
+      <button class="btn-primary" (click)="scheduleAppointment()" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Agendar cita</span>
+        <span *ngIf="isLoading">Cargando...</span>
       </button>
 
       <div class="alerta" *ngIf="showConfirmation">
@@ -72,7 +69,6 @@
 
     </div>
 
-    <!-- LIST -->
     <div *ngIf="view === 'list'" class="card">
 
       <div class="grid">
@@ -91,7 +87,6 @@
           <h4>{{ c.client }}</h4>
           <p>{{ c.service }} • {{ c.time }}</p>
 
-          <!--DETALLES EN LISTA -->
           <p class="details-text" *ngIf="c.details">
             {{ c.details }}
           </p>
@@ -111,7 +106,6 @@
 
     </div>
 
-    <!-- CALENDAR -->
     <div *ngIf="view === 'calendar'" class="calendar-wrapper">
       <full-calendar [options]="calendarOptions"></full-calendar>
     </div>

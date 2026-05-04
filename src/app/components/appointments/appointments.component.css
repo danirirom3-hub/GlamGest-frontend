@@ -148,6 +148,16 @@ input:focus, select:focus, textarea:focus {
   color: white;
 }
 
+/* Botones general */
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 /* Botón principal */
 .btn-primary {
   width: 100%;
@@ -161,15 +171,9 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* Efecto tipo salto */
-.btn-primary:hover {
+.btn-primary:not(:disabled):hover {
   transform: translateY(-4px) scale(1.03);
   opacity: 0.95;
-}
-
-/* Hover botón */
-.btn-primary:hover {
-  transform: translateY(-2px);
-  opacity: 0.9;
 }
 
 /* Botón eliminar */
