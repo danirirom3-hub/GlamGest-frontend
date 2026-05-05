@@ -12,9 +12,10 @@
       <button [class.active]="view === 'calendar'" (click)="view = 'calendar'">Calendario</button>
     </div>
 
+    <!-- CREAR -->
     <div *ngIf="view === 'create'" class="card">
+
       <div class="grid">
-        <!-- Eliminadas las opciones manuales "Cliente" y "Empleado" -->
         <select [(ngModel)]="selectedClient">
           <option *ngFor="let c of clients" [value]="c.name">
             {{ c.name }}
@@ -32,8 +33,7 @@
       </div>
 
       <div class="details-field">
-        <textarea 
-          [(ngModel)]="details"
+        <textarea [(ngModel)]="details"
           placeholder="Agregar detalles de la cita (opcional)...">
         </textarea>
       </div>
@@ -65,7 +65,9 @@
       </div>
     </div>
 
+    <!-- AGENDA -->
     <div *ngIf="view === 'list'" class="card">
+
       <div class="grid">
         <input placeholder="Filtrar Cliente" [(ngModel)]="filterClient">
         <input placeholder="Filtrar Empleado" [(ngModel)]="filterEmployee">
@@ -77,22 +79,48 @@
       </div>
 
       <div *ngFor="let c of filteredAppointments()" class="cita-card">
+
         <div class="info">
           <h4>{{ c.client }}</h4>
-          <p>{{ c.service }} • {{ c.time }}</p>
+
+          <div class="tags">
+            <span class="badge service">{{ c.service }}</span>
+            <span class="badge time">{{ c.time }}</span>
+          </div>
+
           <p class="details-text" *ngIf="c.details">{{ c.details }}</p>
-          <small>{{ c.employee }} | {{ c.status }}</small>
+
+          <div class="meta">
+            <span>{{ c.employee }}</span>
+
+            <span class="status"
+                  [ngClass]="{
+                    'pending': c.status !== 'sent_to_cash',
+                    'sent_to_cash': c.status === 'sent_to_cash'
+                  }">
+              {{ c.status === 'sent_to_cash' ? 'En caja' : 'Pendiente' }}
+            </span>
+          </div>
         </div>
 
-        <button class="btn-primary small"
-                [disabled]="c.status === 'sent_to_cash'"
-                (click)="sendToCash(c)">
-          {{ c.status === 'sent_to_cash' ? 'En caja' : 'Pasar a caja' }}
-        </button>
-        <button class="btn-danger small" (click)="deleteAppointment(c)">Eliminar</button>
+        <div class="actions">
+          <!-- BOTÓN CORRECTO -->
+          <button class="btn-primary small"
+                  [disabled]="c.status === 'sent_to_cash'"
+                  (click)="sendToCash(c)">
+            {{ c.status === 'sent_to_cash' ? 'En caja' : 'Pasar a caja' }}
+          </button>
+
+          <!-- BOTÓN CORRECTO -->
+          <button class="btn-danger small" (click)="deleteAppointment(c)">
+            Eliminar
+          </button>
+        </div>
+
       </div>
     </div>
 
+    <!-- CALENDARIO (NO TOCADO) -->
     <div *ngIf="view === 'calendar'" class="calendar-wrapper">
       <full-calendar [options]="calendarOptions"></full-calendar>
     </div>

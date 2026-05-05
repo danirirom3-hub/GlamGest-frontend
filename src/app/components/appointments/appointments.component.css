@@ -19,13 +19,18 @@
   padding: 40px;
 }
 
+/* Header centrado */
+.header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
 /* Título principal */
 .header h2 {
-  font-size: 34px;
+  font-size: 36px;
   font-weight: 700;
   background: linear-gradient(90deg, var(--primary), #7c3aed);
   -webkit-background-clip: text;
-  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -40,7 +45,7 @@
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin: 20px 0;
+  margin: 25px 0;
 }
 
 /* Botones de tabs */
@@ -53,6 +58,7 @@
   cursor: pointer;
   transition: 0.25s ease;
   min-width: 120px;
+  font-weight: 500;
 }
 
 /* Hover ligero */
@@ -102,7 +108,7 @@ input, select {
 
 /* Textarea flexible */
 textarea {
-  min-height: 48px;
+  min-height: 60px;
   max-height: 120px;
   resize: vertical;
 }
@@ -134,8 +140,8 @@ input:focus, select:focus, textarea:focus {
   text-align: center;
   padding: 12px;
   border-radius: 12px;
-  background: #ffffff; /* Blanco puro para generar jerarquía visual */
-  border: 1px solid #e2e8f0; /* Borde sutil para definir el campo */
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   cursor: pointer;
   transition: 0.25s ease;
   color: var(--text);
@@ -150,14 +156,12 @@ input:focus, select:focus, textarea:focus {
 .servicio-item:hover {
   transform: translateY(-3px);
   border-color: var(--primary);
-  box-shadow: 0 5px 12px rgba(0,0,0,0.08);
 }
 
 /* Servicio seleccionado */
 .servicio-item.activo {
   background: var(--primary);
   color: white;
-  border-color: var(--primary);
 }
 
 /* Botones general */
@@ -173,19 +177,19 @@ button:disabled {
 /* Botón principal */
 .btn-primary {
   width: 100%;
-  margin-top: 15px;
-  padding: 13px;
+  margin-top: 18px;
+  padding: 14px;
   border-radius: 12px;
   border: none;
   background: var(--primary);
   color: white;
-  transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), opacity 0.2s ease;
+  font-weight: 600;
+  transition: transform 0.2s cubic-bezier(.34,1.56,.64,1);
 }
 
 /* Efecto tipo salto */
 .btn-primary:not(:disabled):hover {
   transform: translateY(-4px) scale(1.03);
-  opacity: 0.95;
 }
 
 /* Botón eliminar */
@@ -194,41 +198,103 @@ button:disabled {
   color: white;
   border: none;
   padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
+  border-radius: 10px;
   transition: 0.2s ease;
 }
 
 /* Hover eliminar */
 .btn-danger:hover {
-  background: #c82333;
   transform: translateY(-2px);
 }
 
 /* Variante pequeña */
 .small {
-  width: auto;
-  margin-top: 0;
-  padding: 8px 12px;
   font-size: 12px;
 }
 
 /* Card de cita */
 .cita-card {
-  margin-top: 10px;
+  margin-top: 12px;
   padding: 15px;
   border-radius: 12px;
   background: var(--card);
   display: flex;
   justify-content: space-between;
-  gap: 10px;
+  align-items: center;
+  gap: 15px;
+  border: 1px solid rgba(0,0,0,0.05);
+  transition: 0.25s ease;
+}
+
+/* Hover tipo app */
+.cita-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+
+/* Tags */
+.tags {
+  display: flex;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+/* Badge */
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+}
+
+/* Servicio */
+.badge.service {
+  background: rgba(99,102,241,0.1);
+  color: var(--primary);
+}
+
+/* Hora */
+.badge.time {
+  background: rgba(0,0,0,0.06);
+}
+
+/* Meta info */
+.meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 6px;
+}
+
+/* Estado */
+.status {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+}
+
+/* Pendiente */
+.status.pending {
+  background: #facc15;
+}
+
+/* En caja */
+.status.sent_to_cash {
+  background: #22c55e;
+  color: white;
+}
+
+/* Acciones */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /* Texto secundario */
 .details-text {
   font-size: 13px;
   opacity: 0.8;
-  margin: 4px 0;
 }
 
 /* Mensaje de alerta */
@@ -278,6 +344,11 @@ button:disabled {
   .grid {
     grid-template-columns: 1fr;
   }
+
+  .actions {
+    flex-direction: row;
+  }
+
   .servicios-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
