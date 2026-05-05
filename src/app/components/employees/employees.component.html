@@ -38,8 +38,6 @@
         placeholder="Ingrese el teléfono">
     </div>
 
-    <!-- El campo de Estado ha sido eliminado de aquí -->
-
     <div class="form-group">
       <button type="submit" class="btn btn-primary" [disabled]="employeeForm.invalid">
         {{ isEditing ? 'Actualizar empleado' : 'Guardar empleado' }}
@@ -79,14 +77,26 @@
       <tr *ngFor="let emp of visibleEmployees">
         <td>{{ emp.name }}</td>
         <td>{{ emp.phone }}</td>
-        <td>
-          <button class="btn btn-warning btn-sm" (click)="onEdit(emp)">
-            Editar
+
+        <td class="acciones">
+
+          <!-- EDITAR -->
+          <button class="btn-icon editar" (click)="onEdit(emp)">
+            <i class="fa-solid fa-pen"></i>
           </button>
 
-          <button class="btn btn-danger btn-sm" (click)="onDelete(emp.id)">
-            Eliminar
+          <!-- ACTIVO / INACTIVO -->
+          <button class="btn-icon estado" (click)="toggleActive(emp)">
+            <i class="fa-solid"
+               [class.fa-toggle-on]="emp.active"
+               [class.fa-toggle-off]="!emp.active"></i>
           </button>
+
+          <!-- ELIMINAR -->
+          <button class="btn-icon eliminar" (click)="onDelete(emp.id)">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+
         </td>
       </tr>
     </tbody>

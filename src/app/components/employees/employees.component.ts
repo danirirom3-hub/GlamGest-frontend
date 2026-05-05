@@ -169,4 +169,39 @@ export class EmployeesComponent implements OnInit {
     };
     this.mensaje = '';
   }
+  /* activar / desactivar empleado */
+toggleActive(emp: Employee): void {
+
+  const confirmAction = window.confirm(
+    emp.active
+      ? `¿Desactivar al empleado "${emp.name}"?`
+      : `¿Activar al empleado "${emp.name}"?`
+  );
+
+  if (!confirmAction) return;
+
+  this.employeesService.updateEmployee(emp.id, {
+    ...emp,
+    active: !emp.active
+  }).subscribe({
+    next: (res: any) => {
+      if (res?.successful) {
+
+        this.employees = this.employees.map(e =>
+          e.id === emp.id ? { ...e, active: !e.active } : e
+        );
+
+        this.mensaje = emp.active
+          ? 'Empleado desactivado.'
+          : 'Empleado activado.';
+
+      } else {
+        this.mensaje = res?.message || 'No se pudo cambiar el estado.';
+      }
+    },
+    error: () => {
+      this.mensaje = 'Error al cambiar estado.';
+    }
+  });
+}
 }
