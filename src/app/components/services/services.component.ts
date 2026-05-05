@@ -217,4 +217,37 @@ export class ServicesComponent implements OnInit {
       durationMinutes: null
     };
   }
+
+  // elimina servicio
+deleteService(service: Service): void {
+
+  if (!service.id) {
+    this.message = 'No se pudo eliminar el servicio.';
+    return;
+  }
+
+  const confirmDelete = window.confirm(
+    `¿Eliminar el servicio "${service.name}"?`
+  );
+
+  if (!confirmDelete) return;
+
+  this.servicesService.deleteService(service.id).subscribe({
+    next: (res: any) => {
+      if (res?.successful) {
+
+        // eliminar de la lista local
+        this.services = this.services.filter(s => s.id !== service.id);
+
+        this.message = 'Servicio eliminado correctamente.';
+
+      } else {
+        this.message = res?.message || 'No se pudo eliminar el servicio.';
+      }
+    },
+    error: () => {
+      this.message = 'Error al eliminar el servicio.';
+    }
+  });
+}
 }

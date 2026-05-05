@@ -274,3 +274,10 @@
   opacity: 0.5;
   color: var(--text);
 }
+
+
+/* botón eliminar */
+.eliminar {
+  background: rgba(220,53,69,0.15);
+  color: #dc3545;
+}
