@@ -1,5 +1,4 @@
 <div class="page">
-
   <div class="container">
 
     <div class="header">
@@ -14,17 +13,15 @@
     </div>
 
     <div *ngIf="view === 'create'" class="card">
-
       <div class="grid">
+        <!-- Eliminadas las opciones manuales "Cliente" y "Empleado" -->
         <select [(ngModel)]="selectedClient">
-          <option [ngValue]="null">Cliente</option>
-          <option *ngFor="let c of clients" [ngValue]="c.name">
+          <option *ngFor="let c of clients" [value]="c.name">
             {{ c.name }}
           </option>
         </select>
 
         <select [(ngModel)]="selectedEmployee">
-          <option [ngValue]="null">Empleado</option>
           <option *ngFor="let e of employees" [ngValue]="e">
             {{ e.name }}
           </option>
@@ -41,7 +38,6 @@
         </textarea>
       </div>
 
-      <!-- Sección de servicios con Grid para evitar amontonamiento -->
       <div class="servicios-grid">
         <div class="servicio-item"
              *ngFor="let s of services"
@@ -67,14 +63,12 @@
       <div class="alerta" *ngIf="showConfirmation">
         Cita registrada correctamente
       </div>
-
     </div>
 
     <div *ngIf="view === 'list'" class="card">
-
       <div class="grid">
-        <input placeholder="Cliente" [(ngModel)]="filterClient">
-        <input placeholder="Empleado" [(ngModel)]="filterEmployee">
+        <input placeholder="Filtrar Cliente" [(ngModel)]="filterClient">
+        <input placeholder="Filtrar Empleado" [(ngModel)]="filterEmployee">
         <input type="date" [(ngModel)]="filterDate">
       </div>
 
@@ -83,15 +77,10 @@
       </div>
 
       <div *ngFor="let c of filteredAppointments()" class="cita-card">
-
         <div class="info">
           <h4>{{ c.client }}</h4>
           <p>{{ c.service }} • {{ c.time }}</p>
-
-          <p class="details-text" *ngIf="c.details">
-            {{ c.details }}
-          </p>
-
+          <p class="details-text" *ngIf="c.details">{{ c.details }}</p>
           <small>{{ c.employee }} | {{ c.status }}</small>
         </div>
 
@@ -100,11 +89,8 @@
                 (click)="sendToCash(c)">
           {{ c.status === 'sent_to_cash' ? 'En caja' : 'Pasar a caja' }}
         </button>
-
         <button class="btn-danger small" (click)="deleteAppointment(c)">Eliminar</button>
-
       </div>
-
     </div>
 
     <div *ngIf="view === 'calendar'" class="calendar-wrapper">

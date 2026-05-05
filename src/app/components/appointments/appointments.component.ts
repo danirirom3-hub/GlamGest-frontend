@@ -15,7 +15,6 @@ import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import esLocale from '@fullcalendar/core/locales/es';
 
-/* Modelo de cita en el front */
 interface Appointment {
   id: number;
   client: string;
@@ -23,17 +22,15 @@ interface Appointment {
   service: string;
   date: string;
   time: string;
-  details?: string; // notas
+  details?: string;
   status: 'pending' | 'sent_to_cash';
 }
 
-/* Servicio */
 interface Service {
   id: number;
   name: string;
 }
 
-/* Empleado */
 interface Employee {
   id: number;
   name: string;
@@ -57,85 +54,62 @@ export class AppointmentsComponent implements OnInit {
     private servicesService: ServicesService
   ) {}
 
-  /* Vista actual */
   view: 'create' | 'list' | 'calendar' = 'create';
-
-  /* Selecciones del formulario */
   selectedService: Service | null = null;
   selectedEmployee: Employee | null = null;
-
   selectedClient = '';
   selectedDate = '';
   selectedTime = '';
-  details = ''; // notas de la cita
-
+  details = '';
   showConfirmation = false;
-  isLoading = false; // Estado de carga
-
-  /* Lista de citas */
+  isLoading = false;
   appointments: Appointment[] = [];
-
-  /* Filtros */
   filterClient = '';
   filterEmployee = '';
   filterDate = '';
-
-  /* Datos base */
   services: Service[] = [];
   employees: Employee[] = [];
   clients: any[] = [];
 
-  /* Configuración de FullCalendar */
   calendarOptions: any = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
     locale: esLocale,
     initialView: 'dayGridMonth',
-
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
       right: 'dayGridMonth,timeGridWeek,timeGridDay'
     },
-
-    buttonText: {
-      today: 'Hoy',
-      month: 'Mes',
-      week: 'Semana',
-      day: 'Día'
-    },
-
+    buttonText: { today: 'Hoy', month: 'Mes', week: 'Semana', day: 'Día' },
     height: 'auto',
     expandRows: true,
     eventDisplay: 'block',
-
     events: [],
-
-    /* pequeño efecto al renderizar eventos */
     eventDidMount: (info: any) => {
       info.el.style.transition = 'all 0.2s ease';
     }
   };
 
   ngOnInit(): void {
-    // cargar datos en orden para evitar dependencias vacías
     this.loadInitialData();
   }
 
-  /* Carga clientes, empleados y servicios antes de traer citas */
   loadInitialData(): void {
     this.clientsService.getClients().subscribe({
       next: (clientsRes: any) => {
         this.clients = clientsRes?.data || clientsRes || [];
+        // Autoseleccionar primer cliente si existe
+        if (this.clients.length > 0) this.selectedClient = this.clients[0].name;
 
         this.employeesService.getEmployees().subscribe({
           next: (empRes: any) => {
             this.employees = empRes?.data || empRes || [];
+            // Autoseleccionar primer empleado si existe
+            if (this.employees.length > 0) this.selectedEmployee = this.employees[0];
 
             this.servicesService.getServices().subscribe({
               next: (servRes: any) => {
                 this.services = servRes?.data || servRes || [];
-
-                // ya con todo listo, cargar citas
                 this.loadAppointments();
               }
             });
@@ -145,12 +119,10 @@ export class AppointmentsComponent implements OnInit {
     });
   }
 
-  /* Obtiene citas del backend y las adapta al modelo del front */
   loadAppointments(): void {
     this.appointmentsService.getAppointments().subscribe({
       next: (res: any) => {
         const apiAppointments = res?.data || res || [];
-
         this.appointments = apiAppointments.map((app: any) => ({
           id: app.id,
           client: this.getClientName(app.clientId),
@@ -161,33 +133,25 @@ export class AppointmentsComponent implements OnInit {
           details: app.notes || '',
           status: app.status === 'Pending' ? 'pending' : 'sent_to_cash'
         }));
-
         this.updateCalendarEvents();
       },
-      error: () => {
-        this.appointments = [];
-      }
+      error: () => { this.appointments = []; }
     });
   }
 
-  /* Crear nueva cita */
   scheduleAppointment(): void {
     if (!this.selectedClient || !this.selectedEmployee || !this.selectedDate || !this.selectedTime || !this.selectedService) {
       return;
     }
 
     const appointmentDatetime = `${this.selectedDate}T${this.selectedTime}`;
-
     const client = this.clients.find(c => c.name === this.selectedClient);
-    const employee = this.employees.find(e => e.name === this.selectedEmployee!.name);
-    const service = this.services.find(s => s.name === this.selectedService!.name);
+    const employee = this.employees.find(e => e.id === this.selectedEmployee!.id);
+    const service = this.services.find(s => s.id === this.selectedService!.id);
 
-    if (!client || !employee || !service) {
-      return;
-    }
+    if (!client || !employee || !service) return;
 
-    this.isLoading = true; // Activar carga
-
+    this.isLoading = true;
     this.appointmentsService.createAppointment({
       appointmentDatetime,
       clientId: client.id,
@@ -196,10 +160,9 @@ export class AppointmentsComponent implements OnInit {
       notes: this.details
     }).subscribe({
       next: (res: any) => {
-        this.isLoading = false; // Desactivar carga
+        this.isLoading = false;
         if (res?.successful) {
-
-          const newApp: Appointment = {
+          this.appointments.push({
             id: res.data.id,
             client: this.selectedClient,
             employee: this.selectedEmployee!.name,
@@ -208,62 +171,47 @@ export class AppointmentsComponent implements OnInit {
             time: this.selectedTime,
             details: this.details,
             status: 'pending'
-          };
-
-          this.appointments.push(newApp);
+          });
           this.updateCalendarEvents();
-
           this.showConfirmation = true;
           setTimeout(() => this.showConfirmation = false, 2000);
-
           this.resetForm();
         }
       },
-      error: (err) => {
-        this.isLoading = false; // Desactivar carga en caso de error
-        console.error('Error creating appointment:', err);
-      }
+      error: () => { this.isLoading = false; }
     });
   }
 
-  /* Enviar cita a caja */
   sendToCash(app: Appointment): void {
     this.cashService.addItemFromAppointment(app);
     app.status = 'sent_to_cash';
     this.router.navigate(['/ventas']);
   }
 
-  /* Eliminar cita */
   deleteAppointment(app: Appointment): void {
     if (confirm('¿Estás seguro de que quieres eliminar esta cita?')) {
       this.appointmentsService.deleteAppointment(app.id).subscribe({
         next: () => {
           this.appointments = this.appointments.filter(a => a.id !== app.id);
           this.updateCalendarEvents();
-        },
-        error: (err) => {
-          console.error('Error deleting appointment', err);
         }
       });
     }
   }
 
-  /* Selección de servicio */
   selectService(service: Service): void {
     this.selectedService = this.selectedService?.id === service.id ? null : service;
   }
 
-  /* Reset del formulario */
   resetForm(): void {
-    this.selectedClient = '';
-    this.selectedEmployee = null;
+    if (this.clients.length > 0) this.selectedClient = this.clients[0].name;
+    if (this.employees.length > 0) this.selectedEmployee = this.employees[0];
     this.selectedDate = '';
     this.selectedTime = '';
     this.selectedService = null;
     this.details = '';
   }
 
-  /* Filtro de citas */
   filteredAppointments(): Appointment[] {
     return this.appointments.filter(a =>
       (!this.filterClient || a.client.toLowerCase().includes(this.filterClient.toLowerCase())) &&
@@ -272,31 +220,24 @@ export class AppointmentsComponent implements OnInit {
     );
   }
 
-  /* Actualiza eventos del calendario */
   updateCalendarEvents(): void {
     this.calendarOptions.events = this.appointments.map(app => ({
       id: app.id,
       title: `${app.client} - ${app.service}`,
       start: `${app.date}T${app.time}`,
-      extendedProps: {
-        details: app.details // útil para tooltips o modales
-      }
+      extendedProps: { details: app.details }
     }));
   }
 
-  /* Helpers para obtener nombres */
   getClientName(clientId: number): string {
-    const client = this.clients.find(c => c.id === clientId);
-    return client?.name || 'Desconocido';
+    return this.clients.find(c => c.id === clientId)?.name || 'Desconocido';
   }
 
   getEmployeeName(employeeId: number): string {
-    const employee = this.employees.find(e => e.id === employeeId);
-    return employee?.name || 'Desconocido';
+    return this.employees.find(e => e.id === employeeId)?.name || 'Desconocido';
   }
 
   getServiceName(serviceId: number): string {
-    const service = this.services.find(s => s.id === serviceId);
-    return service?.name || 'Desconocido';
+    return this.services.find(s => s.id === serviceId)?.name || 'Desconocido';
   }
 }
