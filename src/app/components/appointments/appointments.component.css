@@ -6,20 +6,17 @@
   animation: fadeInPage 0.6s ease;
 }
 
-/* Animación de entrada suave */
 @keyframes fadeInPage {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Contenedor principal */
 .container {
   max-width: 1050px;
   margin: auto;
   padding: 40px;
 }
 
-/* Título principal */
 .header h2 {
   font-size: 34px;
   font-weight: 700;
@@ -29,13 +26,11 @@
   -webkit-text-fill-color: transparent;
 }
 
-/* Texto secundario del header */
 .header p {
   color: var(--text);
   opacity: 0.7;
 }
 
-/* Tabs de navegación */
 .tabs {
   display: flex;
   justify-content: center;
@@ -43,7 +38,6 @@
   margin: 20px 0;
 }
 
-/* Botones de tabs */
 .tabs button {
   padding: 10px 16px;
   border: none;
@@ -55,19 +49,16 @@
   min-width: 120px;
 }
 
-/* Hover ligero */
 .tabs button:hover {
   transform: translateY(-2px);
 }
 
-/* Estado activo */
 .tabs button.active {
   background: var(--primary);
   color: white;
   transform: scale(1.05);
 }
 
-/* Card contenedora */
 .card {
   background: var(--card);
   border-radius: 20px;
@@ -75,14 +66,12 @@
   box-shadow: 0 15px 35px rgba(0,0,0,0.08);
 }
 
-/* Grid para formularios */
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
 }
 
-/* Inputs base */
 input, select, textarea {
   width: 100%;
   padding: 12px;
@@ -95,60 +84,72 @@ input, select, textarea {
   box-sizing: border-box;
 }
 
-/* Altura consistente */
 input, select {
   height: 48px;
 }
 
-/* Textarea flexible */
 textarea {
   min-height: 48px;
   max-height: 120px;
   resize: vertical;
 }
 
-/* Focus en campos */
 input:focus, select:focus, textarea:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
 }
 
-/* Campo de detalles */
 .details-field {
   margin-top: 12px;
 }
 
-/* Lista de servicios */
+/* LISTA DE SERVICIOS CORREGIDA */
 .servicios-grid {
-  display: flex;
-  gap: 10px;
+  display: grid;
+  /* Crea columnas automáticas de mínimo 140px */
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
   margin-top: 15px;
+  max-height: 320px; /* Evita que la card crezca infinito */
+  overflow-y: auto;
+  padding: 5px;
 }
 
-/* Item de servicio */
 .servicio-item {
-  flex: 1;
   text-align: center;
-  padding: 12px;
+  padding: 15px 10px;
   border-radius: 12px;
   background: var(--bg);
   cursor: pointer;
   transition: 0.25s ease;
   color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  min-height: 50px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.03);
 }
 
-/* Hover servicio */
 .servicio-item:hover {
   transform: translateY(-3px);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.08);
 }
 
-/* Servicio seleccionado */
 .servicio-item.activo {
   background: var(--primary);
   color: white;
 }
 
-/* Botones general */
+/* Scrollbar estético */
+.servicios-grid::-webkit-scrollbar {
+  width: 5px;
+}
+.servicios-grid::-webkit-scrollbar-thumb {
+  background: #e0e0e0;
+  border-radius: 10px;
+}
+
 button {
   cursor: pointer;
 }
@@ -158,7 +159,6 @@ button:disabled {
   opacity: 0.6;
 }
 
-/* Botón principal */
 .btn-primary {
   width: 100%;
   margin-top: 15px;
@@ -170,13 +170,11 @@ button:disabled {
   transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), opacity 0.2s ease;
 }
 
-/* Efecto tipo salto */
 .btn-primary:not(:disabled):hover {
   transform: translateY(-4px) scale(1.03);
   opacity: 0.95;
 }
 
-/* Botón eliminar */
 .btn-danger {
   background: #dc3545;
   color: white;
@@ -187,13 +185,11 @@ button:disabled {
   transition: 0.2s ease;
 }
 
-/* Hover eliminar */
 .btn-danger:hover {
   background: #c82333;
   transform: translateY(-2px);
 }
 
-/* Variante pequeña */
 .small {
   width: auto;
   margin-top: 0;
@@ -201,7 +197,6 @@ button:disabled {
   font-size: 12px;
 }
 
-/* Card de cita */
 .cita-card {
   margin-top: 10px;
   padding: 15px;
@@ -210,16 +205,15 @@ button:disabled {
   display: flex;
   justify-content: space-between;
   gap: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
 
-/* Texto secundario */
 .details-text {
   font-size: 13px;
   opacity: 0.8;
   margin: 4px 0;
 }
 
-/* Mensaje de alerta */
 .alerta {
   margin-top: 10px;
   padding: 10px;
@@ -229,7 +223,7 @@ button:disabled {
   text-align: center;
 }
 
-/* Ajustes FullCalendar */
+/* FullCalendar Custom */
 ::ng-deep .fc .fc-toolbar {
   display: flex !important;
   flex-wrap: wrap !important;
@@ -239,14 +233,12 @@ button:disabled {
   padding: 10px 0;
 }
 
-/* Título calendario */
 ::ng-deep .fc .fc-toolbar-title {
   font-size: 18px;
   font-weight: 700;
   color: var(--primary);
 }
 
-/* Botones calendario */
 ::ng-deep .fc .fc-button {
   background: var(--primary) !important;
   border: none !important;
@@ -256,24 +248,11 @@ button:disabled {
   color: white !important;
 }
 
-/* Hover calendario */
-::ng-deep .fc .fc-button:hover {
-  opacity: 0.9;
-}
-
-/* Responsive */
 @media (max-width: 768px) {
-
   .grid {
     grid-template-columns: 1fr;
   }
-
-  ::ng-deep .fc .fc-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  ::ng-deep .fc .fc-toolbar-chunk {
-    justify-content: center;
+  .servicios-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
 }
