@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ClientsService } from '../../services/clients.service';
+import Swal from 'sweetalert2';
 
 /* Modelo de cliente */
 interface Client {
@@ -51,6 +52,7 @@ export class ClientsComponent implements OnInit {
       },
       error: () => {
         this.clients = [];
+        Swal.fire('Error', 'No se pudieron cargar los clientes.', 'error');
       }
     });
   }
@@ -60,7 +62,7 @@ export class ClientsComponent implements OnInit {
     this.mensaje = '';
 
     if (!this.client.name || !this.client.email || !this.client.phone) {
-      this.mensaje = 'Completa todos los campos para guardar el cliente.';
+      Swal.fire('Campos incompletos', 'Completa todos los campos para guardar el cliente.', 'warning');
       return;
     }
 
@@ -72,16 +74,25 @@ export class ClientsComponent implements OnInit {
     this.clientsService.createClient(this.client).subscribe({
       next: (res: any) => {
         if (res?.successful) {
-          this.mensaje = 'Cliente creado con éxito.';
+
           const nuevo = res?.data || this.client;
           this.clients.push(nuevo);
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Cliente creado',
+            timer: 1500,
+            showConfirmButton: false
+          });
+
           this.resetForm();
+
         } else {
-          this.mensaje = res?.message || 'No se pudo crear el cliente.';
+          Swal.fire('Error', res?.message || 'No se pudo crear el cliente.', 'error');
         }
       },
       error: (err) => {
-        this.mensaje = err?.error?.message || 'Error al crear el cliente.';
+        Swal.fire('Error', err?.error?.message || 'Error al crear el cliente.', 'error');
       }
     });
   }
@@ -95,33 +106,56 @@ export class ClientsComponent implements OnInit {
       email: client.email,
       phone: client.phone
     };
-    this.mensaje = 'Completa los campos y presiona actualizar cliente.';
+
+    Swal.fire({
+      icon: 'info',
+      title: 'Editando cliente',
+      text: `Estás editando a "${client.name}"`,
+      timer: 1200,
+      showConfirmButton: false
+    });
   }
 
   /* Eliminar cliente */
   onDelete(client: Client): void {
     if (client.id == null) {
-      this.mensaje = 'No se pudo eliminar el cliente.';
+      Swal.fire('Error', 'No se pudo eliminar el cliente.', 'error');
       return;
     }
 
-    const confirmar = window.confirm(`¿Estás seguro de eliminar al cliente "${client.name}"?`);
-    if (!confirmar) {
-      return;
-    }
+    Swal.fire({
+      title: `¿Eliminar a "${client.name}"?`,
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
 
-    this.clientsService.deleteClient(client.id).subscribe({
-      next: () => {
-        this.clients = this.clients.filter((item) => item.id !== client.id);
-        this.mensaje = 'Cliente eliminado con éxito.';
+      if (!result.isConfirmed) return;
 
-        if (this.editClientId === client.id) {
-          this.resetForm();
+      this.clientsService.deleteClient(client.id!).subscribe({ // 🔥 CORREGIDO AQUÍ
+        next: () => {
+
+          this.clients = this.clients.filter((item) => item.id !== client.id);
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Cliente eliminado',
+            timer: 1200,
+            showConfirmButton: false
+          });
+
+          if (this.editClientId === client.id) {
+            this.resetForm();
+          }
+        },
+        error: (err) => {
+          Swal.fire('Error', err?.error?.message || 'Error al eliminar el cliente.', 'error');
         }
-      },
-      error: (err) => {
-        this.mensaje = err?.error?.message || 'Error al eliminar el cliente.';
-      }
+      });
+
     });
   }
 
@@ -129,30 +163,47 @@ export class ClientsComponent implements OnInit {
   onNew(): void {
     this.resetForm();
     this.isEditing = false;
+
+    Swal.fire({
+      icon: 'info',
+      title: 'Nuevo cliente',
+      timer: 1000,
+      showConfirmButton: false
+    });
   }
 
   /* Actualizar cliente existente */
   actualizarCliente(): void {
     if (this.editClientId == null) {
-      this.mensaje = 'No se seleccionó ningún cliente para editar.';
+      Swal.fire('Error', 'No se seleccionó ningún cliente para editar.', 'error');
       return;
     }
 
     this.clientsService.updateClient(this.editClientId, this.client).subscribe({
       next: (res: any) => {
         if (res?.successful) {
-          this.mensaje = 'Cliente actualizado con éxito.';
+
           const actualizado = res?.data || { id: this.editClientId, ...this.client };
+
           this.clients = this.clients.map((item) =>
             item.id === this.editClientId ? actualizado : item
           );
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Cliente actualizado',
+            timer: 1500,
+            showConfirmButton: false
+          });
+
           this.resetForm();
+
         } else {
-          this.mensaje = res?.message || 'No se pudo actualizar el cliente.';
+          Swal.fire('Error', res?.message || 'No se pudo actualizar el cliente.', 'error');
         }
       },
       error: (err) => {
-        this.mensaje = err?.error?.message || 'Error al actualizar el cliente.';
+        Swal.fire('Error', err?.error?.message || 'Error al actualizar el cliente.', 'error');
       }
     });
   }

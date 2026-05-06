@@ -10,6 +10,7 @@ import {
   Settings
 } from 'lucide-angular';
 import { AuthService } from '../../services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-dashboard',
@@ -37,7 +38,31 @@ export class DashboardComponent {
 
   /* Cierra sesión y redirige al login */
   logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+
+    Swal.fire({
+      title: '¿Cerrar sesión?',
+      text: 'Tendrás que iniciar sesión nuevamente',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, salir',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+
+      if (!result.isConfirmed) return;
+
+      this.authService.logout();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Sesión cerrada',
+        timer: 1000,
+        showConfirmButton: false
+      });
+
+      setTimeout(() => {
+        this.router.navigate(['/login']);
+      }, 1000);
+
+    });
   }
 }
