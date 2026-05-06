@@ -15,6 +15,8 @@ import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import esLocale from '@fullcalendar/core/locales/es';
 
+import Swal from 'sweetalert2';
+
 interface Appointment {
   id: number;
   client: string;
@@ -63,10 +65,13 @@ export class AppointmentsComponent implements OnInit {
   details = '';
   showConfirmation = false;
   isLoading = false;
+
   appointments: Appointment[] = [];
+
   filterClient = '';
   filterEmployee = '';
   filterDate = '';
+
   services: Service[] = [];
   employees: Employee[] = [];
   clients: any[] = [];
@@ -135,12 +140,20 @@ export class AppointmentsComponent implements OnInit {
         }));
         this.updateCalendarEvents();
       },
-      error: () => { this.appointments = []; }
+      error: () => {
+        this.appointments = [];
+        Swal.fire('Error', 'No se pudieron cargar las citas.', 'error');
+      }
     });
   }
 
   scheduleAppointment(): void {
+
+    // evitar doble clic
+    if (this.isLoading) return;
+
     if (!this.selectedClient || !this.selectedEmployee || !this.selectedDate || !this.selectedTime || !this.selectedService) {
+      Swal.fire('Campos incompletos', 'Debes llenar todos los campos.', 'warning');
       return;
     }
 
@@ -152,6 +165,7 @@ export class AppointmentsComponent implements OnInit {
     if (!client || !employee || !service) return;
 
     this.isLoading = true;
+
     this.appointmentsService.createAppointment({
       appointmentDatetime,
       clientId: client.id,
@@ -161,7 +175,9 @@ export class AppointmentsComponent implements OnInit {
     }).subscribe({
       next: (res: any) => {
         this.isLoading = false;
+
         if (res?.successful) {
+
           this.appointments.push({
             id: res.data.id,
             client: this.selectedClient,
@@ -172,31 +188,93 @@ export class AppointmentsComponent implements OnInit {
             details: this.details,
             status: 'pending'
           });
+
           this.updateCalendarEvents();
-          this.showConfirmation = true;
-          setTimeout(() => this.showConfirmation = false, 2000);
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Cita agendada',
+            text: 'La cita fue registrada correctamente',
+            timer: 1500,
+            showConfirmButton: false
+          });
+
           this.resetForm();
         }
       },
-      error: () => { this.isLoading = false; }
+      error: () => {
+        this.isLoading = false;
+        Swal.fire('Error', 'No se pudo agendar la cita.', 'error');
+      }
     });
   }
 
+  // enviar a caja
   sendToCash(app: Appointment): void {
-    this.cashService.addItemFromAppointment(app);
-    app.status = 'sent_to_cash';
-    this.router.navigate(['/ventas']);
+
+    Swal.fire({
+      title: 'Enviar a caja',
+      text: `${app.client} - ${app.service}`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, enviar',
+      cancelButtonText: 'Cancelar'
+    }).then(result => {
+
+      if (!result.isConfirmed) return;
+
+      this.cashService.addItemFromAppointment(app);
+      app.status = 'sent_to_cash';
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Enviado a caja',
+        timer: 1000,
+        showConfirmButton: false
+      });
+
+      this.router.navigate(['/ventas']);
+    });
   }
 
+  // elimina cita
   deleteAppointment(app: Appointment): void {
-    if (confirm('¿Estás seguro de que quieres eliminar esta cita?')) {
-      this.appointmentsService.deleteAppointment(app.id).subscribe({
-        next: () => {
-          this.appointments = this.appointments.filter(a => a.id !== app.id);
-          this.updateCalendarEvents();
-        }
-      });
-    }
+
+    Swal.fire({
+      title: '¿Eliminar cita?',
+      text: `${app.client} - ${app.service}`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+
+      if (result.isConfirmed) {
+
+        this.appointmentsService.deleteAppointment(app.id).subscribe({
+          next: () => {
+
+            this.appointments = this.appointments.filter(a => a.id !== app.id);
+            this.updateCalendarEvents();
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Eliminada',
+              text: 'La cita fue eliminada',
+              timer: 1200,
+              showConfirmButton: false
+            });
+
+          },
+          error: () => {
+            Swal.fire('Error', 'No se pudo eliminar la cita.', 'error');
+          }
+        });
+
+      }
+
+    });
   }
 
   selectService(service: Service): void {

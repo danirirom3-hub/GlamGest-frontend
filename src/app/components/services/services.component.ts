@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ServicesService } from '../../services/services.service';
+import Swal from 'sweetalert2';
 
 interface Service {
   id?: number;
@@ -21,7 +22,6 @@ interface Service {
 })
 export class ServicesComponent implements OnInit {
 
-  // modelo del formulario
   service: Service = {
     active: true,
     name: '',
@@ -30,17 +30,12 @@ export class ServicesComponent implements OnInit {
     durationMinutes: null
   };
 
-  // lista de servicios
   services: Service[] = [];
 
-  // estado de edición
   isEditing = false;
   editServiceId: number | null = null;
 
-  // mensaje para feedback al usuario
   message: string = '';
-
-  // filtro de activos
   showOnlyActive: boolean = true;
 
   constructor(private servicesService: ServicesService) {}
@@ -49,19 +44,16 @@ export class ServicesComponent implements OnInit {
     this.loadServices();
   }
 
-  // servicios visibles según filtro
   get filteredServices(): Service[] {
     return this.showOnlyActive
       ? this.services.filter(s => s.active)
       : this.services;
   }
 
-  // cambia entre ver todos o solo activos
   toggleFiltro(): void {
     this.showOnlyActive = !this.showOnlyActive;
   }
 
-  // carga servicios desde backend
   loadServices(): void {
     this.servicesService.getServices().subscribe({
       next: (res: any) => {
@@ -69,19 +61,16 @@ export class ServicesComponent implements OnInit {
       },
       error: (err: any) => {
         this.services = [];
-        this.message = err?.error?.message || 'Error al cargar los servicios.';
+        Swal.fire('Error', err?.error?.message || 'Error al cargar los servicios.', 'error');
       }
     });
   }
 
-  // crea o actualiza un servicio
   saveService(): void {
-    this.message = '';
     this.service.active = true;
 
-    // validación básica
     if (!this.service.name || !this.service.price || !this.service.durationMinutes || !this.service.description) {
-      this.message = 'Por favor completa todos los campos.';
+      Swal.fire('Campos incompletos', 'Por favor completa todos los campos.', 'warning');
       return;
     }
 
@@ -90,80 +79,103 @@ export class ServicesComponent implements OnInit {
       return;
     }
 
-    // creación
     this.servicesService.createService(this.service).subscribe({
       next: (res: any) => {
         if (res?.successful) {
-          this.message = 'Servicio creado correctamente.';
+
           const newService = res?.data || this.service;
           this.services.push(newService);
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Servicio creado',
+            showConfirmButton: false,
+            timer: 1500
+          });
+
           this.resetForm();
+
         } else {
-          this.message = res?.message || 'No se pudo crear el servicio.';
+          Swal.fire('Error', res?.message || 'No se pudo crear el servicio.', 'error');
         }
       },
       error: (err: any) => {
-        this.message = err?.error?.message || 'Error al crear el servicio.';
+        Swal.fire('Error', err?.error?.message || 'Error al crear el servicio.', 'error');
       }
     });
   }
 
-  // carga datos en el formulario para editar
   editService(service: Service): void {
     this.isEditing = true;
     this.editServiceId = service.id ?? null;
     this.service = { ...service };
-    this.message = 'Editando servicio...';
-  }
 
-  // cambia estado activo/inactivo (borrado lógico)
-  toggleActive(service: Service): void {
-
-    if (!service.id) {
-      this.message = 'No se pudo actualizar el estado.';
-      return;
-    }
-
-    const confirmAction = window.confirm(
-      service.active
-        ? `¿Desactivar el servicio "${service.name}"?`
-        : `¿Activar el servicio "${service.name}"?`
-    );
-
-    if (!confirmAction) return;
-
-    const payload = {
-      ...service,
-      active: !service.active
-    };
-
-    this.servicesService.updateService(service.id, payload).subscribe({
-      next: (res: any) => {
-        if (res?.successful) {
-
-          // actualización local del estado
-          this.services = this.services.map(item =>
-            item.id === service.id ? { ...item, active: !item.active } : item
-          );
-
-          this.message = service.active
-            ? 'Servicio desactivado correctamente.'
-            : 'Servicio activado correctamente.';
-
-        } else {
-          this.message = res?.message || 'No se pudo actualizar el estado.';
-        }
-      },
-      error: () => {
-        this.message = 'Error al cambiar el estado.';
-      }
+    Swal.fire({
+      icon: 'info',
+      title: 'Editando servicio',
+      text: `Ahora estás editando "${service.name}"`,
+      timer: 1200,
+      showConfirmButton: false
     });
   }
 
-  // actualiza un servicio existente
+  toggleActive(service: Service): void {
+
+    if (!service.id) {
+      Swal.fire('Error', 'No se pudo actualizar el estado.', 'error');
+      return;
+    }
+
+    Swal.fire({
+      title: service.active
+        ? `¿Desactivar "${service.name}"?`
+        : `¿Activar "${service.name}"?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+
+      if (!result.isConfirmed) return;
+
+      const payload = {
+        ...service,
+        active: !service.active
+      };
+
+      this.servicesService.updateService(service.id!, payload).subscribe({
+        next: (res: any) => {
+          if (res?.successful) {
+
+            this.services = this.services.map(item =>
+              item.id === service.id ? { ...item, active: !item.active } : item
+            );
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Actualizado',
+              text: service.active
+                ? 'Servicio desactivado'
+                : 'Servicio activado',
+              timer: 1200,
+              showConfirmButton: false
+            });
+
+          } else {
+            Swal.fire('Error', res?.message || 'No se pudo actualizar el estado.', 'error');
+          }
+        },
+        error: () => {
+          Swal.fire('Error', 'Error al cambiar el estado.', 'error');
+        }
+      });
+
+    });
+  }
+
   updateService(): void {
     if (this.editServiceId == null) {
-      this.message = 'No hay un servicio seleccionado.';
+      Swal.fire('Error', 'No hay un servicio seleccionado.', 'error');
       return;
     }
 
@@ -178,33 +190,43 @@ export class ServicesComponent implements OnInit {
     this.servicesService.updateService(this.editServiceId, payload).subscribe({
       next: (res: any) => {
         if (res?.successful) {
-          this.message = 'Servicio actualizado correctamente.';
 
           const updated = res?.data || { id: this.editServiceId, ...payload };
 
-          // reemplazo en la lista
           this.services = this.services.map(item =>
             item.id === this.editServiceId ? updated : item
           );
 
+          Swal.fire({
+            icon: 'success',
+            title: 'Servicio actualizado',
+            showConfirmButton: false,
+            timer: 1500
+          });
+
           this.resetForm();
+
         } else {
-          this.message = res?.message || 'No se pudo actualizar el servicio.';
+          Swal.fire('Error', res?.message || 'No se pudo actualizar el servicio.', 'error');
         }
       },
       error: (err: any) => {
-        this.message = err?.error?.message || 'Error al actualizar el servicio.';
+        Swal.fire('Error', err?.error?.message || 'Error al actualizar el servicio.', 'error');
       }
     });
   }
 
-  // cancela edición
   cancelEdit(): void {
     this.resetForm();
-    this.message = 'Edición cancelada.';
+
+    Swal.fire({
+      icon: 'info',
+      title: 'Edición cancelada',
+      timer: 1000,
+      showConfirmButton: false
+    });
   }
 
-  // reinicia el formulario
   private resetForm(): void {
     this.isEditing = false;
     this.editServiceId = null;
@@ -218,36 +240,50 @@ export class ServicesComponent implements OnInit {
     };
   }
 
-  // elimina servicio
-deleteService(service: Service): void {
+  deleteService(service: Service): void {
 
-  if (!service.id) {
-    this.message = 'No se pudo eliminar el servicio.';
-    return;
-  }
-
-  const confirmDelete = window.confirm(
-    `¿Eliminar el servicio "${service.name}"?`
-  );
-
-  if (!confirmDelete) return;
-
-  this.servicesService.deleteService(service.id).subscribe({
-    next: (res: any) => {
-      if (res?.successful) {
-
-        // eliminar de la lista local
-        this.services = this.services.filter(s => s.id !== service.id);
-
-        this.message = 'Servicio eliminado correctamente.';
-
-      } else {
-        this.message = res?.message || 'No se pudo eliminar el servicio.';
-      }
-    },
-    error: () => {
-      this.message = 'Error al eliminar el servicio.';
+    if (!service.id) {
+      Swal.fire('Error', 'No se pudo eliminar el servicio.', 'error');
+      return;
     }
-  });
-}
+
+    Swal.fire({
+      title: `¿Eliminar "${service.name}"?`,
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+
+      if (result.isConfirmed) {
+
+        this.servicesService.deleteService(service.id!).subscribe({
+          next: (res: any) => {
+            if (res?.successful) {
+
+              this.services = this.services.filter(s => s.id !== service.id);
+
+              Swal.fire({
+                icon: 'success',
+                title: 'Eliminado',
+                text: 'Servicio eliminado correctamente',
+                timer: 1500,
+                showConfirmButton: false
+              });
+
+            } else {
+              Swal.fire('Error', res?.message || 'No se pudo eliminar.', 'error');
+            }
+          },
+          error: () => {
+            Swal.fire('Error', 'Error al eliminar el servicio.', 'error');
+          }
+        });
+
+      }
+
+    });
+  }
 }
