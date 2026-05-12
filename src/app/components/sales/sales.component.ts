@@ -1,63 +1,86 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CashService } from '../../services/cash.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-sales',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './sales.component.html',
   styleUrls: ['./sales.component.css']
 })
 export class SalesComponent {
 
-  constructor(private cashService: CashService) {}
-
-  // controla la vista actual (registro o historial)
+  // Control de vistas
   view: 'create' | 'history' = 'create';
 
-  // datos generales (pendientes de integración completa con backend)
-  sales: any[] = [];
+  // Control del modal
+  showModal = false;
+
+  // Datos del cliente
+  clientData = {
+    name: '',
+    phone: '',
+    email: ''
+  };
+
+  // Método de pago
+  paymentMethod = '';
+
+  // Clientes
   clients: any[] = [];
+
+  // Servicios
   services: any[] = [];
+
+  // Empleados
   employees: any[] = [];
 
-  // items actuales de la venta
+  // Detalle de venta
   items: any[] = [];
 
-  // id de la venta seleccionada para mostrar detalle
-  activeSale: number | null = null;
+  // Historial
+  sales: any[] = [];
 
-  ngOnInit() {
-    // suscripción a los items del servicio de caja
-    this.cashService.items$.subscribe(data => {
-      this.items = data;
-    });
+  // Abrir modal
+  openModal() {
+
   }
 
-  // agrega un servicio manualmente desde la lista
+  // Cerrar modal
+  closeModal() {
+
+  }
+
+  // Agregar servicio
   addService(service: any) {
-    const item = {
-      service: service.name,
-      price: service.price,
-      source: 'manual'
-    };
 
-    this.cashService.addManualItem(item);
   }
 
-  // elimina un item por índice
+  // Eliminar servicio
   removeService(index: number) {
-    this.cashService.removeItem(index);
+
   }
 
-  // calcula el total de la venta
+  // Calcular línea
+  calculateLine(item: any) {
+
+  }
+
+  // Calcular total
   getTotal(): number {
-    return this.items.reduce((sum, item) => sum + (item.price || 0), 0);
+
+    return 0;
   }
 
-  // muestra u oculta el detalle de una venta
-  toggleDetail(id: number) {
-    this.activeSale = this.activeSale === id ? null : id;
+  // Registrar venta
+  registrarVenta() {
+
   }
+
+  // Limpiar formulario
+  resetForm() {
+
+  }
+
 }

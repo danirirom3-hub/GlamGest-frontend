@@ -1,44 +1,58 @@
 <div class="page">
   <div class="container">
 
-    <!-- Encabezado de la vista -->
     <div class="header">
       <h2>Ventas</h2>
       <p>Control de ingresos del salón</p>
     </div>
 
-    <!-- Navegación entre registro e historial -->
     <div class="tabs">
       <button [class.active]="view === 'create'" (click)="view = 'create'">
         Nueva Venta
       </button>
+
       <button [class.active]="view === 'history'" (click)="view = 'history'">
         Historial de Ventas
       </button>
     </div>
 
-    <!-- Formulario de registro de venta -->
+    <!-- REGISTRAR VENTA -->
     <div *ngIf="view === 'create'" class="card fade-in">
 
-      <h3>Registrar Venta</h3>
+      <h3>Datos del Cliente</h3>
 
       <div class="grid">
 
-        <!-- Selección de cliente -->
         <div class="form-group">
-          <label>Cliente</label>
-          <select>
-            <option value="">Seleccionar cliente</option>
-            <option *ngFor="let client of clients" [value]="client.client_id">
-              {{ client.name }}
-            </option>
-          </select>
+          <label>Nombre</label>
+          <input
+            type="text"
+            placeholder="Nombre del cliente"
+            [(ngModel)]="clientData.name"
+          >
         </div>
 
-        <!-- Selección de método de pago -->
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input
+            type="text"
+            placeholder="Teléfono"
+            [(ngModel)]="clientData.phone"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>Correo</label>
+          <input
+            type="email"
+            placeholder="Correo"
+            [(ngModel)]="clientData.email"
+          >
+        </div>
+
         <div class="form-group">
           <label>Método de pago</label>
-          <select>
+          <select [(ngModel)]="paymentMethod">
             <option value="">Seleccionar método</option>
             <option value="Efectivo">Efectivo</option>
             <option value="Tarjeta">Tarjeta</option>
@@ -48,150 +62,167 @@
 
       </div>
 
-      <!-- Listado de servicios disponibles -->
-      <div class="form-group">
-        <label>Servicios disponibles</label>
-
-        <div class="tabla-servicios">
-          <div class="fila header">
-            <span>Servicio</span>
-            <span>Precio</span>
-            <span>Seleccionar</span>
-          </div>
-
-          <!-- Agregar servicio al detalle -->
-          <div class="fila" *ngFor="let service of services" (click)="addService(service)">
-            <span>{{ service.name }}</span>
-            <span>{{ service.price | currency:'COP' }}</span>
-            <span>Agregar</span>
-          </div>
-        </div>
+      <!-- BOTON AGREGAR -->
+      <div class="actions">
+        <button class="btn-primary" (click)="openModal()">
+          + Agregar Servicio
+        </button>
       </div>
 
-      <!-- Detalle de servicios seleccionados -->
+      <!-- DETALLE -->
       <div class="form-group">
+
         <label>Detalle de la venta</label>
 
-        <div class="tabla-servicios">
-          <div class="fila header">
-            <span>Servicio</span>
+        <div class="tabla-contenedor">
+
+          <div class="fila header-tabla col-detalles">
             <span>Empleado</span>
+            <span>Servicio</span>
             <span>Cantidad</span>
-            <span>Precio Unitario</span>
+            <span>Valor Unitario</span>
             <span>Subtotal</span>
+            <span>Total</span>
             <span></span>
           </div>
 
-          <!-- Items agregados a la venta -->
-          <div class="fila" *ngFor="let item of items; let i = index">
+          <div class="fila col-detalles" *ngFor="let item of items; let i = index">
 
-            <span>{{ item.service }}</span>
+            <select [(ngModel)]="item.employee_id">
+              <option value="">Empleado</option>
 
-            <!-- Selección de empleado -->
+              <option
+                *ngFor="let emp of employees"
+                [value]="emp.employee_id"
+              >
+                {{ emp.name }}
+              </option>
+            </select>
+
+            <span>{{ item.service_name }}</span>
+
+            <input
+              type="number"
+              min="1"
+              [(ngModel)]="item.quantity"
+              (input)="calculateLine(item)"
+            >
+
             <span>
-              <select>
-                <option value="">Seleccionar</option>
-                <option *ngFor="let emp of employees" [value]="emp.employee_id">
-                  {{ emp.name }}
-                </option>
-              </select>
+              {{ item.unit_price | currency:'COP':'symbol':'1.0-0' }}
             </span>
 
-            <!-- Cantidad del servicio -->
             <span>
-              <input type="number" min="1" value="1">
+              {{ item.subtotal | currency:'COP':'symbol':'1.0-0' }}
             </span>
 
-            <!-- Precio unitario -->
-            <span>{{ item.price | currency:'COP' }}</span>
-
-            <!-- Subtotal (pendiente cálculo dinámico) -->
-            <span>{{ item.price | currency:'COP' }}</span>
-
-            <!-- Eliminar item -->
-            <span>
-              <button (click)="removeService(i)">X</button>
+            <span class="monto">
+              {{ item.total | currency:'COP':'symbol':'1.0-0' }}
             </span>
+
+            <button class="btn-remove" (click)="removeService(i)">
+              X
+            </button>
 
           </div>
+
         </div>
+
       </div>
 
-      <!-- Total de la venta -->
+      <!-- TOTAL -->
       <div class="total-box">
-        <span>Total</span>
-        <h2>{{ getTotal() | currency:'COP' }}</h2>
+        <span>Total a pagar</span>
+
+        <h2>
+          {{ getTotal() | currency:'COP':'symbol':'1.0-0' }}
+        </h2>
       </div>
 
-      <!-- Acción principal -->
-      <button class="btn-primary">
+      <button class="btn-save" (click)="registrarVenta()">
         Registrar Venta
       </button>
 
     </div>
 
-    <!-- Vista de historial de ventas -->
+    <!-- HISTORIAL -->
     <div *ngIf="view === 'history'" class="card fade-in">
 
       <h3>Historial de Ventas</h3>
 
-      <!-- Estado vacío -->
-      <div class="empty" *ngIf="!sales || sales.length === 0">
+      <div class="empty" *ngIf="sales.length === 0">
         No hay ventas registradas
       </div>
 
-      <!-- Tabla de ventas -->
-      <div class="tabla" *ngIf="sales && sales.length > 0">
+      <div class="tabla-contenedor" *ngIf="sales.length > 0">
 
-        <div class="fila header">
+        <div class="fila header-tabla col-historial">
           <span>Fecha</span>
           <span>Cliente</span>
           <span>Total</span>
-          <span>Método de Pago</span>
           <span>Detalle</span>
         </div>
 
-        <ng-container *ngFor="let sale of sales">
+        <div class="fila col-historial" *ngFor="let sale of sales">
 
-          <!-- Fila de venta -->
-          <div class="fila">
-            <span>{{ sale.sale_datetime }}</span>
-            <span>{{ sale.client_name }}</span>
-            <span>{{ sale.total | currency:'COP' }}</span>
-            <span>{{ sale.payment_type }}</span>
+          <span>{{ sale.date }}</span>
 
-            <!-- Toggle detalle -->
-            <button class="btn-detalle" (click)="toggleDetail(sale.sale_id)">
-              Ver detalle
+          <span>{{ sale.client }}</span>
+
+          <span>
+            {{ sale.total | currency:'COP':'symbol':'1.0-0' }}
+          </span>
+
+          <button class="btn-view">
+            Ver
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- MODAL SERVICIOS -->
+    <div class="modal-backdrop" *ngIf="showModal">
+
+      <div class="modal">
+
+        <div class="modal-header">
+          <h3>Seleccionar Servicio</h3>
+
+          <button class="btn-close" (click)="closeModal()">
+            ✕
+          </button>
+        </div>
+
+        <div class="tabla-contenedor">
+
+          <div class="fila header-tabla col-servicios">
+            <span>Servicio</span>
+            <span>Precio</span>
+            <span>Acción</span>
+          </div>
+
+          <div class="fila col-servicios" *ngFor="let service of services">
+
+            <span>{{ service.name }}</span>
+
+            <span>
+              {{ service.price | currency:'COP':'symbol':'1.0-0' }}
+            </span>
+
+            <button
+              class="btn-add"
+              (click)="addService(service)"
+            >
+              Agregar
             </button>
+
           </div>
 
-          <!-- Detalle expandido -->
-          <div class="detalle" *ngIf="activeSale === sale.sale_id">
+        </div>
 
-            <div class="tabla-detalle">
-
-              <div class="fila header">
-                <span>Servicio</span>
-                <span>Empleado</span>
-                <span>Cantidad</span>
-                <span>Precio Unitario</span>
-                <span>Subtotal</span>
-              </div>
-
-              <!-- Items de la venta -->
-              <div class="fila" *ngFor="let d of sale.details">
-                <span>{{ d.service_name }}</span>
-                <span>{{ d.employee_name }}</span>
-                <span>{{ d.quantity }}</span>
-                <span>{{ d.unit_price | currency:'COP' }}</span>
-                <span>{{ d.subtotal | currency:'COP' }}</span>
-              </div>
-
-            </div>
-          </div>
-
-        </ng-container>
       </div>
 
     </div>
