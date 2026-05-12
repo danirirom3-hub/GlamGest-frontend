@@ -12,7 +12,6 @@
       <button [class.active]="view === 'calendar'" (click)="view = 'calendar'">Calendario</button>
     </div>
 
-    <!-- CREAR -->
     <div *ngIf="view === 'create'" class="card">
 
       <div class="grid">
@@ -65,7 +64,6 @@
       </div>
     </div>
 
-    <!-- AGENDA -->
     <div *ngIf="view === 'list'" class="card">
 
       <div class="grid">
@@ -75,7 +73,7 @@
       </div>
 
       <div class="empty" *ngIf="filteredAppointments().length === 0">
-        No hay citas registradas
+        No hay citas registradas que coincidan con la búsqueda
       </div>
 
       <div *ngFor="let c of filteredAppointments()" class="cita-card">
@@ -104,14 +102,12 @@
         </div>
 
         <div class="actions">
-          <!-- BOTÓN CORRECTO -->
           <button class="btn-primary small"
                   [disabled]="c.status === 'sent_to_cash'"
                   (click)="sendToCash(c)">
             {{ c.status === 'sent_to_cash' ? 'En caja' : 'Pasar a caja' }}
           </button>
 
-          <!-- BOTÓN CORRECTO -->
           <button class="btn-danger small" (click)="deleteAppointment(c)">
             Eliminar
           </button>
@@ -120,7 +116,6 @@
       </div>
     </div>
 
-    <!-- CALENDARIO (NO TOCADO) -->
     <div *ngIf="view === 'calendar'" class="calendar-wrapper">
       <full-calendar [options]="calendarOptions"></full-calendar>
     </div>

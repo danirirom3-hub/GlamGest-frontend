@@ -103,13 +103,11 @@ export class AppointmentsComponent implements OnInit {
     this.clientsService.getClients().subscribe({
       next: (clientsRes: any) => {
         this.clients = clientsRes?.data || clientsRes || [];
-        // Autoseleccionar primer cliente si existe
         if (this.clients.length > 0) this.selectedClient = this.clients[0].name;
 
         this.employeesService.getEmployees().subscribe({
           next: (empRes: any) => {
             this.employees = empRes?.data || empRes || [];
-            // Autoseleccionar primer empleado si existe
             if (this.employees.length > 0) this.selectedEmployee = this.employees[0];
 
             this.servicesService.getServices().subscribe({
@@ -148,8 +146,6 @@ export class AppointmentsComponent implements OnInit {
   }
 
   scheduleAppointment(): void {
-
-    // evitar doble clic
     if (this.isLoading) return;
 
     if (!this.selectedClient || !this.selectedEmployee || !this.selectedDate || !this.selectedTime || !this.selectedService) {
@@ -175,9 +171,7 @@ export class AppointmentsComponent implements OnInit {
     }).subscribe({
       next: (res: any) => {
         this.isLoading = false;
-
         if (res?.successful) {
-
           this.appointments.push({
             id: res.data.id,
             client: this.selectedClient,
@@ -209,9 +203,7 @@ export class AppointmentsComponent implements OnInit {
     });
   }
 
-  // enviar a caja
   sendToCash(app: Appointment): void {
-
     Swal.fire({
       title: 'Enviar a caja',
       text: `${app.client} - ${app.service}`,
@@ -220,7 +212,6 @@ export class AppointmentsComponent implements OnInit {
       confirmButtonText: 'Sí, enviar',
       cancelButtonText: 'Cancelar'
     }).then(result => {
-
       if (!result.isConfirmed) return;
 
       this.cashService.addItemFromAppointment(app);
@@ -237,9 +228,7 @@ export class AppointmentsComponent implements OnInit {
     });
   }
 
-  // elimina cita
   deleteAppointment(app: Appointment): void {
-
     Swal.fire({
       title: '¿Eliminar cita?',
       text: `${app.client} - ${app.service}`,
@@ -249,15 +238,11 @@ export class AppointmentsComponent implements OnInit {
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#d33'
     }).then((result) => {
-
       if (result.isConfirmed) {
-
         this.appointmentsService.deleteAppointment(app.id).subscribe({
           next: () => {
-
             this.appointments = this.appointments.filter(a => a.id !== app.id);
             this.updateCalendarEvents();
-
             Swal.fire({
               icon: 'success',
               title: 'Eliminada',
@@ -265,15 +250,12 @@ export class AppointmentsComponent implements OnInit {
               timer: 1200,
               showConfirmButton: false
             });
-
           },
           error: () => {
             Swal.fire('Error', 'No se pudo eliminar la cita.', 'error');
           }
         });
-
       }
-
     });
   }
 
@@ -290,12 +272,15 @@ export class AppointmentsComponent implements OnInit {
     this.details = '';
   }
 
+  // --- ESTA ES LA FUNCIÓN CORREGIDA ---
   filteredAppointments(): Appointment[] {
-    return this.appointments.filter(a =>
-      (!this.filterClient || a.client.toLowerCase().includes(this.filterClient.toLowerCase())) &&
-      (!this.filterEmployee || a.employee.toLowerCase().includes(this.filterEmployee.toLowerCase())) &&
-      (!this.filterDate || a.date === this.filterDate)
-    );
+    return this.appointments.filter(a => {
+      const matchClient = !this.filterClient || a.client.toLowerCase().includes(this.filterClient.toLowerCase());
+      const matchEmployee = !this.filterEmployee || a.employee.toLowerCase().includes(this.filterEmployee.toLowerCase());
+      const matchDate = !this.filterDate || a.date === this.filterDate;
+      
+      return matchClient && matchEmployee && matchDate;
+    });
   }
 
   updateCalendarEvents(): void {
