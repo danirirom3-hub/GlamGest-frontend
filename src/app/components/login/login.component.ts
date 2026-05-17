@@ -43,23 +43,40 @@ export class LoginComponent {
 
     this.authService.login(this.user).subscribe({
       next: (res: any) => {
-        const token = res?.data?.token;
+        const token =
+          res?.data?.token ||
+          res?.token ||
+          res?.accessToken;
 
         if (token) {
           this.authService.saveToken(token);
+
           // Guardar userId en localStorage si el backend lo devuelve
-          const userId = res?.data?.user?.id || res?.data?.userId || res?.data?.id;
+          let userId =
+            res?.data?.user?.id ||
+            res?.data?.userId ||
+            res?.data?.id ||
+            res?.user?.id ||
+            res?.userId ||
+            res?.id;
+
+          if (!userId) {
+            userId = this.authService.getUserId();
+          }
+
           if (userId) {
             localStorage.setItem('userId', String(userId));
             localStorage.setItem('user_id', String(userId));
+            localStorage.setItem('id', String(userId));
           }
+
           this.message = 'Login exitoso. Redirigiendo...';
           this.messageType = 'success';
-          
+
           setTimeout(() => {
             this.router.navigate(['/dashboard']);
           }, 1500);
-          
+
         } else {
           this.message = res?.message || 'No se pudo iniciar sesión.';
           this.messageType = 'error';

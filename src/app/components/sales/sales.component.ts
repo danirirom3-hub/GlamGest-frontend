@@ -24,14 +24,14 @@ export class SalesComponent implements OnInit {
   ) {}
 
   // =========================
-  // MENSAJES Y ESTADOS
+  // MENSAJES
   // =========================
   errorMessage: string = '';
   successMessage: string = '';
   isLoading: boolean = false;
 
   // =========================
-  // CONTROL DE VISTAS
+  // VISTAS
   // =========================
   view: 'create' | 'history' = 'create';
 
@@ -41,7 +41,7 @@ export class SalesComponent implements OnInit {
   showModal = false;
 
   // =========================
-  // DATOS CLIENTE
+  // CLIENTE
   // =========================
   clientData = {
     name: '',
@@ -49,17 +49,14 @@ export class SalesComponent implements OnInit {
     email: ''
   };
 
-  // =========================
-  // MÉTODO DE PAGO
-  // =========================
-  paymentMethod = '';
+  selectedClientId: any = '';
 
-  // =========================
-  // CLIENTES
-  // =========================
   clients: any[] = [];
 
-  selectedClientId: any = '';
+  // =========================
+  // PAGO
+  // =========================
+  paymentMethod = '';
 
   // =========================
   // SERVICIOS
@@ -72,7 +69,7 @@ export class SalesComponent implements OnInit {
   employees: any[] = [];
 
   // =========================
-  // ITEMS VENTA
+  // ITEMS
   // =========================
   items: any[] = [];
 
@@ -87,14 +84,17 @@ export class SalesComponent implements OnInit {
   ngOnInit(): void {
 
     this.loadClients();
+
     this.loadServices();
+
     this.loadEmployees();
+
     this.loadSales();
 
   }
 
   // =========================
-  // CARGAR CLIENTES
+  // CLIENTES
   // =========================
   loadClients(): void {
 
@@ -102,12 +102,15 @@ export class SalesComponent implements OnInit {
 
       next: (res: any) => {
 
-        this.clients = res?.data || res || [];
+        this.clients =
+          res?.data || res || [];
 
         if (this.clients.length > 0) {
 
           this.selectedClientId =
+
             this.clients[0].client_id ??
+
             this.clients[0].id;
 
           this.onClientSelect();
@@ -115,6 +118,7 @@ export class SalesComponent implements OnInit {
       },
 
       error: (err: any) => {
+
         console.error(
           'Error cargando clientes',
           err
@@ -125,7 +129,7 @@ export class SalesComponent implements OnInit {
   }
 
   // =========================
-  // CARGAR SERVICIOS
+  // SERVICIOS
   // =========================
   loadServices(): void {
 
@@ -150,7 +154,7 @@ export class SalesComponent implements OnInit {
   }
 
   // =========================
-  // CARGAR EMPLEADOS
+  // EMPLEADOS
   // =========================
   loadEmployees(): void {
 
@@ -175,7 +179,7 @@ export class SalesComponent implements OnInit {
   }
 
   // =========================
-  // CARGAR HISTORIAL
+  // HISTORIAL
   // =========================
   loadSales(): void {
 
@@ -205,9 +209,13 @@ export class SalesComponent implements OnInit {
   onClientSelect(): void {
 
     const client = this.clients.find(
+
       c =>
+
         (c.client_id ?? c.id) ==
+
         this.selectedClientId
+
     );
 
     if (client) {
@@ -224,15 +232,19 @@ export class SalesComponent implements OnInit {
     } else {
 
       this.clientData = {
+
         name: '',
+
         phone: '',
+
         email: ''
+
       };
     }
   }
 
   // =========================
-  // ABRIR MODAL
+  // MODAL
   // =========================
   openModal(): void {
 
@@ -240,9 +252,6 @@ export class SalesComponent implements OnInit {
 
   }
 
-  // =========================
-  // CERRAR MODAL
-  // =========================
   closeModal(): void {
 
     this.showModal = false;
@@ -271,7 +280,9 @@ export class SalesComponent implements OnInit {
     });
 
     this.calculateLine(
+
       this.items[this.items.length - 1]
+
     );
 
     this.closeModal();
@@ -287,7 +298,7 @@ export class SalesComponent implements OnInit {
   }
 
   // =========================
-  // CALCULAR LÍNEA
+  // CALCULAR SUBTOTAL
   // =========================
   calculateLine(item: any): void {
 
@@ -312,7 +323,9 @@ export class SalesComponent implements OnInit {
       (sum, item) =>
 
         sum + (
+
           Number(item.subtotal) || 0
+
         ),
 
       0
@@ -333,10 +346,13 @@ export class SalesComponent implements OnInit {
     // =========================
 
     const matchedClient =
-      this.clients.find(c =>
+      this.clients.find(
 
-        (c.client_id ?? c.id) ==
-        this.selectedClientId
+        c =>
+
+          (c.client_id ?? c.id) ==
+
+          this.selectedClientId
 
       );
 
@@ -378,7 +394,9 @@ export class SalesComponent implements OnInit {
 
     const missingEmployee =
       this.items.some(
+
         item => !item.employeeId
+
       );
 
     if (missingEmployee) {
@@ -390,82 +408,16 @@ export class SalesComponent implements OnInit {
     }
 
     // =========================
-    // OBTENER USER ID
+    // USER ID
     // =========================
+    // TEMPORAL
+    // CAMBIA EL 2
+    // POR TU ID REAL
 
-    let userId: number | null = null;
-
-    // Buscar en localStorage
-    const storedUser =
-
-      localStorage.getItem('userId') ||
-
-      localStorage.getItem('user_id') ||
-
-      localStorage.getItem('id');
-
-    if (storedUser) {
-
-      userId = Number(storedUser);
-
-    }
-
-    // Buscar en token
-    if (!userId) {
-
-      const token =
-        localStorage.getItem('token');
-
-      if (token) {
-
-        try {
-
-          const payload = JSON.parse(
-
-            atob(
-              token.split('.')[1]
-            )
-
-          );
-
-          console.log(
-            'TOKEN PAYLOAD:',
-            payload
-          );
-
-          userId = Number(
-
-            payload.id ||
-
-            payload.userId ||
-
-            payload.user_id ||
-
-            payload.sub
-
-          );
-
-        } catch (e) {
-
-          console.error(
-            'Error leyendo token',
-            e
-          );
-        }
-      }
-    }
-
-    // Validación final
-    if (!userId || isNaN(userId)) {
-
-      this.errorMessage =
-        'No se encontró el usuario logueado';
-
-      return;
-    }
+    const userId = 2;
 
     // =========================
-    // CONSTRUIR DETALLES
+    // DETALLES
     // =========================
 
     const saleDetails =
@@ -475,10 +427,10 @@ export class SalesComponent implements OnInit {
           item.appointmentId || null,
 
         employeeId:
-          item.employeeId,
+          Number(item.employeeId),
 
         serviceId:
-          item.serviceId,
+          Number(item.serviceId),
 
         quantity:
           Number(item.quantity) || 1,
@@ -495,10 +447,12 @@ export class SalesComponent implements OnInit {
     const payload = {
 
       clientId:
-        matchedClient.client_id ??
-        matchedClient.id,
+        Number(
+          matchedClient.client_id ??
+          matchedClient.id
+        ),
 
-      userId,
+      userId: Number(userId),
 
       paymentType:
         this.paymentMethod.toLowerCase(),
@@ -523,10 +477,17 @@ export class SalesComponent implements OnInit {
 
         next: (res: any) => {
 
+          console.log(
+            'VENTA CREADA:',
+            res
+          );
+
           this.isLoading = false;
 
           this.successMessage =
+
             res?.message ||
+
             'Venta creada correctamente';
 
           this.resetForm();
@@ -537,12 +498,12 @@ export class SalesComponent implements OnInit {
 
         error: (err: any) => {
 
-          this.isLoading = false;
-
           console.error(
-            'ERROR CREANDO VENTA',
+            'ERROR CREANDO VENTA:',
             err
           );
+
+          this.isLoading = false;
 
           this.errorMessage =
 
@@ -555,7 +516,7 @@ export class SalesComponent implements OnInit {
   }
 
   // =========================
-  // LIMPIAR FORMULARIO
+  // LIMPIAR
   // =========================
   resetForm(): void {
 

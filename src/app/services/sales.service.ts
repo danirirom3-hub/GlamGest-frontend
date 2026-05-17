@@ -15,7 +15,8 @@ export interface SaleDetail {
 export interface CreateSaleRequest {
   clientId: number;
   saleDetails: SaleDetail[];
-  userId: number;
+  userId?: number;
+  user_id?: number;
   paymentType: string;
 }
 
