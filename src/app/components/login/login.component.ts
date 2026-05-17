@@ -47,6 +47,12 @@ export class LoginComponent {
 
         if (token) {
           this.authService.saveToken(token);
+          // Guardar userId en localStorage si el backend lo devuelve
+          const userId = res?.data?.user?.id || res?.data?.userId || res?.data?.id;
+          if (userId) {
+            localStorage.setItem('userId', String(userId));
+            localStorage.setItem('user_id', String(userId));
+          }
           this.message = 'Login exitoso. Redirigiendo...';
           this.messageType = 'success';
           

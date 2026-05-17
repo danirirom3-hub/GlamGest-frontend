@@ -16,7 +16,6 @@
       </button>
     </div>
 
-    <!-- REGISTRAR VENTA -->
     <div *ngIf="view === 'create'" class="card fade-in">
 
       <h3>Datos del Cliente</h3>
@@ -43,14 +42,12 @@
 
       </div>
 
-      <!-- BOTON AGREGAR -->
       <div class="actions">
         <button class="btn-primary" (click)="openModal()">
           + Agregar Servicio
         </button>
       </div>
 
-      <!-- DETALLE -->
       <div class="form-group">
 
         <label>Detalle de la venta</label>
@@ -63,24 +60,19 @@
             <span>Cantidad</span>
             <span>Valor Unitario</span>
             <span>Subtotal</span>
-            <span>Total</span>
             <span></span>
           </div>
 
           <div class="fila col-detalles" *ngFor="let item of items; let i = index">
 
-            <select [(ngModel)]="item.employee_id">
+            <select [(ngModel)]="item.employeeId">
               <option value="">Empleado</option>
-
-              <option
-                *ngFor="let emp of employees"
-                [value]="emp.employee_id"
-              >
+              <option *ngFor="let emp of employees" [value]="emp.employee_id || emp.id">
                 {{ emp.name }}
               </option>
             </select>
 
-            <span>{{ item.service_name }}</span>
+            <span>{{ item.serviceName }}</span>
 
             <input
               type="number"
@@ -89,16 +81,16 @@
               (input)="calculateLine(item)"
             >
 
-            <span>
-              {{ item.unit_price | currency:'COP':'symbol':'1.0-0' }}
-            </span>
+            <input 
+              type="number" 
+              min="0"
+              [(ngModel)]="item.unitPrice" 
+              (input)="calculateLine(item)"
+              class="input-price"
+            >
 
             <span>
               {{ item.subtotal | currency:'COP':'symbol':'1.0-0' }}
-            </span>
-
-            <span class="monto">
-              {{ item.total | currency:'COP':'symbol':'1.0-0' }}
             </span>
 
             <button class="btn-remove" (click)="removeService(i)">
@@ -111,22 +103,22 @@
 
       </div>
 
-      <!-- TOTAL -->
       <div class="total-box">
         <span>Total a pagar</span>
-
         <h2>
           {{ getTotal() | currency:'COP':'symbol':'1.0-0' }}
         </h2>
       </div>
 
-      <button class="btn-save" (click)="registrarVenta()">
-        Registrar Venta
+      <p *ngIf="errorMessage" class="error-msg" style="color: red; margin: 10px 0;">{{ errorMessage }}</p>
+      <p *ngIf="successMessage" class="success-msg" style="color: green; margin: 10px 0;">{{ successMessage }}</p>
+
+      <button class="btn-save" [disabled]="isLoading" (click)="registrarVenta()">
+        {{ isLoading ? 'Procesando...' : 'Registrar Venta' }}
       </button>
 
     </div>
 
-    <!-- HISTORIAL -->
     <div *ngIf="view === 'history'" class="card fade-in">
 
       <h3>Historial de Ventas</h3>
@@ -145,33 +137,26 @@
         </div>
 
         <div class="fila col-historial" *ngFor="let sale of sales">
-
-          <span>{{ sale.date }}</span>
-
-          <span>{{ sale.client }}</span>
-
+          <span>{{ sale.date || sale.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          <span>{{ sale.client?.name || sale.clientName || 'Cliente General' }}</span>
           <span>
             {{ sale.total | currency:'COP':'symbol':'1.0-0' }}
           </span>
-
           <button class="btn-view">
             Ver
           </button>
-
         </div>
 
       </div>
 
     </div>
 
-    <!-- MODAL SERVICIOS -->
     <div class="modal-backdrop" *ngIf="showModal">
 
       <div class="modal">
 
         <div class="modal-header">
           <h3>Seleccionar Servicio</h3>
-
           <button class="btn-close" (click)="closeModal()">
             ✕
           </button>
@@ -186,20 +171,13 @@
           </div>
 
           <div class="fila col-servicios" *ngFor="let service of services">
-
             <span>{{ service.name }}</span>
-
             <span>
               {{ service.price | currency:'COP':'symbol':'1.0-0' }}
             </span>
-
-            <button
-              class="btn-add"
-              (click)="addService(service)"
-            >
+            <button class="btn-add" (click)="addService(service)">
               Agregar
             </button>
-
           </div>
 
         </div>
