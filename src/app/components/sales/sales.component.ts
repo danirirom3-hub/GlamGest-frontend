@@ -410,9 +410,6 @@ export class SalesComponent implements OnInit {
     // =========================
     // USER ID
     // =========================
-    // TEMPORAL
-    // CAMBIA EL 2
-    // POR TU ID REAL
 
     const userId = 2;
 
@@ -510,6 +507,48 @@ export class SalesComponent implements OnInit {
             err?.error?.message ||
 
             'Error al registrar la venta';
+        }
+
+      });
+  }
+
+  // =========================
+  // ELIMINAR VENTA
+  // =========================
+  deleteSale(sale: any): void {
+
+    const confirmDelete = confirm(
+      `¿Deseas eliminar la venta #${sale.id}?`
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    this.salesService.deleteSale(sale.id)
+      .subscribe({
+
+        next: () => {
+
+          this.sales = this.sales.filter(
+            s => s.id !== sale.id
+          );
+
+          this.successMessage =
+            'Venta eliminada correctamente';
+
+        },
+
+        error: (err: any) => {
+
+          console.error(
+            'Error eliminando venta',
+            err
+          );
+
+          this.errorMessage =
+            err?.error?.message ||
+            'No se pudo eliminar la venta';
         }
 
       });

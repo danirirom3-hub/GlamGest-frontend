@@ -24,28 +24,58 @@
 
         <div class="form-group">
           <label>Cliente</label>
+
           <select [(ngModel)]="selectedClientId" (change)="onClientSelect()">
-            <option value="">Seleccionar cliente</option>
-            <option *ngFor="let c of clients" [value]="c.client_id || c.id">{{ c.name }}</option>
+
+            <option value="">
+              Seleccionar cliente
+            </option>
+
+            <option
+              *ngFor="let c of clients"
+              [value]="c.client_id || c.id"
+            >
+              {{ c.name }}
+            </option>
+
           </select>
         </div>
 
         <div class="form-group">
           <label>Método de pago</label>
+
           <select [(ngModel)]="paymentMethod">
-            <option value="">Seleccionar método</option>
-            <option value="Efectivo">Efectivo</option>
-            <option value="Tarjeta">Tarjeta</option>
-            <option value="Transferencia">Transferencia</option>
+
+            <option value="">
+              Seleccionar método
+            </option>
+
+            <option value="Efectivo">
+              Efectivo
+            </option>
+
+            <option value="Tarjeta">
+              Tarjeta
+            </option>
+
+            <option value="Transferencia">
+              Transferencia
+            </option>
+
           </select>
         </div>
 
       </div>
 
       <div class="actions">
-        <button class="btn-primary" (click)="openModal()">
+
+        <button
+          class="btn-primary"
+          (click)="openModal()"
+        >
           + Agregar Servicio
         </button>
+
       </div>
 
       <div class="form-group">
@@ -55,21 +85,34 @@
         <div class="tabla-contenedor">
 
           <div class="fila header-tabla col-detalles">
+
             <span>Empleado</span>
             <span>Servicio</span>
             <span>Cantidad</span>
             <span>Valor Unitario</span>
             <span>Subtotal</span>
             <span></span>
+
           </div>
 
-          <div class="fila col-detalles" *ngFor="let item of items; let i = index">
+          <div
+            class="fila col-detalles"
+            *ngFor="let item of items; let i = index"
+          >
 
             <select [(ngModel)]="item.employeeId">
-              <option value="">Empleado</option>
-              <option *ngFor="let emp of employees" [value]="emp.employee_id || emp.id">
+
+              <option value="">
+                Empleado
+              </option>
+
+              <option
+                *ngFor="let emp of employees"
+                [value]="emp.employee_id || emp.id"
+              >
                 {{ emp.name }}
               </option>
+
             </select>
 
             <span>{{ item.serviceName }}</span>
@@ -81,10 +124,10 @@
               (input)="calculateLine(item)"
             >
 
-            <input 
-              type="number" 
+            <input
+              type="number"
               min="0"
-              [(ngModel)]="item.unitPrice" 
+              [(ngModel)]="item.unitPrice"
               (input)="calculateLine(item)"
               class="input-price"
             >
@@ -93,7 +136,10 @@
               {{ item.subtotal | currency:'COP':'symbol':'1.0-0' }}
             </span>
 
-            <button class="btn-remove" (click)="removeService(i)">
+            <button
+              class="btn-remove"
+              (click)="removeService(i)"
+            >
               X
             </button>
 
@@ -104,16 +150,36 @@
       </div>
 
       <div class="total-box">
+
         <span>Total a pagar</span>
+
         <h2>
           {{ getTotal() | currency:'COP':'symbol':'1.0-0' }}
         </h2>
+
       </div>
 
-      <p *ngIf="errorMessage" class="error-msg" style="color: red; margin: 10px 0;">{{ errorMessage }}</p>
-      <p *ngIf="successMessage" class="success-msg" style="color: green; margin: 10px 0;">{{ successMessage }}</p>
+      <p
+        *ngIf="errorMessage"
+        class="error-msg"
+        style="color: red; margin: 10px 0;"
+      >
+        {{ errorMessage }}
+      </p>
 
-      <button class="btn-save" [disabled]="isLoading" (click)="registrarVenta()">
+      <p
+        *ngIf="successMessage"
+        class="success-msg"
+        style="color: green; margin: 10px 0;"
+      >
+        {{ successMessage }}
+      </p>
+
+      <button
+        class="btn-save"
+        [disabled]="isLoading"
+        (click)="registrarVenta()"
+      >
         {{ isLoading ? 'Procesando...' : 'Registrar Venta' }}
       </button>
 
@@ -127,57 +193,105 @@
         No hay ventas registradas
       </div>
 
-      <div class="tabla-contenedor" *ngIf="sales.length > 0">
+      <div
+        class="tabla-contenedor"
+        *ngIf="sales.length > 0"
+      >
 
         <div class="fila header-tabla col-historial">
+
           <span>Fecha</span>
           <span>Cliente</span>
           <span>Total</span>
           <span>Detalle</span>
+          <span>Acciones</span>
+
         </div>
 
-        <div class="fila col-historial" *ngFor="let sale of sales">
-          <span>{{ sale.date || sale.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
-          <span>{{ sale.client?.name || sale.clientName || 'Cliente General' }}</span>
+        <div
+          class="fila col-historial"
+          *ngFor="let sale of sales"
+        >
+
+          <span>
+            {{ sale.date || sale.createdAt | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+
+          <span>
+            {{ sale.client?.name || sale.clientName || 'Cliente General' }}
+          </span>
+
           <span>
             {{ sale.total | currency:'COP':'symbol':'1.0-0' }}
           </span>
+
           <button class="btn-view">
             Ver
           </button>
+
+          <button
+            class="btn-remove"
+            (click)="deleteSale(sale)"
+          >
+            Eliminar
+          </button>
+
         </div>
 
       </div>
 
     </div>
 
-    <div class="modal-backdrop" *ngIf="showModal">
+    <div
+      class="modal-backdrop"
+      *ngIf="showModal"
+    >
 
       <div class="modal">
 
         <div class="modal-header">
-          <h3>Seleccionar Servicio</h3>
-          <button class="btn-close" (click)="closeModal()">
+
+          <h3>
+            Seleccionar Servicio
+          </h3>
+
+          <button
+            class="btn-close"
+            (click)="closeModal()"
+          >
             ✕
           </button>
+
         </div>
 
         <div class="tabla-contenedor">
 
           <div class="fila header-tabla col-servicios">
+
             <span>Servicio</span>
             <span>Precio</span>
             <span>Acción</span>
+
           </div>
 
-          <div class="fila col-servicios" *ngFor="let service of services">
+          <div
+            class="fila col-servicios"
+            *ngFor="let service of services"
+          >
+
             <span>{{ service.name }}</span>
+
             <span>
               {{ service.price | currency:'COP':'symbol':'1.0-0' }}
             </span>
-            <button class="btn-add" (click)="addService(service)">
+
+            <button
+              class="btn-add"
+              (click)="addService(service)"
+            >
               Agregar
             </button>
+
           </div>
 
         </div>
