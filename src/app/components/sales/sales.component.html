@@ -24,30 +24,11 @@
       <div class="grid">
 
         <div class="form-group">
-          <label>Nombre</label>
-          <input
-            type="text"
-            placeholder="Nombre del cliente"
-            [(ngModel)]="clientData.name"
-          >
-        </div>
-
-        <div class="form-group">
-          <label>Teléfono</label>
-          <input
-            type="text"
-            placeholder="Teléfono"
-            [(ngModel)]="clientData.phone"
-          >
-        </div>
-
-        <div class="form-group">
-          <label>Correo</label>
-          <input
-            type="email"
-            placeholder="Correo"
-            [(ngModel)]="clientData.email"
-          >
+          <label>Cliente</label>
+          <select [(ngModel)]="selectedClientId" (change)="onClientSelect()">
+            <option value="">Seleccionar cliente</option>
+            <option *ngFor="let c of clients" [value]="c.client_id || c.id">{{ c.name }}</option>
+          </select>
         </div>
 
         <div class="form-group">
