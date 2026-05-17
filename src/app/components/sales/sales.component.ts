@@ -23,26 +23,25 @@ export class SalesComponent implements OnInit {
     private servicesService: ServicesService
   ) {}
 
-  // =========================
   // MENSAJES
-  // =========================
+  
   errorMessage: string = '';
   successMessage: string = '';
   isLoading: boolean = false;
 
-  // =========================
+  
   // VISTAS
-  // =========================
+  
   view: 'create' | 'history' = 'create';
 
-  // =========================
+  
   // MODAL
-  // =========================
+  
   showModal = false;
 
-  // =========================
+  
   // CLIENTE
-  // =========================
+  
   clientData = {
     name: '',
     phone: '',
@@ -53,34 +52,33 @@ export class SalesComponent implements OnInit {
 
   clients: any[] = [];
 
-  // =========================
+  
   // PAGO
-  // =========================
+  
   paymentMethod = '';
 
-  // =========================
+ 
   // SERVICIOS
-  // =========================
+  
   services: any[] = [];
 
-  // =========================
+ 
   // EMPLEADOS
-  // =========================
+
   employees: any[] = [];
 
-  // =========================
+ 
   // ITEMS
-  // =========================
+ 
   items: any[] = [];
 
-  // =========================
   // HISTORIAL
-  // =========================
+  
   sales: any[] = [];
 
-  // =========================
+  
   // INIT
-  // =========================
+ 
   ngOnInit(): void {
 
     this.loadClients();
@@ -93,9 +91,8 @@ export class SalesComponent implements OnInit {
 
   }
 
-  // =========================
   // CLIENTES
-  // =========================
+ 
   loadClients(): void {
 
     this.clientsService.getClients().subscribe({
@@ -128,9 +125,9 @@ export class SalesComponent implements OnInit {
     });
   }
 
-  // =========================
+  
   // SERVICIOS
-  // =========================
+  
   loadServices(): void {
 
     this.servicesService.getServices().subscribe({
@@ -153,9 +150,9 @@ export class SalesComponent implements OnInit {
     });
   }
 
-  // =========================
+  
   // EMPLEADOS
-  // =========================
+ 
   loadEmployees(): void {
 
     this.employeesService.getEmployees().subscribe({
@@ -178,9 +175,9 @@ export class SalesComponent implements OnInit {
     });
   }
 
-  // =========================
+ 
   // HISTORIAL
-  // =========================
+
   loadSales(): void {
 
     this.salesService.getSales().subscribe({
@@ -203,9 +200,9 @@ export class SalesComponent implements OnInit {
     });
   }
 
-  // =========================
+  
   // SELECCIONAR CLIENTE
-  // =========================
+ 
   onClientSelect(): void {
 
     const client = this.clients.find(
@@ -243,9 +240,9 @@ export class SalesComponent implements OnInit {
     }
   }
 
-  // =========================
+  
   // MODAL
-  // =========================
+ 
   openModal(): void {
 
     this.showModal = true;
@@ -258,9 +255,8 @@ export class SalesComponent implements OnInit {
 
   }
 
-  // =========================
   // AGREGAR SERVICIO
-  // =========================
+ 
   addService(service: any): void {
 
     this.items.push({
@@ -407,15 +403,15 @@ export class SalesComponent implements OnInit {
       return;
     }
 
-    // =========================
+    
     // USER ID
-    // =========================
+    
 
     const userId = 2;
 
-    // =========================
+    
     // DETALLES
-    // =========================
+    
 
     const saleDetails =
       this.items.map(item => ({
@@ -436,10 +432,6 @@ export class SalesComponent implements OnInit {
           Number(item.unitPrice) || 0
 
       }));
-
-    // =========================
-    // PAYLOAD
-    // =========================
 
     const payload = {
 
@@ -463,9 +455,9 @@ export class SalesComponent implements OnInit {
       payload
     );
 
-    // =========================
+    
     // CREAR VENTA
-    // =========================
+    
 
     this.isLoading = true;
 
@@ -512,9 +504,8 @@ export class SalesComponent implements OnInit {
       });
   }
 
-  // =========================
   // ELIMINAR VENTA
-  // =========================
+  
   deleteSale(sale: any): void {
 
     const confirmDelete = confirm(
@@ -554,9 +545,8 @@ export class SalesComponent implements OnInit {
       });
   }
 
-  // =========================
   // LIMPIAR
-  // =========================
+ 
   resetForm(): void {
 
     this.clientData = {
