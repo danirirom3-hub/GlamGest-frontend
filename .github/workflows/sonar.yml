@@ -1,0 +1,35 @@
+name: Frontend SonarCloud
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sonar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Angular project
+        run: npm run build
+
+      - name: SonarCloud Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          npx sonar-scanner \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.organization=danirirom3-hub \
+          -Dsonar.projectKey=danirirom3-hub_GlamGest-frontend \
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }}
