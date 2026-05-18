@@ -70,9 +70,9 @@ export class SalesService {
   }
 
   // Eliminar venta
-  deleteSale(id: number): Observable<any> {
+  deleteSale(id: number): Observable<void> {
     const headers = this.getAuthHeaders();
-    return this.http.delete(`${this.apiUrl}/${id}`, headers ? { headers } : {});
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, headers ? { headers } : {});
   }
 
 }
