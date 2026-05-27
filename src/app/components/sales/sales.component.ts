@@ -6,6 +6,7 @@ import { ClientsService } from '../../services/clients.service';
 import { SalesService } from '../../services/sales.service';
 import { EmployeesService } from '../../services/employees.service';
 import { ServicesService } from '../../services/services.service';
+import { AppointmentsService } from '../../services/appointments.service';
 
 @Component({
   selector: 'app-sales',
@@ -20,163 +21,109 @@ export class SalesComponent implements OnInit {
     private clientsService: ClientsService,
     private salesService: SalesService,
     private employeesService: EmployeesService,
-    private servicesService: ServicesService
+    private servicesService: ServicesService,
+    private appointmentsService: AppointmentsService
   ) {}
 
-  // MENSAJES
-  
-  errorMessage: string = '';
-  successMessage: string = '';
-  isLoading: boolean = false;
+  errorMessage = '';
+  successMessage = '';
+  isLoading = false;
 
-  
-  // VISTAS
-  
   view: 'create' | 'history' = 'create';
 
-  
-  // MODAL
-  
   showModal = false;
+  showAppointmentsModal = false;
 
-  
-  // CLIENTE
-  
+  appointmentSearch = '';
+
+  selectedClientId: any = '';
+
+  paymentMethod = '';
+
+  clients: any[] = [];
+  services: any[] = [];
+  employees: any[] = [];
+  sales: any[] = [];
+  appointments: any[] = [];
+  items: any[] = [];
+
+  selectedAppointment: any = null;
+
   clientData = {
     name: '',
     phone: '',
     email: ''
   };
 
-  selectedClientId: any = '';
-
-  clients: any[] = [];
-
-  
-  // PAGO
-  
-  paymentMethod = '';
-
- 
-  // SERVICIOS
-  
-  services: any[] = [];
-
- 
-  // EMPLEADOS
-
-  employees: any[] = [];
-
- 
-  // ITEMS
- 
-  items: any[] = [];
-
-  // HISTORIAL
-  
-  sales: any[] = [];
-
-  
-  // INIT
- 
   ngOnInit(): void {
 
     this.loadClients();
-
     this.loadServices();
-
     this.loadEmployees();
-
     this.loadSales();
+    this.loadAppointments();
 
   }
 
-  // CLIENTES
- 
   loadClients(): void {
 
     this.clientsService.getClients().subscribe({
 
       next: (res: any) => {
 
-        this.clients =
-          res?.data || res || [];
+        this.clients = res?.data || res || [];
 
-        if (this.clients.length > 0) {
-
-          this.selectedClientId =
-
-            this.clients[0].client_id ??
-
-            this.clients[0].id;
-
-          this.onClientSelect();
-        }
       },
 
       error: (err: any) => {
 
-        console.error(
-          'Error cargando clientes',
-          err
-        );
+        console.error(err);
+
       }
 
     });
+
   }
 
-  
-  // SERVICIOS
-  
   loadServices(): void {
 
     this.servicesService.getServices().subscribe({
 
       next: (res: any) => {
 
-        this.services =
-          res?.data || res || [];
+        this.services = res?.data || res || [];
 
       },
 
       error: (err: any) => {
 
-        console.error(
-          'Error cargando servicios',
-          err
-        );
+        console.error(err);
+
       }
 
     });
+
   }
 
-  
-  // EMPLEADOS
- 
   loadEmployees(): void {
 
     this.employeesService.getEmployees().subscribe({
 
       next: (res: any) => {
 
-        this.employees =
-          res?.data || res || [];
+        this.employees = res?.data || res || [];
 
       },
 
       error: (err: any) => {
 
-        console.error(
-          'Error cargando empleados',
-          err
-        );
+        console.error(err);
+
       }
 
     });
-  }
 
- 
-  // HISTORIAL
+  }
 
   loadSales(): void {
 
@@ -184,65 +131,68 @@ export class SalesComponent implements OnInit {
 
       next: (res: any) => {
 
-        this.sales =
-          res?.data || res || [];
+        this.sales = res?.data || res || [];
 
       },
 
       error: (err: any) => {
 
-        console.error(
-          'Error cargando ventas',
-          err
-        );
+        console.error(err);
+
       }
 
     });
+
   }
 
-  
-  // SELECCIONAR CLIENTE
- 
+  loadAppointments(): void {
+
+    this.appointmentsService.getAppointments().subscribe({
+
+      next: (res: any) => {
+
+        const data = res?.data || res || [];
+
+        this.appointments = data.filter(
+          (a: any) => a.status !== 'FACTURADA'
+        );
+
+      },
+
+      error: (err: any) => {
+
+        console.error(err);
+
+      }
+
+    });
+
+  }
+
   onClientSelect(): void {
 
     const client = this.clients.find(
 
       c =>
-
         (c.client_id ?? c.id) ==
-
         this.selectedClientId
 
     );
 
     if (client) {
 
-      this.clientData.name =
-        client.name || '';
-
-      this.clientData.phone =
-        client.phone || '';
-
-      this.clientData.email =
-        client.email || '';
-
-    } else {
-
       this.clientData = {
 
-        name: '',
-
-        phone: '',
-
-        email: ''
+        name: client.name || '',
+        phone: client.phone || '',
+        email: client.email || ''
 
       };
+
     }
+
   }
 
-  
-  // MODAL
- 
   openModal(): void {
 
     this.showModal = true;
@@ -255,8 +205,204 @@ export class SalesComponent implements OnInit {
 
   }
 
-  // AGREGAR SERVICIO
- 
+  openAppointmentsModal(): void {
+
+    this.showAppointmentsModal = true;
+
+  }
+
+  closeAppointmentsModal(): void {
+
+    this.showAppointmentsModal = false;
+
+  }
+
+  filteredAppointments(): any[] {
+
+    if (!this.appointmentSearch) {
+
+      return this.appointments;
+
+    }
+
+    return this.appointments.filter((a: any) =>
+
+      this.getAppointmentClientName(a)
+        .toLowerCase()
+        .includes(
+          this.appointmentSearch.toLowerCase()
+        )
+
+    );
+
+  }
+
+  getAppointmentClientName(
+    appointment: any
+  ): string {
+
+    return (
+
+      appointment.client?.name ||
+
+      appointment.clientName ||
+
+      this.findClientName(
+        appointment.clientId
+      ) ||
+
+      'Cliente'
+
+    );
+
+  }
+
+  getAppointmentServiceName(
+    appointment: any
+  ): string {
+
+    return (
+
+      appointment.service?.name ||
+
+      appointment.serviceName ||
+
+      this.findServiceName(
+        appointment.serviceId
+      ) ||
+
+      'Servicio'
+
+    );
+
+  }
+
+  getAppointmentEmployeeName(
+    appointment: any
+  ): string {
+
+    return (
+
+      appointment.employee?.name ||
+
+      appointment.employeeName ||
+
+      this.findEmployeeName(
+        appointment.employeeId
+      ) ||
+
+      'Empleado'
+
+    );
+
+  }
+
+  findClientName(id: any): string {
+
+    const client = this.clients.find(
+
+      c =>
+        (c.client_id ?? c.id) == id
+
+    );
+
+    return client?.name || '';
+
+  }
+
+  findServiceName(id: any): string {
+
+    const service = this.services.find(
+
+      s => s.id == id
+
+    );
+
+    return service?.name || '';
+
+  }
+
+  findEmployeeName(id: any): string {
+
+    const employee = this.employees.find(
+
+      e =>
+        (e.employee_id ?? e.id) == id
+
+    );
+
+    return employee?.name || '';
+
+  }
+
+  getEmployeeName(id: any): string {
+
+    return this.findEmployeeName(id);
+
+  }
+
+  selectAppointment(
+    appointment: any
+  ): void {
+
+    this.selectedAppointment =
+      appointment;
+
+    this.selectedClientId =
+
+      appointment.clientId ||
+
+      appointment.client?.id ||
+
+      appointment.client?.client_id ||
+
+      '';
+
+    this.onClientSelect();
+
+    this.items = [];
+
+    const serviceId =
+      appointment.serviceId ||
+      appointment.service?.id;
+
+    const employeeId =
+      appointment.employeeId ||
+      appointment.employee?.id;
+
+    const service = this.services.find(
+      s => s.id == serviceId
+    );
+
+    const price =
+      service?.price || 0;
+
+    this.items.push({
+
+      appointmentId:
+        appointment.id,
+
+      serviceId,
+
+      serviceName:
+        this.getAppointmentServiceName(
+          appointment
+        ),
+
+      employeeId,
+
+      quantity: 1,
+
+      unitPrice: price,
+
+      subtotal: price
+
+    });
+
+    this.closeAppointmentsModal();
+
+  }
+
   addService(service: any): void {
 
     this.items.push({
@@ -275,43 +421,26 @@ export class SalesComponent implements OnInit {
 
     });
 
-    this.calculateLine(
-
-      this.items[this.items.length - 1]
-
-    );
-
     this.closeModal();
+
   }
 
-  // =========================
-  // ELIMINAR ITEM
-  // =========================
   removeService(index: number): void {
 
     this.items.splice(index, 1);
 
   }
 
-  // =========================
-  // CALCULAR SUBTOTAL
-  // =========================
   calculateLine(item: any): void {
 
-    const quantity =
-      Number(item.quantity) || 0;
-
-    const unitPrice =
-      Number(item.unitPrice) || 0;
-
     item.subtotal =
-      quantity * unitPrice;
+
+      (Number(item.quantity) || 0) *
+
+      (Number(item.unitPrice) || 0);
 
   }
 
-  // =========================
-  // TOTAL
-  // =========================
   getTotal(): number {
 
     return this.items.reduce(
@@ -319,35 +448,25 @@ export class SalesComponent implements OnInit {
       (sum, item) =>
 
         sum + (
-
           Number(item.subtotal) || 0
-
         ),
 
       0
 
     );
+
   }
 
-  // =========================
-  // REGISTRAR VENTA
-  // =========================
   registrarVenta(): void {
 
     this.errorMessage = '';
     this.successMessage = '';
 
-    // =========================
-    // VALIDAR CLIENTE
-    // =========================
-
     const matchedClient =
       this.clients.find(
 
         c =>
-
           (c.client_id ?? c.id) ==
-
           this.selectedClientId
 
       );
@@ -358,11 +477,8 @@ export class SalesComponent implements OnInit {
         'Debe seleccionar un cliente válido';
 
       return;
-    }
 
-    // =========================
-    // VALIDAR MÉTODO PAGO
-    // =========================
+    }
 
     if (!this.paymentMethod) {
 
@@ -370,11 +486,8 @@ export class SalesComponent implements OnInit {
         'Seleccione un método de pago';
 
       return;
-    }
 
-    // =========================
-    // VALIDAR ITEMS
-    // =========================
+    }
 
     if (this.items.length === 0) {
 
@@ -382,36 +495,22 @@ export class SalesComponent implements OnInit {
         'Debe agregar al menos un servicio';
 
       return;
-    }
 
-    // =========================
-    // VALIDAR EMPLEADOS
-    // =========================
+    }
 
     const missingEmployee =
       this.items.some(
-
         item => !item.employeeId
-
       );
 
     if (missingEmployee) {
 
       this.errorMessage =
-        'Debe asignar un empleado a cada servicio';
+        'Debe asignar un empleado';
 
       return;
+
     }
-
-    
-    // USER ID
-    
-
-    const userId = 2;
-
-    
-    // DETALLES
-    
 
     const saleDetails =
       this.items.map(item => ({
@@ -426,10 +525,10 @@ export class SalesComponent implements OnInit {
           Number(item.serviceId),
 
         quantity:
-          Number(item.quantity) || 1,
+          Number(item.quantity),
 
         unitPrice:
-          Number(item.unitPrice) || 0
+          Number(item.unitPrice)
 
       }));
 
@@ -441,7 +540,7 @@ export class SalesComponent implements OnInit {
           matchedClient.id
         ),
 
-      userId: Number(userId),
+      userId: 2,
 
       paymentType:
         this.paymentMethod.toLowerCase(),
@@ -450,34 +549,17 @@ export class SalesComponent implements OnInit {
 
     };
 
-    console.log(
-      'PAYLOAD VENTA:',
-      payload
-    );
-
-    
-    // CREAR VENTA
-    
-
     this.isLoading = true;
 
     this.salesService.createSale(payload)
       .subscribe({
 
-        next: (res: any) => {
-
-          console.log(
-            'VENTA CREADA:',
-            res
-          );
-
-          this.isLoading = false;
+        next: () => {
 
           this.successMessage =
-
-            res?.message ||
-
             'Venta creada correctamente';
+
+          this.isLoading = false;
 
           this.resetForm();
 
@@ -487,34 +569,21 @@ export class SalesComponent implements OnInit {
 
         error: (err: any) => {
 
-          console.error(
-            'ERROR CREANDO VENTA:',
-            err
-          );
-
-          this.isLoading = false;
-
           this.errorMessage =
 
             err?.error?.message ||
 
-            'Error al registrar la venta';
+            'Error al registrar venta';
+
+          this.isLoading = false;
+
         }
 
       });
+
   }
 
-  // ELIMINAR VENTA
-  
   deleteSale(sale: any): void {
-
-    const confirmDelete = confirm(
-      `¿Deseas eliminar la venta #${sale.id}?`
-    );
-
-    if (!confirmDelete) {
-      return;
-    }
 
     this.salesService.deleteSale(sale.id)
       .subscribe({
@@ -525,54 +594,28 @@ export class SalesComponent implements OnInit {
             s => s.id !== sale.id
           );
 
-          this.successMessage =
-            'Venta eliminada correctamente';
-
         },
 
         error: (err: any) => {
 
-          console.error(
-            'Error eliminando venta',
-            err
-          );
+          console.error(err);
 
-          this.errorMessage =
-            err?.error?.message ||
-            'No se pudo eliminar la venta';
         }
 
       });
+
   }
 
-  // LIMPIAR
- 
   resetForm(): void {
-
-    this.clientData = {
-
-      name: '',
-
-      phone: '',
-
-      email: ''
-
-    };
 
     this.paymentMethod = '';
 
     this.items = [];
 
-    if (this.clients.length > 0) {
+    this.selectedAppointment = null;
 
-      this.selectedClientId =
+    this.selectedClientId = '';
 
-        this.clients[0].client_id ??
-
-        this.clients[0].id;
-
-      this.onClientSelect();
-    }
   }
 
 }
