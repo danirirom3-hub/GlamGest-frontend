@@ -256,82 +256,75 @@
     </div>
 
     <div
-      *ngIf="view === 'history'"
-      class="card fade-in"
+  *ngIf="view === 'history'"
+  class="card fade-in"
+>
+
+  <h3>
+    Historial de Ventas
+  </h3>
+
+  <div
+    class="empty"
+    *ngIf="sales.length === 0"
+  >
+    No hay ventas registradas
+  </div>
+
+  <div
+    class="sales-list"
+    *ngIf="sales.length > 0"
+  >
+
+    <div
+      class="sale-card"
+      *ngFor="let sale of sales"
     >
 
-      <h3>
-        Historial de Ventas
-      </h3>
+      <div class="sale-top">
 
-      <div
-        class="empty"
-        *ngIf="sales.length === 0"
-      >
-        No hay ventas registradas
-      </div>
+        <div>
 
-      <div
-        class="sales-list"
-        *ngIf="sales.length > 0"
-      >
+          <h4>
+            {{
+              sale.client?.name ||
+              sale.clientName ||
+              findClientName(sale.clientId) ||
+              'Cliente General'
+            }}
+          </h4>
 
-        <div
-          class="sale-card"
-          *ngFor="let sale of sales"
-        >
+          <p>
+            {{
+              (sale.date || sale.createdAt)
+                | date:'dd/MM/yyyy HH:mm'
+            }}
+          </p>
 
-          <div class="sale-top">
+        </div>
 
-            <div>
-
-              <h4>
-                {{
-                  sale.client?.name ||
-                  sale.clientName ||
-                  'Cliente General'
-                }}
-              </h4>
-
-              <p>
-                {{
-                  sale.date ||
-                  sale.createdAt
-                    | date:'dd/MM/yyyy HH:mm'
-                }}
-              </p>
-
-            </div>
-
-            <div class="sale-total">
-              {{
-                sale.total
-                  | currency:'COP':'symbol':'1.0-0'
-              }}
-            </div>
-
-          </div>
-
-          <div class="sale-actions">
-
-            <button class="btn-view">
-              Ver Detalle
-            </button>
-
-            <button
-              class="btn-remove-sale"
-              (click)="deleteSale(sale)"
-            >
-              Eliminar
-            </button>
-
-          </div>
-
+        <div class="sale-total">
+          {{
+            sale.total
+              | currency:'COP':'symbol':'1.0-0'
+          }}
         </div>
 
       </div>
 
+      <div class="sale-actions">
+
+        <button class="btn-view">
+          Ver Detalle
+        </button>
+
+      </div>
+
     </div>
+
+  </div>
+
+</div>
 
     <div
       class="modal-backdrop"
