@@ -1,51 +1,104 @@
 <div class="container">
-  <h2>{{ isEditing ? 'Editar empleado' : 'Gestión de Empleados' }}</h2>
 
-  <!-- FILTRO (Se mantiene según lo solicitado) -->
-  <div class="filter-bar">
-    <input 
-      type="checkbox" 
-      [(ngModel)]="showOnlyActive"
-      name="filterActive"
-    >
-    <span>Mostrar solo empleados activos</span>
+  <div class="top-header">
+
+    <div>
+      <h2>
+        {{ isEditing ? 'Editar empleado' : 'Gestión de Empleados' }}
+      </h2>
+
+      <p class="subtitle">
+        Administra el personal del salón
+      </p>
+    </div>
+
+    <div class="filter-bar">
+      <input
+        type="checkbox"
+        [(ngModel)]="showOnlyActive"
+        name="filterActive"
+      >
+
+      <span>
+        Mostrar solo empleados activos
+      </span>
+    </div>
+
   </div>
 
   <!-- FORMULARIO -->
-  <form (ngSubmit)="onSubmit()" #employeeForm="ngForm" class="form">
 
-    <div class="form-group">
-      <label for="name">Nombre</label>
-      <input 
-        type="text" 
-        id="name" 
-        name="name"
-        [(ngModel)]="employee.name" 
-        required 
-        class="form-control"
-        placeholder="Ingrese el nombre">
+  <form
+    (ngSubmit)="onSubmit()"
+    #employeeForm="ngForm"
+    class="form-card"
+  >
+
+    <div class="form-grid">
+
+      <div class="form-group">
+
+        <label for="name">
+          Nombre
+        </label>
+
+        <input
+          type="text"
+          id="name"
+          name="name"
+          [(ngModel)]="employee.name"
+          required
+          class="form-control"
+          placeholder="Ingrese el nombre"
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label for="phone">
+          Teléfono
+        </label>
+
+        <input
+          type="text"
+          id="phone"
+          name="phone"
+          [(ngModel)]="employee.phone"
+          required
+          class="form-control"
+          placeholder="Ingrese el teléfono"
+        >
+
+      </div>
+
     </div>
 
-    <div class="form-group">
-      <label for="phone">Teléfono</label>
-      <input 
-        type="text" 
-        id="phone" 
-        name="phone"
-        [(ngModel)]="employee.phone" 
-        required 
-        class="form-control"
-        placeholder="Ingrese el teléfono">
-    </div>
+    <div class="buttons">
 
-    <div class="form-group">
-      <button type="submit" class="btn btn-primary" [disabled]="employeeForm.invalid">
-        {{ isEditing ? 'Actualizar empleado' : 'Guardar empleado' }}
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="employeeForm.invalid"
+      >
+        <i class="fa-solid fa-floppy-disk"></i>
+
+        {{
+          isEditing
+            ? 'Actualizar empleado'
+            : 'Guardar empleado'
+        }}
       </button>
 
-      <button type="button" class="btn btn-secondary" (click)="onCancel()">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="onCancel()"
+      >
+        <i class="fa-solid fa-xmark"></i>
         Cancelar
       </button>
+
     </div>
 
     <div class="alerta" *ngIf="mensaje">
@@ -54,51 +107,110 @@
 
   </form>
 
-  <hr>
+  <!-- LISTA -->
 
-  <h3>Lista de Empleados</h3>
+  <div class="employees-section">
 
-  <!-- ESTADO VACÍO -->
-  <div class="empty" *ngIf="!visibleEmployees || visibleEmployees.length === 0">
-    No hay empleados disponibles
-  </div>
+    <div class="section-title">
 
-  <!-- TABLA -->
-  <table class="table" *ngIf="visibleEmployees && visibleEmployees.length > 0">
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Teléfono</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
+      <h3>
+        Lista de Empleados
+      </h3>
 
-    <tbody>
-      <tr *ngFor="let emp of visibleEmployees">
-        <td>{{ emp.name }}</td>
-        <td>{{ emp.phone }}</td>
+      <span class="count">
+        {{ visibleEmployees.length }} empleados
+      </span>
 
-        <td class="acciones">
+    </div>
 
-          <!-- EDITAR -->
-          <button class="btn-icon editar" (click)="onEdit(emp)">
+    <div
+      class="empty"
+      *ngIf="!visibleEmployees || visibleEmployees.length === 0"
+    >
+      No hay empleados disponibles
+    </div>
+
+    <div
+      class="employees-grid"
+      *ngIf="visibleEmployees && visibleEmployees.length > 0"
+    >
+
+      <div
+  class="employee-card"
+  [class.employee-inactive]="!emp.active"
+  *ngFor="let emp of visibleEmployees"
+>
+
+        <div class="employee-top">
+
+          <div class="avatar">
+            {{ emp.name.charAt(0) }}
+          </div>
+
+          <div class="employee-status">
+
+            <span
+              class="badge"
+              [class.active]="emp.active"
+              [class.inactive]="!emp.active"
+            >
+              {{
+                emp.active
+                  ? 'Activo'
+                  : 'Inactivo'
+              }}
+            </span>
+
+          </div>
+
+        </div>
+
+        <div class="employee-info">
+
+          <h4>
+            {{ emp.name }}
+          </h4>
+
+          <p>
+            <i class="fa-solid fa-phone"></i>
+            {{ emp.phone }}
+          </p>
+
+        </div>
+
+        <div class="employee-actions">
+
+          <button
+            class="btn-icon editar"
+            (click)="onEdit(emp)"
+          >
             <i class="fa-solid fa-pen"></i>
           </button>
 
-          <!-- ACTIVO / INACTIVO -->
-          <button class="btn-icon estado" (click)="toggleActive(emp)">
-            <i class="fa-solid"
-               [class.fa-toggle-on]="emp.active"
-               [class.fa-toggle-off]="!emp.active"></i>
+          <button
+            class="btn-icon estado"
+            (click)="toggleActive(emp)"
+          >
+            <i
+              class="fa-solid"
+              [class.fa-toggle-on]="emp.active"
+              [class.fa-toggle-off]="!emp.active"
+            ></i>
           </button>
 
-          <!-- ELIMINAR -->
-          <button class="btn-icon eliminar" (click)="onDelete(emp.id)">
+          <button
+            class="btn-icon eliminar"
+            (click)="onDelete(emp.id)"
+          >
             <i class="fa-solid fa-trash"></i>
           </button>
 
-        </td>
-      </tr>
-    </tbody>
-  </table>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </div>

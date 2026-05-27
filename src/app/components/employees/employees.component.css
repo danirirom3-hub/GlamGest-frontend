@@ -1,254 +1,519 @@
-/* Contenedor principal */
-.container {
+.container{
   min-height: 100vh;
   padding: 40px;
-  background: var(--bg);
+  background:
+    radial-gradient(circle at top right,
+    rgba(124,58,237,0.08),
+    transparent 30%),
+    radial-gradient(circle at bottom left,
+    rgba(99,102,241,0.08),
+    transparent 30%),
+    var(--bg);
+
+  transition: 0.3s ease;
   font-family: 'Poppins', sans-serif;
   box-sizing: border-box;
-  transition: 0.3s ease;
 }
 
-/* Títulos */
-h2, h3 {
-  font-size: 26px;
+/* HEADER */
+
+.top-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+h2{
+  font-size: 34px;
+  margin: 0;
   font-weight: 700;
-  margin-bottom: 18px;
-  background: linear-gradient(90deg, var(--primary), #7c3aed);
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--primary),
+      #7c3aed
+    );
+
   -webkit-background-clip: text;
-  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Formulario */
-.form {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-  background: var(--card);
-  padding: 28px;
-  border-radius: 22px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-  margin-bottom: 30px;
-  transition: all 0.3s ease;
+.subtitle{
+  margin-top: 8px;
+  color: var(--text);
+  opacity: 0.7;
+  font-size: 14px;
 }
 
-/* Hover leve del formulario */
-.form:hover {
+/* FILTER */
+
+.filter-bar{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 14px 18px;
+  border-radius: 18px;
+
+  background: var(--card);
+  border: 1px solid rgba(0,0,0,0.06);
+
+  box-shadow:
+    0 12px 24px rgba(0,0,0,0.04);
+
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+
+  transition: 0.3s ease;
+}
+
+.filter-bar:hover{
   transform: translateY(-2px);
 }
 
-/* Responsive formulario */
-@media (max-width: 768px) {
-  .form {
-    grid-template-columns: 1fr;
-  }
+.filter-bar input{
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary);
 }
 
-/* Grupo de campos */
-.form-group {
+/* FORM */
+
+.form-card{
+  background: var(--card);
+
+  border-radius: 28px;
+  padding: 32px;
+
+  margin-bottom: 35px;
+
+  border: 1px solid rgba(255,255,255,0.2);
+
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.05);
+
+  backdrop-filter: blur(10px);
+
+  transition: 0.3s ease;
+}
+
+.form-card:hover{
+  transform: translateY(-2px);
+}
+
+.form-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+.form-group{
   display: flex;
   flex-direction: column;
 }
 
-/* Labels */
-label {
+label{
+  margin-bottom: 8px;
   font-size: 13px;
   font-weight: 600;
   color: var(--text);
   opacity: 0.8;
-  margin-bottom: 6px;
 }
 
-/* Inputs */
-.form-control {
-  height: 44px;
-  padding: 0 12px;
-  border-radius: 12px;
+.form-control{
+  height: 52px;
+
+  border-radius: 16px;
   border: 1px solid rgba(0,0,0,0.08);
+
+  padding: 0 16px;
+
   background: var(--bg);
   color: var(--text);
+
   font-size: 14px;
+
   outline: none;
-  transition: all 0.2s ease;
+
+  transition: 0.3s ease;
 }
 
-/* Focus inputs */
-.form-control:focus {
+.form-control:focus{
   border-color: var(--primary);
+
+  box-shadow:
+    0 0 0 4px rgba(99,102,241,0.18);
+
   background: var(--card);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
-  transform: translateY(-1px);
 }
 
-/* Contenedor de botones */
-.form-group:last-child {
-  grid-column: 1 / -1;
+/* BUTTONS */
+
+.buttons{
   display: flex;
-  gap: 12px;
+  gap: 14px;
+  margin-top: 28px;
+  flex-wrap: wrap;
 }
 
-/* Botones base */
-.btn {
+.btn{
   flex: 1;
-  padding: 13px;
-  border-radius: 14px;
+
+  height: 52px;
+
   border: none;
+  border-radius: 16px;
+
   cursor: pointer;
+
   font-weight: 600;
-  transition: all 0.25s ease;
-}
-
-/* Hover botones */
-.btn:hover {
-  transform: translateY(-2px);
-}
-
-/* Botón principal */
-.btn-primary {
-  background: var(--primary);
-  color: white;
-}
-
-.btn-primary:hover {
-  opacity: 0.9;
-}
-
-/* Botón secundario */
-.btn-secondary {
-  background: rgba(107,114,128,0.15);
-  color: var(--text);
-}
-
-/* Botón tipo warning */
-.btn-warning {
-  background: rgba(59,130,246,0.15);
-  color: #2563eb;
-}
-
-/* Botón peligro */
-.btn-danger {
-  background: rgba(239,68,68,0.15);
-  color: #dc2626;
-}
-
-/* Tabla */
-.table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 18px;
-}
-
-/* Filas estilo card */
-.table tbody tr {
-  background: var(--card);
-  border-radius: 18px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.06);
-  transition: all 0.3s ease;
-}
-
-/* Hover fila */
-.table tbody tr:hover {
-  transform: translateY(-5px) scale(1.01);
-  box-shadow: 0 20px 45px rgba(0,0,0,0.1);
-}
-
-.table td {
-  padding: 16px;
-  color: var(--text);
-}
-
-/* Acciones en tabla */
-.table td:last-child {
-  display: flex;
-  gap: 10px;
-}
-
-/* Barra de filtros */
-.filter-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  padding: 12px 14px;
-  margin-bottom: 20px;
-
-  border-radius: 14px;
-
-  background: var(--card);
-  border: 1px solid rgba(0,0,0,0.08);
-
-  color: var(--text);
-  font-weight: 500;
   font-size: 14px;
 
-  cursor: pointer;
-
-  box-shadow: 0 10px 20px rgba(0,0,0,0.04);
-  transition: all 0.25s ease;
-  user-select: none;
-}
-
-/* Hover filtro */
-.filter-bar:hover {
-  border-color: var(--primary);
-  box-shadow: 0 12px 25px rgba(99,102,241,0.15);
-  transform: translateY(-2px);
-}
-
-/* Checkbox del filtro */
-.filter-bar input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--primary);
-  cursor: pointer;
-}
-
-
-
-
-/* botón icono base */
-.btn-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  background: var(--bg);
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 10px;
+
+  transition: 0.3s ease;
+}
+
+.btn:hover{
+  transform: translateY(-2px);
+}
+
+.btn-primary{
+  background:
+    linear-gradient(
+      90deg,
+      var(--primary),
+      #7c3aed
+    );
+
+  color: white;
+
+  box-shadow:
+    0 14px 28px rgba(124,58,237,0.25);
+}
+
+.btn-secondary{
+  background: rgba(107,114,128,0.12);
+  color: var(--text);
+}
+
+/* ALERT */
+
+.alerta{
+  margin-top: 18px;
+  padding: 14px 18px;
+
+  border-radius: 14px;
+
+  background: rgba(16,185,129,0.12);
+  color: #10b981;
+
   font-size: 14px;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
+  font-weight: 500;
 }
 
-/* hover botón icono */
-.btn-icon:hover {
+/* SECTION */
+
+.employees-section{
+  margin-top: 10px;
+}
+
+.section-title{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+h3{
+  margin: 0;
+
+  font-size: 24px;
+  font-weight: 700;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--primary),
+      #7c3aed
+    );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.count{
+  background: rgba(124,58,237,0.12);
+  color: var(--primary);
+
+  padding: 8px 14px;
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* GRID */
+
+.employees-grid{
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fill,minmax(280px,1fr));
+
+  gap: 24px;
+}
+
+/* CARD */
+
+.employee-card{
   background: var(--card);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+
+  border-radius: 28px;
+
+  padding: 24px;
+
+  border: 1px solid rgba(0,0,0,0.05);
+
+  box-shadow:
+    0 18px 35px rgba(0,0,0,0.05);
+
+  transition: 0.3s ease;
 }
 
-/* editar */
-.editar {
-  background: rgba(59,130,246,0.15);
-  color: #2563eb;
+.employee-card:hover{
+  transform: translateY(-6px);
+
+  box-shadow:
+    0 24px 40px rgba(0,0,0,0.08);
 }
 
-/* estado */
-.estado {
-  background: rgba(16,185,129,0.15);
+.employee-top{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 20px;
+}
+
+/* AVATAR */
+
+.avatar{
+  width: 60px;
+  height: 60px;
+
+  border-radius: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 22px;
+  font-weight: 700;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--primary),
+      #7c3aed
+    );
+
+  box-shadow:
+    0 12px 20px rgba(124,58,237,0.25);
+}
+
+/* BADGE */
+
+.badge{
+  padding: 8px 14px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.badge.active{
+  background: rgba(16,185,129,0.12);
   color: #10b981;
 }
 
-/* eliminar */
-.eliminar {
-  background: rgba(220,53,69,0.15);
-  color: #dc3545;
+.badge.inactive{
+  background: rgba(239,68,68,0.12);
+  color: #ef4444;
 }
 
-/*mantener tamaño de botones del formulario */
-.form-group .btn {
-  flex: 1;
-  height: 48px;
+/* INFO */
+
+.employee-info h4{
+  margin: 0 0 10px 0;
+
+  font-size: 20px;
+  color: var(--text);
+}
+
+.employee-info p{
+  margin: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: var(--text);
+  opacity: 0.75;
+
   font-size: 14px;
-  padding: 13px;
+}
+
+/* ACTIONS */
+
+.employee-actions{
+  display: flex;
+  gap: 12px;
+
+  margin-top: 24px;
+}
+
+.btn-icon{
+  flex: 1;
+
+  height: 46px;
+
+  border: none;
+  border-radius: 16px;
+
+  cursor: pointer;
+
+  font-size: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: 0.3s ease;
+}
+
+.btn-icon:hover{
+  transform: translateY(-2px);
+}
+
+.editar{
+  background: rgba(59,130,246,0.12);
+  color: #2563eb;
+}
+
+.estado{
+  background: rgba(16,185,129,0.12);
+  color: #10b981;
+}
+
+.eliminar{
+  background: rgba(239,68,68,0.12);
+  color: #ef4444;
+}
+
+/* EMPTY */
+
+.empty{
+  background: var(--card);
+
+  border-radius: 24px;
+
+  padding: 50px;
+
+  text-align: center;
+
+  color: var(--text);
+  opacity: 0.7;
+
+  border: 1px dashed rgba(0,0,0,0.08);
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 768px){
+
+  .container{
+    padding: 20px;
+  }
+
+  .form-grid{
+    grid-template-columns: 1fr;
+  }
+
+  .buttons{
+    flex-direction: column;
+  }
+
+  .top-header{
+    align-items: flex-start;
+  }
+
+}
+
+
+/* ===================================
+   EMPLEADO INACTIVO
+=================================== */
+
+.employee-inactive{
+  opacity: 0.65;
+  filter: grayscale(0.9);
+  transform: scale(0.98);
+}
+
+/* quita brillo del avatar */
+
+.employee-inactive .avatar{
+  background:
+    linear-gradient(
+      135deg,
+      #9ca3af,
+      #6b7280
+    );
+
+  box-shadow: none;
+}
+
+/* nombre más apagado */
+
+.employee-inactive .employee-info h4{
+  color: #6b7280;
+}
+
+/* teléfono más tenue */
+
+.employee-inactive .employee-info p{
+  opacity: 0.55;
+}
+
+/* card más gris */
+
+.employee-inactive{
+  background:
+    linear-gradient(
+      180deg,
+      rgba(240,240,240,0.9),
+      rgba(230,230,230,0.9)
+    );
+}
+
+/* hover más suave */
+
+.employee-inactive:hover{
+  transform: translateY(-2px);
+  box-shadow:
+    0 10px 20px rgba(0,0,0,0.04);
 }
