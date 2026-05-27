@@ -101,12 +101,7 @@
           </div>
         </div>
 
-        <div class="actions">
-          <button class="btn-primary small"
-                  [disabled]="c.status === 'sent_to_cash'"
-                  (click)="sendToCash(c)">
-            {{ c.status === 'sent_to_cash' ? 'En caja' : 'Pasar a caja' }}
-          </button>
+       
 
           <button class="btn-danger small" (click)="deleteAppointment(c)">
             Eliminar
@@ -121,4 +116,3 @@
     </div>
 
   </div>
-</div>
