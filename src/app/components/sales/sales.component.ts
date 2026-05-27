@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import Swal from 'sweetalert2';
+
 import { ClientsService } from '../../services/clients.service';
 import { SalesService } from '../../services/sales.service';
 import { EmployeesService } from '../../services/employees.service';
@@ -79,6 +81,12 @@ export class SalesComponent implements OnInit {
 
         console.error(err);
 
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudieron cargar los clientes'
+        });
+
       }
 
     });
@@ -99,6 +107,12 @@ export class SalesComponent implements OnInit {
 
         console.error(err);
 
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudieron cargar los servicios'
+        });
+
       }
 
     });
@@ -118,6 +132,12 @@ export class SalesComponent implements OnInit {
       error: (err: any) => {
 
         console.error(err);
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudieron cargar los empleados'
+        });
 
       }
 
@@ -155,6 +175,12 @@ export class SalesComponent implements OnInit {
 
         console.error(err);
 
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo cargar el historial de ventas'
+        });
+
       }
 
     });
@@ -178,6 +204,12 @@ export class SalesComponent implements OnInit {
       error: (err: any) => {
 
         console.error(err);
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudieron cargar las citas'
+        });
 
       }
 
@@ -423,6 +455,14 @@ export class SalesComponent implements OnInit {
 
     });
 
+    Swal.fire({
+      icon: 'success',
+      title: 'Cita seleccionada',
+      text: 'La cita fue agregada correctamente',
+      timer: 1800,
+      showConfirmButton: false
+    });
+
     this.closeAppointmentsModal();
 
   }
@@ -445,13 +485,44 @@ export class SalesComponent implements OnInit {
 
     });
 
+    Swal.fire({
+      icon: 'success',
+      title: 'Servicio agregado',
+      text: `${service.name} fue agregado a la venta`,
+      timer: 1800,
+      showConfirmButton: false
+    });
+
     this.closeModal();
 
   }
 
   removeService(index: number): void {
 
-    this.items.splice(index, 1);
+    Swal.fire({
+      title: '¿Eliminar servicio?',
+      text: 'El servicio será removido de la venta',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+
+      if (result.isConfirmed) {
+
+        this.items.splice(index, 1);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Eliminado',
+          text: 'Servicio eliminado correctamente',
+          timer: 1800,
+          showConfirmButton: false
+        });
+
+      }
+
+    });
 
   }
 
@@ -497,8 +568,11 @@ export class SalesComponent implements OnInit {
 
     if (!matchedClient) {
 
-      this.errorMessage =
-        'Debe seleccionar un cliente válido';
+      Swal.fire({
+        icon: 'warning',
+        title: 'Cliente requerido',
+        text: 'Debe seleccionar un cliente válido'
+      });
 
       return;
 
@@ -506,8 +580,11 @@ export class SalesComponent implements OnInit {
 
     if (!this.paymentMethod) {
 
-      this.errorMessage =
-        'Seleccione un método de pago';
+      Swal.fire({
+        icon: 'warning',
+        title: 'Método de pago',
+        text: 'Seleccione un método de pago'
+      });
 
       return;
 
@@ -515,8 +592,11 @@ export class SalesComponent implements OnInit {
 
     if (this.items.length === 0) {
 
-      this.errorMessage =
-        'Debe agregar al menos un servicio';
+      Swal.fire({
+        icon: 'warning',
+        title: 'Servicios requeridos',
+        text: 'Debe agregar al menos un servicio'
+      });
 
       return;
 
@@ -529,8 +609,11 @@ export class SalesComponent implements OnInit {
 
     if (missingEmployee) {
 
-      this.errorMessage =
-        'Debe asignar un empleado';
+      Swal.fire({
+        icon: 'warning',
+        title: 'Empleado requerido',
+        text: 'Debe asignar un empleado'
+      });
 
       return;
 
@@ -573,37 +656,65 @@ export class SalesComponent implements OnInit {
 
     };
 
-    this.isLoading = true;
+    Swal.fire({
+      title: '¿Registrar venta?',
+      text: 'La venta será guardada en el sistema',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, registrar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
 
-    this.salesService.createSale(payload)
-      .subscribe({
+      if (result.isConfirmed) {
 
-        next: () => {
+        this.isLoading = true;
 
-          this.successMessage =
-            'Venta creada correctamente';
+        this.salesService.createSale(payload)
+          .subscribe({
 
-          this.isLoading = false;
+            next: () => {
 
-          this.resetForm();
+              this.successMessage =
+                'Venta creada correctamente';
 
-          this.loadSales();
+              this.isLoading = false;
 
-        },
+              Swal.fire({
+                icon: 'success',
+                title: 'Venta registrada',
+                text: 'La venta fue creada correctamente',
+                confirmButtonText: 'Aceptar'
+              });
 
-        error: (err: any) => {
+              this.resetForm();
 
-          this.errorMessage =
+              this.loadSales();
 
-            err?.error?.message ||
+            },
 
-            'Error al registrar venta';
+            error: (err: any) => {
 
-          this.isLoading = false;
+              this.errorMessage =
 
-        }
+                err?.error?.message ||
 
-      });
+                'Error al registrar venta';
+
+              this.isLoading = false;
+
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: this.errorMessage
+              });
+
+            }
+
+          });
+
+      }
+
+    });
 
   }
 
