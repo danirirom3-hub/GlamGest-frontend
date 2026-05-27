@@ -131,7 +131,23 @@ export class SalesComponent implements OnInit {
 
       next: (res: any) => {
 
-        this.sales = res?.data || res || [];
+        const data = res?.data || res || [];
+
+        this.sales = data.map((sale: any) => ({
+
+          ...sale,
+
+          showDetails: false,
+
+          saleDetails:
+
+            sale.saleDetails ||
+
+            sale.details ||
+
+            []
+
+        }));
 
       },
 
@@ -166,6 +182,12 @@ export class SalesComponent implements OnInit {
       }
 
     });
+
+  }
+
+  toggleSaleDetails(sale: any): void {
+
+    sale.showDetails = !sale.showDetails;
 
   }
 
@@ -314,7 +336,8 @@ export class SalesComponent implements OnInit {
 
     const service = this.services.find(
 
-      s => s.id == id
+      s =>
+        (s.service_id ?? s.id) == id
 
     );
 
@@ -371,7 +394,8 @@ export class SalesComponent implements OnInit {
       appointment.employee?.id;
 
     const service = this.services.find(
-      s => s.id == serviceId
+      s =>
+        (s.service_id ?? s.id) == serviceId
     );
 
     const price =
@@ -576,29 +600,6 @@ export class SalesComponent implements OnInit {
             'Error al registrar venta';
 
           this.isLoading = false;
-
-        }
-
-      });
-
-  }
-
-  deleteSale(sale: any): void {
-
-    this.salesService.deleteSale(sale.id)
-      .subscribe({
-
-        next: () => {
-
-          this.sales = this.sales.filter(
-            s => s.id !== sale.id
-          );
-
-        },
-
-        error: (err: any) => {
-
-          console.error(err);
 
         }
 

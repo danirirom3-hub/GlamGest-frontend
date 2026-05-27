@@ -256,75 +256,147 @@
     </div>
 
     <div
-  *ngIf="view === 'history'"
-  class="card fade-in"
->
-
-  <h3>
-    Historial de Ventas
-  </h3>
-
-  <div
-    class="empty"
-    *ngIf="sales.length === 0"
-  >
-    No hay ventas registradas
-  </div>
-
-  <div
-    class="sales-list"
-    *ngIf="sales.length > 0"
-  >
-
-    <div
-      class="sale-card"
-      *ngFor="let sale of sales"
+      *ngIf="view === 'history'"
+      class="card fade-in"
     >
 
-      <div class="sale-top">
+      <h3>
+        Historial de Ventas
+      </h3>
 
-        <div>
-
-          <h4>
-            {{
-              sale.client?.name ||
-              sale.clientName ||
-              findClientName(sale.clientId) ||
-              'Cliente General'
-            }}
-          </h4>
-
-          <p>
-            {{
-              (sale.date || sale.createdAt)
-                | date:'dd/MM/yyyy HH:mm'
-            }}
-          </p>
-
-        </div>
-
-        <div class="sale-total">
-          {{
-            sale.total
-              | currency:'COP':'symbol':'1.0-0'
-          }}
-        </div>
-
+      <div
+        class="empty"
+        *ngIf="sales.length === 0"
+      >
+        No hay ventas registradas
       </div>
 
-      <div class="sale-actions">
+      <div
+        class="sales-list"
+        *ngIf="sales.length > 0"
+      >
 
-        <button class="btn-view">
-          Ver Detalle
-        </button>
+        <div
+          class="sale-card"
+          *ngFor="let sale of sales"
+        >
+
+          <div class="sale-top">
+
+            <div>
+
+              <h4>
+                {{
+                  sale.client?.name ||
+                  sale.clientName ||
+                  findClientName(sale.clientId) ||
+                  'Cliente General'
+                }}
+              </h4>
+
+              <p>
+                {{
+                  (sale.date || sale.createdAt)
+                    | date:'dd/MM/yyyy HH:mm'
+                }}
+              </p>
+
+            </div>
+
+            <div class="sale-total">
+              {{
+                sale.total
+                  | currency:'COP':'symbol':'1.0-0'
+              }}
+            </div>
+
+          </div>
+
+          <div class="sale-actions">
+
+            <button
+              class="btn-view"
+              (click)="toggleSaleDetails(sale)"
+            >
+              {{
+                sale.showDetails
+                  ? 'Ocultar Detalle'
+                  : 'Ver Detalle'
+              }}
+            </button>
+
+          </div>
+
+          <div
+            class="sale-details"
+            *ngIf="sale.showDetails"
+          >
+
+            <div
+              *ngIf="!sale.saleDetails || sale.saleDetails.length === 0"
+              class="empty"
+            >
+              No hay detalles disponibles
+            </div>
+
+            <div
+              class="sale-detail-item"
+              *ngFor="let detail of sale.saleDetails"
+            >
+
+              <div class="detail-info">
+
+                <h5>
+                  {{
+                    detail.service?.name ||
+                    findServiceName(detail.serviceId)
+                  }}
+                </h5>
+
+                <p>
+                  Empleado:
+                  {{
+                    detail.employee?.name ||
+                    findEmployeeName(detail.employeeId)
+                  }}
+                </p>
+
+                <p>
+                  Cantidad:
+                  {{ detail.quantity }}
+                </p>
+
+                <p>
+                  Valor Unitario:
+                  {{
+                    detail.unitPrice
+                      | currency:'COP':'symbol':'1.0-0'
+                  }}
+                </p>
+
+              </div>
+
+              <div class="detail-price">
+
+                {{
+                  (
+                    detail.unitPrice *
+                    detail.quantity
+                  )
+                  | currency:'COP':'symbol':'1.0-0'
+                }}
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
 
       </div>
 
     </div>
-
-  </div>
-
-</div>
 
     <div
       class="modal-backdrop"
