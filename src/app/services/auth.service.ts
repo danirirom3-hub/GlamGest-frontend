@@ -10,7 +10,6 @@ export class AuthService {
 
   // URL base tomada desde variables de entorno
   private authUrl = `${environment.apiUrl}/auth`;
-  private usersUrl = `${environment.apiUrl}/users`;
 
   constructor(private http: HttpClient) { }
 
@@ -21,7 +20,19 @@ export class AuthService {
 
   // Registrar nuevo usuario
   register(data: any): Observable<any> {
-    return this.http.post(this.usersUrl, data);
+    return this.http.post(`${this.authUrl}/register`, data);
+  }
+
+  saveSession(response: any): void {
+    const session = response?.data || response;
+    if (session?.token) this.saveToken(session.token);
+    if (session?.role) localStorage.setItem('role', session.role);
+    if (session?.userId !== undefined) localStorage.setItem('userId', String(session.userId));
+    if (session?.clientId !== undefined && session.clientId !== null) {
+      localStorage.setItem('clientId', String(session.clientId));
+    } else {
+      localStorage.removeItem('clientId');
+    }
   }
 
   // Guardar token en el almacenamiento local del navegador
@@ -40,11 +51,24 @@ export class AuthService {
     localStorage.removeItem('userId');
     localStorage.removeItem('user_id');
     localStorage.removeItem('id');
+    localStorage.removeItem('role');
+    localStorage.removeItem('clientId');
   }
 
   // Verificar si el usuario está autenticado
   isLoggedIn(): boolean {
     return !!this.getToken();
+  }
+
+  getRole(): string | null {
+    return localStorage.getItem('role');
+  }
+
+  getClientId(): number | null {
+    const value = localStorage.getItem('clientId');
+    if (!value) return null;
+    const parsed = Number(value);
+    return Number.isNaN(parsed) ? null : parsed;
   }
 
   // Obtener el ID del usuario actual desde localStorage o el token

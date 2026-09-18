@@ -17,6 +17,8 @@ import { SalesComponent } from './components/sales/sales.component';
 import { AppointmentsComponent } from './components/appointments/appointments.component';
 import { EmployeesComponent } from './components/employees/employees.component';
 import { SettingsComponent } from './components/settings/settings.component';
+import { ClientComponent } from './components/client/client.component';
+import { ClientGuard } from './guards/client.guard';
 
 export const routes: Routes = [
 
@@ -26,6 +28,8 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [LoginGuard] },
 
   { path: 'users', component: UsersComponent },
+
+  { path: 'client', component: ClientComponent, canActivate: [ClientGuard] },
 
   {
     path: 'dashboard',

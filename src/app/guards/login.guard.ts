@@ -17,7 +17,7 @@ export class LoginGuard implements CanActivate {
       return true;
     }
 
-    this.router.navigate(['/dashboard']);
+    this.router.navigate([this.authService.getRole() === 'CLIENT' ? '/client' : '/dashboard']);
     return false;
   }
 }

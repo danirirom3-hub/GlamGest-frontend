@@ -1,0 +1,48 @@
+<div class="dashboard">
+  <aside class="sidebar">
+    <div class="brand"><h2>Glam<span>Gest</span></h2></div>
+    <nav class="menu">
+      <a routerLink="/client" fragment="profile"><lucide-icon [img]="icons.User"></lucide-icon>Mi perfil</a>
+      <a routerLink="/client" fragment="appointments"><lucide-icon [img]="icons.Calendar"></lucide-icon>Mis citas</a>
+    </nav>
+    <button class="logout-btn" (click)="logout()"><lucide-icon [img]="icons.LogOut"></lucide-icon>Cerrar sesión</button>
+    <div class="footer"><p>© 2026</p></div>
+  </aside>
+  <main class="contenido client-content">
+    <section id="profile" class="client-card">
+      <div class="client-heading"><div><h1>Mi perfil</h1><p>Consulta tus datos personales</p></div><lucide-icon [img]="icons.User"></lucide-icon></div>
+      <div class="profile-grid" *ngIf="profile; else loadingProfile">
+        <div><span>Nombre</span><strong>{{ profile.name }}</strong></div>
+        <div><span>Correo</span><strong>{{ profile.email }}</strong></div>
+        <div><span>Teléfono</span><strong>{{ profile.phone || 'No registrado' }}</strong></div>
+      </div>
+      <ng-template #loadingProfile><p class="empty">Cargando perfil...</p></ng-template>
+    </section>
+    <section id="appointments" class="client-card">
+      <div class="client-heading"><div><h1>Mis citas</h1><p>Agenda y administra tus próximas citas</p></div><lucide-icon [img]="icons.Calendar"></lucide-icon></div>
+      <div class="catalog-error" *ngIf="catalogError">{{ catalogError }}</div>
+      <div class="appointment-form" *ngIf="!isLoadingCatalog; else loadingCatalog">
+        <input type="datetime-local" [(ngModel)]="form.appointmentDatetime">
+        <select [(ngModel)]="form.serviceId">
+          <option value="">Selecciona un servicio</option>
+          <option *ngFor="let service of services" [value]="service.id">{{ service.name }}</option>
+        </select>
+        <select [(ngModel)]="form.employeeId">
+          <option value="">Selecciona un empleado</option>
+          <option *ngFor="let employee of employees" [value]="employee.id">{{ employee.name }}</option>
+        </select>
+        <input [(ngModel)]="form.notes" placeholder="Notas (opcional)">
+        <button class="btn-primary" (click)="saveAppointment()" [disabled]="isLoading">{{ editingId === null ? 'Agendar cita' : 'Guardar cambios' }}</button>
+        <button *ngIf="editingId !== null" class="btn-secondary" (click)="resetForm()">Cancelar edición</button>
+      </div>
+      <ng-template #loadingCatalog><p class="empty">Cargando servicios y empleados...</p></ng-template>
+      <p class="request-error" *ngIf="appointmentsError">{{ appointmentsError }}</p>
+      <p class="empty" *ngIf="!isLoadingAppointments && !appointmentsError && appointments.length === 0">No tienes citas registradas.</p>
+      <p class="empty" *ngIf="isLoadingAppointments">Cargando tus citas...</p>
+      <article class="cita-card" *ngFor="let appointment of appointments">
+        <div><strong>{{ appointment.appointmentDatetime | date:'dd/MM/yyyy HH:mm' }}</strong><p>{{ getServiceName(appointment.serviceId) }} · {{ getEmployeeName(appointment.employeeId) }}</p><p>{{ appointment.notes || 'Sin notas' }}</p></div>
+        <div class="actions"><button class="btn-secondary" (click)="editAppointment(appointment)" [disabled]="deletingId !== null">Editar</button><button class="btn-danger" (click)="cancelAppointment(appointment)" [disabled]="deletingId === appointment.id">{{ deletingId === appointment.id ? 'Cancelando...' : 'Cancelar' }}</button></div>
+      </article>
+    </section>
+  </main>
+</div>

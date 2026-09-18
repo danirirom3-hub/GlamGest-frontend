@@ -49,7 +49,7 @@ export class LoginComponent {
           res?.accessToken;
 
         if (token) {
-          this.authService.saveToken(token);
+          this.authService.saveSession(res);
 
           // Guardar userId en localStorage si el backend lo devuelve
           let userId =
@@ -64,17 +64,25 @@ export class LoginComponent {
             userId = this.authService.getUserId();
           }
 
-          if (userId) {
+           if (userId) {
             localStorage.setItem('userId', String(userId));
             localStorage.setItem('user_id', String(userId));
             localStorage.setItem('id', String(userId));
           }
 
-          this.message = 'Login exitoso. Redirigiendo...';
+           const role = res?.data?.role || res?.role;
+           if (role !== 'ADMIN' && role !== 'CLIENT') {
+             this.authService.logout();
+             this.message = 'La respuesta de autenticación no contiene un rol válido.';
+             this.messageType = 'error';
+             return;
+           }
+
+           this.message = 'Login exitoso. Redirigiendo...';
           this.messageType = 'success';
 
           setTimeout(() => {
-            this.router.navigate(['/dashboard']);
+             this.router.navigate([role === 'ADMIN' ? '/dashboard' : '/client']);
           }, 1500);
 
         } else {
@@ -83,10 +91,17 @@ export class LoginComponent {
         }
       },
       error: (err) => {
-        this.message = err?.error?.message || 'Usuario o contraseña incorrectos.';
+        this.message = this.getErrorMessage(err, 'Usuario o contraseña incorrectos.');
         this.messageType = 'error';
       }
     });
+  }
+
+  private getErrorMessage(error: any, fallback: string): string {
+    if (error?.status === 0) {
+      return 'No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose en el puerto 8080.';
+    }
+    return error?.error?.error || error?.error?.message || error?.message || fallback;
   }
 
 }

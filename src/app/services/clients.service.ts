@@ -28,6 +28,11 @@ export class ClientsService {
   }
 
   // Obtener todos los clientes
+  getMyProfile(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/me`, { headers });
+  }
+
   getClients(): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.get(this.apiUrl, { headers });

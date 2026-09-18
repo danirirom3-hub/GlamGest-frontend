@@ -31,6 +31,11 @@ export class AppointmentsService {
     return this.http.get(this.apiUrl, { headers });
   }
 
+  getMyAppointments(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/me`, { headers });
+  }
+
   getAppointmentById(id: number): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.get(`${this.apiUrl}/${id}`, { headers });
