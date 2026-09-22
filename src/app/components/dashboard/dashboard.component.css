@@ -22,6 +22,14 @@ body {
   justify-content: space-between;
   padding: 25px 20px;
   animation: slideIn 0.4s ease;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  transition: width 0.25s ease, padding 0.25s ease;
+}
+
+.sidebar.collapsed {
+  width: 78px;
+  padding: 25px 12px;
 }
 
 /* Logo */
@@ -30,6 +38,39 @@ body {
   text-align: center;
   font-weight: 600;
   color: var(--text);
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.brand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-toggle {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 18px;
+  z-index: 1;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+  background: var(--bg);
+  transform: scale(1.06);
 }
 
 .brand span {
@@ -55,6 +96,36 @@ body {
   border-radius: 10px;
   transition: all 0.25s ease;
   font-size: 14px;
+  white-space: nowrap;
+}
+
+.menu-label {
+  overflow: hidden;
+  transition: opacity 0.15s ease, width 0.25s ease;
+}
+
+.sidebar.collapsed .brand h2 {
+  width: 25px;
+  overflow: hidden;
+  font-size: 0;
+}
+
+.sidebar.collapsed .brand h2::after {
+  content: 'G';
+  color: var(--text);
+  font-size: 20px;
+}
+
+.sidebar.collapsed .menu a {
+  justify-content: center;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.sidebar.collapsed .menu-label,
+.sidebar.collapsed .logout-btn .menu-label {
+  width: 0;
+  opacity: 0;
 }
 
 /* Hover enlaces */
@@ -85,6 +156,23 @@ body {
   font-size: 14px;
   font-weight: 500;
   transition: 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.logout-icon {
+  display: none;
+}
+
+.sidebar.collapsed .logout-btn {
+  padding-left: 10px;
+  padding-right: 10px;
+  text-align: center;
+}
+
+.sidebar.collapsed .logout-icon {
+  display: inline;
+  font-size: 19px;
 }
 
 /* Hover logout */
@@ -144,6 +232,39 @@ body {
     padding: 10px 15px;
     border-right: none;
     border-bottom: 1px solid rgba(0,0,0,0.08);
+    transition: none;
+  }
+
+  .sidebar.collapsed {
+    width: 100%;
+    padding: 10px 15px;
+  }
+
+  .sidebar.collapsed .brand h2 {
+    width: auto;
+    overflow: visible;
+    font-size: 20px;
+  }
+
+  .sidebar.collapsed .brand h2::after {
+    display: none;
+  }
+
+  .sidebar.collapsed .menu-label,
+  .sidebar.collapsed .logout-btn .menu-label {
+    width: auto;
+    opacity: 1;
+  }
+
+  .sidebar.collapsed .menu a {
+    justify-content: flex-start;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .sidebar-toggle {
+    top: -5px;
+    right: -12px;
   }
 
   .menu {

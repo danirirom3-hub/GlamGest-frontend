@@ -23,6 +23,8 @@ import Swal from 'sweetalert2';
 })
 export class DashboardComponent {
 
+  sidebarCollapsed = false;
+
   /* Iconos usados en el menú */
   icons = {
     Scissors,
@@ -41,6 +43,10 @@ export class DashboardComponent {
 
   get isAdmin(): boolean {
     return this.authService.getRole() === 'ADMIN';
+  }
+
+  toggleSidebar(): void {
+    this.sidebarCollapsed = !this.sidebarCollapsed;
   }
 
   /* Cierra sesión y redirige al login */

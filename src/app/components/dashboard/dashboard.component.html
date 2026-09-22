@@ -1,57 +1,67 @@
-<div class="dashboard">
+<div class="dashboard" [class.sidebar-collapsed]="sidebarCollapsed">
 
   <!-- Sidebar -->
-  <aside class="sidebar">
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
 
     <!-- Brand -->
     <div class="brand">
       <h2>Glam<span>Gest</span></h2>
+      <button
+        class="sidebar-toggle"
+        type="button"
+        (click)="toggleSidebar()"
+        [attr.aria-label]="sidebarCollapsed ? 'Expandir menú' : 'Contraer menú'"
+        [attr.title]="sidebarCollapsed ? 'Expandir menú' : 'Contraer menú'"
+      >
+        <span aria-hidden="true">{{ sidebarCollapsed ? '›' : '‹' }}</span>
+      </button>
     </div>
 
     <!-- Navigation -->
     <nav class="menu">
 
-      <a routerLink="/dashboard/services" routerLinkActive="activo">
+      <a routerLink="/dashboard/services" routerLinkActive="activo" title="Servicios" aria-label="Servicios">
         <lucide-icon [img]="icons.Scissors"></lucide-icon>
-        Servicios
+        <span class="menu-label">Servicios</span>
       </a>
 
-      <a routerLink="/dashboard/clients" routerLinkActive="activo">
+      <a routerLink="/dashboard/clients" routerLinkActive="activo" title="Clientes" aria-label="Clientes">
         <lucide-icon [img]="icons.Users"></lucide-icon>
-        Clientes
+        <span class="menu-label">Clientes</span>
       </a>
 
-      <a routerLink="/dashboard/employees" routerLinkActive="activo">
+      <a routerLink="/dashboard/employees" routerLinkActive="activo" title="Empleados" aria-label="Empleados">
         <lucide-icon [img]="icons.User"></lucide-icon>
-        Empleados
+        <span class="menu-label">Empleados</span>
       </a>
 
-      <a routerLink="/dashboard/sales" routerLinkActive="activo">
+      <a routerLink="/dashboard/sales" routerLinkActive="activo" title="Ventas" aria-label="Ventas">
         <lucide-icon [img]="icons.ShoppingCart"></lucide-icon>
-        Ventas
+        <span class="menu-label">Ventas</span>
       </a>
 
-      <a routerLink="/dashboard/appointments" routerLinkActive="activo">
+      <a routerLink="/dashboard/appointments" routerLinkActive="activo" title="Citas" aria-label="Citas">
         <lucide-icon [img]="icons.Calendar"></lucide-icon>
-        Citas
+        <span class="menu-label">Citas</span>
       </a>
 
-      <a *ngIf="isAdmin" routerLink="/admin/metrics" routerLinkActive="activo">
+      <a *ngIf="isAdmin" routerLink="/admin/metrics" routerLinkActive="activo" title="Métricas" aria-label="Métricas">
         <lucide-icon [img]="icons.BarChart3"></lucide-icon>
-        Métricas
+        <span class="menu-label">Métricas</span>
       </a>
 
       <!--SETTINGS -->
-      <a routerLink="/dashboard/settings" routerLinkActive="activo">
+      <a routerLink="/dashboard/settings" routerLinkActive="activo" title="Configuración" aria-label="Configuración">
         <lucide-icon [img]="icons.Settings"></lucide-icon>
-        Configuración
+        <span class="menu-label">Configuración</span>
       </a>
 
     </nav>
 
     <!-- Logout -->
-    <button class="logout-btn" (click)="logout()">
-      Cerrar sesión
+    <button class="logout-btn" (click)="logout()" title="Cerrar sesión" aria-label="Cerrar sesión">
+      <span class="menu-label">Cerrar sesión</span>
+      <span class="logout-icon" aria-hidden="true">↪</span>
     </button>
 
     <!-- Footer -->
