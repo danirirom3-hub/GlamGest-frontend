@@ -19,6 +19,7 @@ import { EmployeesComponent } from './components/employees/employees.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { ClientComponent } from './components/client/client.component';
 import { ClientGuard } from './guards/client.guard';
+import { MetricsComponent } from './components/metrics/metrics.component';
 
 export const routes: Routes = [
 
@@ -30,6 +31,16 @@ export const routes: Routes = [
   { path: 'users', component: UsersComponent },
 
   { path: 'client', component: ClientComponent, canActivate: [ClientGuard] },
+
+  {
+    path: 'admin',
+    component: DashboardComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: 'metrics', component: MetricsComponent },
+      { path: '', redirectTo: 'metrics', pathMatch: 'full' }
+    ]
+  },
 
   {
     path: 'dashboard',

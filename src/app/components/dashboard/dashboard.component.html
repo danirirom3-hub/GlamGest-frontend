@@ -36,6 +36,11 @@
         Citas
       </a>
 
+      <a *ngIf="isAdmin" routerLink="/admin/metrics" routerLinkActive="activo">
+        <lucide-icon [img]="icons.BarChart3"></lucide-icon>
+        Métricas
+      </a>
+
       <!--SETTINGS -->
       <a routerLink="/dashboard/settings" routerLinkActive="activo">
         <lucide-icon [img]="icons.Settings"></lucide-icon>

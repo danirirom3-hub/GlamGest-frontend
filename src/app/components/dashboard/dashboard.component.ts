@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { 
   LucideAngularModule, 
@@ -7,7 +8,8 @@ import {
   ShoppingCart, 
   Calendar, 
   User,
-  Settings
+  Settings,
+  BarChart3
 } from 'lucide-angular';
 import { AuthService } from '../../services/auth.service';
 import Swal from 'sweetalert2';
@@ -15,7 +17,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterModule, LucideAngularModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -28,13 +30,18 @@ export class DashboardComponent {
     ShoppingCart,
     Calendar,
     User,
-    Settings
+    Settings,
+    BarChart3
   };
 
   constructor(
     private authService: AuthService,
     private router: Router
   ) {}
+
+  get isAdmin(): boolean {
+    return this.authService.getRole() === 'ADMIN';
+  }
 
   /* Cierra sesión y redirige al login */
   logout(): void {

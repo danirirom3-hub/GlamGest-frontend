@@ -1,0 +1,62 @@
+<section class="metrics-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Visión general</p>
+      <h1>Métricas</h1>
+      <p class="subtitle">Conoce el rendimiento de tu negocio en un vistazo.</p>
+    </div>
+    <div class="date-panel">
+      <div class="preset-list" role="group" aria-label="Rango de fechas">
+        <button [class.selected]="preset === 'today'" (click)="selectPreset('today')">Hoy</button>
+        <button [class.selected]="preset === 'week'" (click)="selectPreset('week')">Esta semana</button>
+        <button [class.selected]="preset === 'month'" (click)="selectPreset('month')">Este mes</button>
+        <button [class.selected]="preset === 'custom'" (click)="selectPreset('custom')">Rango personalizado</button>
+      </div>
+      <div class="custom-range" *ngIf="preset === 'custom'">
+        <label>Desde <input type="date" [(ngModel)]="customFrom"></label>
+        <label>Hasta <input type="date" [(ngModel)]="customTo"></label>
+        <button class="apply-btn" [disabled]="!customFrom || !customTo || customFrom > customTo" (click)="applyCustomRange()">Aplicar</button>
+      </div>
+      <span class="current-range"><lucide-icon [img]="icons.CalendarDays" [size]="15"></lucide-icon>{{ from }} al {{ to }}</span>
+    </div>
+  </header>
+
+  <div class="loading-state" *ngIf="loading"><lucide-icon [img]="icons.RefreshCw" class="spin"></lucide-icon> Actualizando métricas...</div>
+  <div class="error-state" *ngIf="errorMessage"><strong>No pudimos cargar los datos.</strong><span>{{ errorMessage }}</span><button (click)="loadMetrics()">Reintentar</button></div>
+
+  <ng-container *ngIf="!loading && !errorMessage">
+    <div class="stat-grid" *ngIf="summary as data">
+      <article class="stat-card revenue-card"><span class="stat-icon"><lucide-icon [img]="icons.TrendingUp"></lucide-icon></span><p>Ingresos</p><strong>{{ formatCurrency(data.totalRevenue) }}</strong><small>Ventas completadas</small></article>
+      <article class="stat-card"><span class="stat-icon"><lucide-icon [img]="icons.ShoppingBag"></lucide-icon></span><p>Ventas</p><strong>{{ data.totalSales | number }}</strong><small>Operaciones registradas</small></article>
+      <article class="stat-card"><span class="stat-icon"><lucide-icon [img]="icons.Receipt"></lucide-icon></span><p>Ticket promedio</p><strong>{{ formatCurrency(data.averageTicket) }}</strong><small>Por venta</small></article>
+      <article class="stat-card"><span class="stat-icon"><lucide-icon [img]="icons.Users"></lucide-icon></span><p>Clientes nuevos</p><strong>{{ data.newClients | number }}</strong><small>En el período</small></article>
+      <article class="stat-card"><span class="stat-icon"><lucide-icon [img]="icons.CalendarDays"></lucide-icon></span><p>Citas</p><strong>{{ data.totalAppointments | number }}</strong><small>Agendadas</small></article>
+    </div>
+
+    <div class="charts-grid" *ngIf="hasLoaded">
+      <article class="panel revenue-panel">
+        <div class="panel-heading"><div><p class="eyebrow">Evolución</p><h2>Ingresos por día</h2></div><span class="panel-note">{{ revenue.length }} días</span></div>
+        <div class="empty-state" *ngIf="!revenue.length">No hay ingresos registrados en este período.</div>
+        <div class="line-chart" *ngIf="revenue.length">
+          <svg viewBox="0 0 640 230" preserveAspectRatio="none" role="img" aria-label="Ingresos por día">
+            <line x1="0" y1="210" x2="640" y2="210" class="axis"></line>
+            <polyline [attr.points]="revenuePoints" class="line"></polyline>
+            <ng-container *ngFor="let item of revenue; let i = index"><circle [attr.cx]="revenue.length === 1 ? 320 : i * 640 / (revenue.length - 1)" [attr.cy]="210 - (item.revenue / maxRevenue) * 190" r="4" class="point"></circle></ng-container>
+          </svg>
+          <div class="chart-labels"><span *ngFor="let item of revenue; let i = index" [style.left.%]="revenue.length === 1 ? 50 : i * 100 / (revenue.length - 1)">{{ item.date | date:'dd MMM' }}</span></div>
+        </div>
+      </article>
+
+      <article class="panel status-panel">
+        <div class="panel-heading"><div><p class="eyebrow">Agenda</p><h2>Citas por estado</h2></div></div>
+        <div class="empty-state" *ngIf="!appointments.length">No hay citas en este período.</div>
+        <div class="status-list" *ngIf="appointments.length"><div class="status-row" *ngFor="let item of appointments; trackBy: trackByLabel"><div class="status-title"><span>{{ statusName(item.label) }}</span><strong>{{ item.value }}</strong></div><div class="bar-track"><span [style.width.%]="statusPercent(item.value)"></span></div></div></div>
+      </article>
+    </div>
+
+    <div class="lower-grid" *ngIf="hasLoaded">
+      <article class="panel"><div class="panel-heading"><div><p class="eyebrow">Catálogo</p><h2>Servicios más vendidos</h2></div><span class="panel-note">Ordenados por ingresos</span></div><div class="empty-state" *ngIf="!services.length">No hay servicios vendidos en este período.</div><div class="service-list" *ngIf="services.length"><div class="service-row" *ngFor="let item of services; let index = index; trackBy: trackByService"><div class="rank">{{ index + 1 | number:'2.0-0' }}</div><div class="service-info"><strong>{{ item.serviceName }}</strong><span>{{ item.units }} unidades</span></div><strong class="amount">{{ formatCurrency(item.revenue) }}</strong></div></div></article>
+      <article class="panel"><div class="panel-heading"><div><p class="eyebrow">Equipo</p><h2>Rendimiento por empleado</h2></div></div><div class="empty-state" *ngIf="!employees.length">No hay rendimiento registrado en este período.</div><div class="employee-table" *ngIf="employees.length"><div class="table-header"><span>Empleado</span><span>Citas</span><span>Ingresos</span></div><div class="employee-row" *ngFor="let item of employees; trackBy: trackByEmployee"><strong>{{ item.employeeName }}</strong><span>{{ item.appointments }}</span><span>{{ formatCurrency(item.revenue) }}</span></div></div></article>
+    </div>
+  </ng-container>
+</section>
