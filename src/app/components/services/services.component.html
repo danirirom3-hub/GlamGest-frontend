@@ -12,30 +12,45 @@
       </div>
     </header>
 
-    <section class="toolbar">
-      <label class="filter-control">Filtrar por categoría
-        <select [(ngModel)]="selectedCategoryId">
-          <option [ngValue]="null">Todas las categorías</option>
-          <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
-        </select>
-      </label>
-      <label class="active-filter"><input type="checkbox" [(ngModel)]="showOnlyActive"> Mostrar solo servicios activos</label>
-      <span class="result-count">{{ filteredServices.length }} servicio(s)</span>
-    </section>
-
     <div class="loading" *ngIf="loading">Cargando servicios...</div>
-    <div class="cards" *ngIf="!loading">
-      <article class="card" *ngFor="let item of filteredServices" [class.inactivo]="!item.active">
-        <div class="card-header"><div><span class="category-pill">{{ categoryName(item) }}</span><h2>{{ item.name }}</h2></div><span class="precio">{{ formatPrice(item.price) }}</span></div>
-        <p class="duracion">{{ item.durationMinutes }} minutos</p>
-        <p class="descripcion">{{ item.description }}</p>
-        <span class="status" [class.disabled]="!item.active">{{ item.active ? 'Activo' : 'Inactivo' }}</span>
-        <div class="acciones">
-          <button class="btn-icon editar" type="button" (click)="openEditService(item)">Editar</button>
-          <button *ngIf="isAdmin && item.active" class="btn-icon eliminar" type="button" (click)="toggleService(item)">Desactivar</button>
+    <div class="master-detail" *ngIf="!loading">
+      <aside class="category-panel" aria-label="Categorías de servicios">
+        <div class="category-panel-heading">
+          <span class="eyebrow">Explorar</span>
+          <h2>Categorías</h2>
         </div>
-      </article>
-      <div *ngIf="filteredServices.length === 0" class="empty">No hay servicios para los filtros seleccionados.</div>
+        <nav class="category-navigation">
+          <button type="button" [class.selected]="selectedCategoryId === null" (click)="selectCategory(null)">
+            <span class="category-link-content"><span class="category-dot all-dot"></span>Todos los servicios</span>
+            <span class="category-count">{{ allVisibleServicesCount }}</span>
+          </button>
+          <button type="button" *ngFor="let category of categories" [class.selected]="selectedCategoryId === category.id" (click)="selectCategory(category.id!)">
+            <span class="category-link-content"><span class="category-dot"></span>{{ category.name }}</span>
+            <span class="category-count">{{ categoryServiceCount(category.id!) }}</span>
+          </button>
+        </nav>
+        <p class="category-hint">Selecciona una categoría para ver sus servicios.</p>
+      </aside>
+
+      <section class="service-results" aria-live="polite">
+        <div class="results-heading">
+          <div><p class="eyebrow">Catálogo</p><h2>{{ selectedCategoryLabel }}</h2></div>
+          <div class="results-controls"><label class="active-filter"><input type="checkbox" [(ngModel)]="showOnlyActive"> Solo activos</label><span class="result-count">{{ filteredServices.length }} servicio(s)</span></div>
+        </div>
+        <div class="cards">
+          <article class="card" *ngFor="let item of filteredServices" [class.inactivo]="!item.active">
+            <div class="card-header"><div><span class="category-pill">{{ categoryName(item) }}</span><h2>{{ item.name }}</h2></div><span class="precio">{{ formatPrice(item.price) }}</span></div>
+            <p class="duracion">{{ item.durationMinutes }} minutos</p>
+            <p class="descripcion">{{ item.description }}</p>
+            <span class="status" [class.disabled]="!item.active">{{ item.active ? 'Activo' : 'Inactivo' }}</span>
+            <div class="acciones">
+              <button class="btn-icon editar" type="button" (click)="openEditService(item)">Editar</button>
+              <button *ngIf="isAdmin && item.active" class="btn-icon eliminar" type="button" (click)="toggleService(item)">Desactivar</button>
+            </div>
+          </article>
+          <div *ngIf="filteredServices.length === 0" class="empty">No hay servicios en esta categoría.</div>
+        </div>
+      </section>
     </div>
 
     <div class="modal-backdrop" *ngIf="serviceModalOpen" (click)="closeServiceModal()">

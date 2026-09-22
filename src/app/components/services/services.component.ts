@@ -57,6 +57,26 @@ export class ServicesComponent implements OnInit {
     );
   }
 
+  get selectedCategoryLabel(): string {
+    return this.selectedCategoryId === null
+      ? 'Todos los servicios'
+      : this.categories.find(category => category.id === this.selectedCategoryId)?.name || 'Servicios';
+  }
+
+  get allVisibleServicesCount(): number {
+    return this.services.filter(service => !this.showOnlyActive || service.active).length;
+  }
+
+  selectCategory(categoryId: number | null): void {
+    this.selectedCategoryId = categoryId;
+  }
+
+  categoryServiceCount(categoryId: number): number {
+    return this.services.filter(service =>
+      service.categoryId === categoryId && (!this.showOnlyActive || service.active)
+    ).length;
+  }
+
   ngOnInit(): void {
     this.loadData();
   }
@@ -222,6 +242,7 @@ export class ServicesComponent implements OnInit {
         next: response => {
           if (!response?.successful) { this.showError(response, 'No se pudo desactivar la categoría.'); return; }
           this.categories = this.categories.filter(item => item.id !== category.id);
+          if (this.selectedCategoryId === category.id) this.selectedCategoryId = null;
           Swal.fire({ icon: 'success', title: 'Categoría desactivada', timer: 1200, showConfirmButton: false });
         },
         error: error => this.showError(error, 'No se pudo desactivar la categoría.')
