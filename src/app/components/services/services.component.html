@@ -1,128 +1,68 @@
 <div class="page">
   <div class="container">
-
-    <!-- FORMULARIO -->
-    <div class="form-card">
-      <div class="form-header">
-        <h2>{{ isEditing ? 'Editar servicio' : 'Nuevo servicio' }}</h2>
-        <span class="sub">Completa la información del servicio</span>
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Catálogo</p>
+        <h1>Servicios</h1>
+        <p class="sub">Organiza la oferta de tu negocio y sus categorías.</p>
       </div>
+      <div class="header-actions">
+        <button *ngIf="isAdmin" class="btn-secondary" type="button" (click)="openCategories()">Gestionar categorías</button>
+        <button class="btn-primary" type="button" (click)="openNewService()">+ Nuevo servicio</button>
+      </div>
+    </header>
 
-      <form (ngSubmit)="saveService()" class="form-grid">
+    <section class="toolbar">
+      <label class="filter-control">Filtrar por categoría
+        <select [(ngModel)]="selectedCategoryId">
+          <option [ngValue]="null">Todas las categorías</option>
+          <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
+        </select>
+      </label>
+      <label class="active-filter"><input type="checkbox" [(ngModel)]="showOnlyActive"> Mostrar solo servicios activos</label>
+      <span class="result-count">{{ filteredServices.length }} servicio(s)</span>
+    </section>
 
-        <div class="input-group">
-          <label>Nombre del servicio</label>
-          <input
-            type="text"
-            placeholder="Ej: Corte de cabello"
-            name="name"
-            [(ngModel)]="service.name"
-          >
-        </div>
-
-        <div class="input-group">
-          <label>Precio</label>
-          <input
-            type="number"
-            placeholder="Ej: 20000"
-            name="price"
-            [(ngModel)]="service.price"
-          >
-        </div>
-
-        <div class="input-group">
-          <label>Duración (minutos)</label>
-          <input
-            type="number"
-            placeholder="Ej: 30"
-            name="durationMinutes"
-            [(ngModel)]="service.durationMinutes"
-          >
-        </div>
-
-        <div class="input-group full">
-          <label>Descripción</label>
-          <textarea
-            name="description"
-            placeholder="Describe el servicio..."
-            [(ngModel)]="service.description"
-          ></textarea>
-        </div>
-
-        <div class="form-actions">
-          <button class="btn-save" type="submit">
-            {{ isEditing ? 'Actualizar servicio' : 'Guardar servicio' }}
-          </button>
-
-          <button
-            class="btn-cancel"
-            type="button"
-            *ngIf="isEditing"
-            (click)="cancelEdit()"
-          >
-            Cancelar
-          </button>
-        </div>
-
-      </form>
-
-      <p class="mensaje">{{ message }}</p>
-    </div>
-
-    <!-- FILTRO -->
-    <div class="form-card filtro" (click)="toggleFiltro()">
-      <input 
-        type="checkbox" 
-        [checked]="showOnlyActive"
-        (click)="$event.stopPropagation()"
-        (change)="toggleFiltro()"
-      >
-      <span>Mostrar solo servicios activos</span>
-    </div>
-
-    <!-- LISTADO -->
-    <div class="cards">
-
-      <div class="card" 
-           *ngFor="let item of filteredServices"
-           [class.inactivo]="!item.active">
-
-        <div class="card-header">
-          <h3>{{ item.name }}</h3>
-          <span class="precio">${{ item.price }}</span>
-        </div>
-
-        <div class="card-body">
-          <p class="duracion">Duración: {{ item.durationMinutes }} minutos</p>
-          <p class="descripcion">{{ item.description }}</p>
-        </div>
-
+    <div class="loading" *ngIf="loading">Cargando servicios...</div>
+    <div class="cards" *ngIf="!loading">
+      <article class="card" *ngFor="let item of filteredServices" [class.inactivo]="!item.active">
+        <div class="card-header"><div><span class="category-pill">{{ categoryName(item) }}</span><h2>{{ item.name }}</h2></div><span class="precio">{{ formatPrice(item.price) }}</span></div>
+        <p class="duracion">{{ item.durationMinutes }} minutos</p>
+        <p class="descripcion">{{ item.description }}</p>
+        <span class="status" [class.disabled]="!item.active">{{ item.active ? 'Activo' : 'Inactivo' }}</span>
         <div class="acciones">
-
-          <button class="btn-icon editar" (click)="editService(item)">
-            <i class="fa-solid fa-pen"></i>
-          </button>
-
-          <button class="btn-icon estado" (click)="toggleActive(item)">
-            <i class="fa-solid"
-               [class.fa-toggle-on]="item.active"
-               [class.fa-toggle-off]="!item.active"></i>
-          </button>
-
-          <!-- BOTÓN ELIMINAR AGREGADO -->
-          <button class="btn-icon eliminar" (click)="deleteService(item)">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-
+          <button class="btn-icon editar" type="button" (click)="openEditService(item)">Editar</button>
+          <button *ngIf="isAdmin && item.active" class="btn-icon eliminar" type="button" (click)="toggleService(item)">Desactivar</button>
         </div>
-
-      </div>
-
-      <div *ngIf="filteredServices.length === 0" class="empty">
-        No hay servicios registrados.
-      </div>
-
+      </article>
+      <div *ngIf="filteredServices.length === 0" class="empty">No hay servicios para los filtros seleccionados.</div>
     </div>
 
+    <div class="modal-backdrop" *ngIf="serviceModalOpen" (click)="closeServiceModal()">
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="service-modal-title" (click)="$event.stopPropagation()">
+        <div class="modal-header"><div><p class="eyebrow">Catálogo</p><h2 id="service-modal-title">{{ isEditing ? 'Editar servicio' : 'Nuevo servicio' }}</h2></div><button class="close" type="button" (click)="closeServiceModal()">×</button></div>
+        <form class="form-grid" (ngSubmit)="saveService()">
+          <label>Nombre del servicio<input type="text" name="name" [(ngModel)]="service.name" placeholder="Ej. Masaje relajante"></label>
+          <label>Categoría<select name="categoryId" [(ngModel)]="service.categoryId"><option [ngValue]="null">Sin categoría</option><option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option></select></label>
+          <label>Precio<input type="number" name="price" min="0" [(ngModel)]="service.price" placeholder="80000"></label>
+          <label>Duración (minutos)<input type="number" name="durationMinutes" min="1" [(ngModel)]="service.durationMinutes" placeholder="60"></label>
+          <label class="full">Descripción<textarea name="description" [(ngModel)]="service.description" placeholder="Describe el servicio..."></textarea></label>
+          <div class="modal-actions"><button class="btn-secondary" type="button" (click)="closeServiceModal()">Cancelar</button><button class="btn-primary" type="submit" [disabled]="savingService">{{ savingService ? 'Guardando...' : (isEditing ? 'Actualizar servicio' : 'Crear servicio') }}</button></div>
+        </form>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" *ngIf="categoryModalOpen" (click)="closeCategoryModal()">
+      <section class="modal category-modal" role="dialog" aria-modal="true" aria-labelledby="category-modal-title" (click)="$event.stopPropagation()">
+        <div class="modal-header"><div><p class="eyebrow">Catálogo</p><h2 id="category-modal-title">Gestionar categorías</h2></div><button class="close" type="button" (click)="closeCategoryModal()">×</button></div>
+        <div class="category-layout">
+          <div class="category-list" *ngIf="!loadingCategories && categories.length"><div class="category-row" *ngFor="let item of categories"><div><strong>{{ item.name }}</strong><span>{{ item.description || 'Sin descripción' }}</span></div><div class="category-actions"><button type="button" (click)="editCategory(item)">Editar</button><button type="button" class="danger-link" (click)="deactivateCategory(item)">Desactivar</button></div></div></div>
+          <div class="empty compact" *ngIf="!loadingCategories && !categories.length">No hay categorías activas.</div>
+          <div class="loading compact" *ngIf="loadingCategories">Cargando categorías...</div>
+          <div class="category-form" *ngIf="categoryFormOpen"><h3>{{ editCategoryId === null ? 'Nueva categoría' : 'Editar categoría' }}</h3><label>Nombre<input type="text" name="categoryName" [(ngModel)]="category.name" placeholder="Ej. Masajes"></label><label>Descripción<textarea name="categoryDescription" [(ngModel)]="category.description" placeholder="Describe la categoría..."></textarea></label><div class="modal-actions"><button class="btn-secondary" type="button" (click)="cancelCategoryForm()">Cancelar</button><button class="btn-primary" type="button" [disabled]="savingCategory" (click)="saveCategory()">{{ savingCategory ? 'Guardando...' : 'Guardar categoría' }}</button></div></div>
+        </div>
+        <button *ngIf="!categoryFormOpen" class="btn-primary full-width" type="button" (click)="newCategory()">+ Nueva categoría</button>
+      </section>
+    </div>
   </div>
 </div>
