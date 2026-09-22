@@ -35,7 +35,7 @@
       <section class="service-results" aria-live="polite">
         <div class="results-heading">
           <div><p class="eyebrow">Catálogo</p><h2>{{ selectedCategoryLabel }}</h2></div>
-          <div class="results-controls"><label class="active-filter"><input type="checkbox" [(ngModel)]="showOnlyActive"> Solo activos</label><span class="result-count">{{ filteredServices.length }} servicio(s)</span></div>
+          <div class="results-controls"><div class="status-filters" role="group" aria-label="Estado de los servicios"><button type="button" [class.selected]="statusFilter === 'active'" (click)="statusFilter = 'active'">Activos</button><button type="button" [class.selected]="statusFilter === 'inactive'" (click)="statusFilter = 'inactive'">Inactivos</button><button type="button" [class.selected]="statusFilter === 'all'" (click)="statusFilter = 'all'">Todos</button></div><span class="result-count">{{ filteredServices.length }} servicio(s)</span></div>
         </div>
         <div class="cards">
           <article class="card" *ngFor="let item of filteredServices" [class.inactivo]="!item.active">
@@ -45,7 +45,7 @@
             <span class="status" [class.disabled]="!item.active">{{ item.active ? 'Activo' : 'Inactivo' }}</span>
             <div class="acciones">
               <button class="btn-icon editar" type="button" (click)="openEditService(item)">Editar</button>
-              <button *ngIf="isAdmin && item.active" class="btn-icon eliminar" type="button" (click)="toggleService(item)">Desactivar</button>
+              <button *ngIf="isAdmin" class="btn-icon" [class.eliminar]="item.active" [class.activar]="!item.active" type="button" (click)="toggleService(item)">{{ item.active ? 'Desactivar' : 'Activar' }}</button>
             </div>
           </article>
           <div *ngIf="filteredServices.length === 0" class="empty">No hay servicios en esta categoría.</div>
@@ -60,7 +60,17 @@
           <label>Nombre del servicio<input type="text" name="name" [(ngModel)]="service.name" placeholder="Ej. Masaje relajante"></label>
           <label>Categoría<select name="categoryId" [(ngModel)]="service.categoryId"><option [ngValue]="null">Sin categoría</option><option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option></select></label>
           <label>Precio<input type="number" name="price" min="0" [(ngModel)]="service.price" placeholder="80000"></label>
-          <label>Duración (minutos)<input type="number" name="durationMinutes" min="1" [(ngModel)]="service.durationMinutes" placeholder="60"></label>
+          <label>Duración del servicio
+            <span class="duration-select">
+              <button class="duration-trigger" type="button" [class.open]="durationMenuOpen" (click)="toggleDurationMenu()">
+                {{ service.durationMinutes ? service.durationMinutes + ' minutos' : 'Selecciona una duración' }}
+                <span aria-hidden="true">⌄</span>
+              </button>
+              <span class="duration-options" *ngIf="durationMenuOpen">
+                <button *ngFor="let duration of durationOptions" type="button" (click)="selectDuration(duration)">{{ duration }} minutos</button>
+              </span>
+            </span>
+          </label>
           <label class="full">Descripción<textarea name="description" [(ngModel)]="service.description" placeholder="Describe el servicio..."></textarea></label>
           <div class="modal-actions"><button class="btn-secondary" type="button" (click)="closeServiceModal()">Cancelar</button><button class="btn-primary" type="submit" [disabled]="savingService">{{ savingService ? 'Guardando...' : (isEditing ? 'Actualizar servicio' : 'Crear servicio') }}</button></div>
         </form>

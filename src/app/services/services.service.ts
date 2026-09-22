@@ -10,6 +10,7 @@ export interface ServicePayload {
   price: number;
   durationMinutes: number;
   categoryId: number | null;
+  active?: boolean;
 }
 
 export interface ServiceItem extends ServicePayload {
@@ -60,6 +61,13 @@ export class ServicesService {
     });
   }
 
+  // Obtener servicios activos e inactivos para la vista administrativa.
+  getAdminServices(): Observable<ServicesResponse<ServiceItem[]>> {
+    return this.http.get<ServicesResponse<ServiceItem[]>>(`${this.apiUrl}/admin`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
   // Obtener servicio por ID
   getServiceById(id: number): Observable<ServicesResponse<ServiceItem>> {
     return this.http.get<ServicesResponse<ServiceItem>>(`${this.apiUrl}/${id}`, {
@@ -68,7 +76,7 @@ export class ServicesService {
   }
 
   // Actualizar servicio
-  updateService(id: number, data: ServicePayload): Observable<ServicesResponse<ServiceItem>> {
+  updateService(id: number, data: Partial<ServicePayload>): Observable<ServicesResponse<ServiceItem>> {
     return this.http.put<ServicesResponse<ServiceItem>>(`${this.apiUrl}/${id}`, data, {
       headers: this.getAuthHeaders()
     });

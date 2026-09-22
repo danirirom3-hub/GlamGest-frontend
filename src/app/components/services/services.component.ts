@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Observable } from 'rxjs';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../services/auth.service';
 import { CategoriesService, Category } from '../../services/categories.service';
-import { ServicesService } from '../../services/services.service';
+import { ServicePayload, ServicesService } from '../../services/services.service';
 
 interface Service {
   id?: number;
@@ -25,10 +26,12 @@ interface Service {
   styleUrls: ['./services.component.css']
 })
 export class ServicesComponent implements OnInit {
+  readonly durationOptions = Array.from({ length: 32 }, (_, index) => (index + 1) * 15);
+
   services: Service[] = [];
   categories: Category[] = [];
   selectedCategoryId: number | null = null;
-  showOnlyActive = true;
+  statusFilter: 'active' | 'inactive' | 'all' = 'active';
   loading = true;
   savingService = false;
   loadingCategories = false;
@@ -40,7 +43,9 @@ export class ServicesComponent implements OnInit {
   editServiceId: number | null = null;
   editCategoryId: number | null = null;
   service: Service = this.emptyService();
+  private originalService: Service | null = null;
   category: Category = this.emptyCategory();
+  durationMenuOpen = false;
 
   constructor(
     private servicesService: ServicesService,
@@ -52,7 +57,7 @@ export class ServicesComponent implements OnInit {
 
   get filteredServices(): Service[] {
     return this.services.filter(service =>
-      (!this.showOnlyActive || service.active) &&
+      this.matchesStatus(service) &&
       (this.selectedCategoryId === null || service.categoryId === this.selectedCategoryId)
     );
   }
@@ -64,7 +69,7 @@ export class ServicesComponent implements OnInit {
   }
 
   get allVisibleServicesCount(): number {
-    return this.services.filter(service => !this.showOnlyActive || service.active).length;
+    return this.services.filter(service => this.matchesStatus(service)).length;
   }
 
   selectCategory(categoryId: number | null): void {
@@ -73,8 +78,12 @@ export class ServicesComponent implements OnInit {
 
   categoryServiceCount(categoryId: number): number {
     return this.services.filter(service =>
-      service.categoryId === categoryId && (!this.showOnlyActive || service.active)
+      service.categoryId === categoryId && this.matchesStatus(service)
     ).length;
+  }
+
+  private matchesStatus(service: Service): boolean {
+    return this.statusFilter === 'all' || (this.statusFilter === 'active' ? service.active : !service.active);
   }
 
   ngOnInit(): void {
@@ -83,7 +92,7 @@ export class ServicesComponent implements OnInit {
 
   loadData(): void {
     this.loading = true;
-    this.servicesService.getServices().subscribe({
+    this.servicesService.getAdminServices().subscribe({
       next: response => {
         this.services = this.unwrap(response);
         this.loading = false;
@@ -114,7 +123,9 @@ export class ServicesComponent implements OnInit {
     this.closeCategoryModal();
     this.isEditing = false;
     this.editServiceId = null;
+    this.originalService = null;
     this.service = this.emptyService();
+    this.durationMenuOpen = false;
     this.serviceModalOpen = true;
   }
 
@@ -123,11 +134,25 @@ export class ServicesComponent implements OnInit {
     this.isEditing = true;
     this.editServiceId = service.id ?? null;
     this.service = { ...service, categoryId: service.categoryId ?? null };
+    this.originalService = { ...this.service };
+    this.durationMenuOpen = false;
     this.serviceModalOpen = true;
   }
 
   closeServiceModal(): void {
-    if (!this.savingService) this.serviceModalOpen = false;
+    if (!this.savingService) {
+      this.durationMenuOpen = false;
+      this.serviceModalOpen = false;
+    }
+  }
+
+  toggleDurationMenu(): void {
+    this.durationMenuOpen = !this.durationMenuOpen;
+  }
+
+  selectDuration(duration: number): void {
+    this.service.durationMinutes = duration;
+    this.durationMenuOpen = false;
   }
 
   saveService(): void {
@@ -135,17 +160,27 @@ export class ServicesComponent implements OnInit {
       Swal.fire('Campos incompletos', 'Completa nombre, descripción, precio y duración.', 'warning');
       return;
     }
-    const payload = {
-      name: this.service.name.trim(),
-      description: this.service.description.trim(),
-      price: this.service.price,
-      durationMinutes: this.service.durationMinutes,
-      categoryId: this.service.categoryId
-    };
+    if (this.service.durationMinutes <= 0 || this.service.durationMinutes % 15 !== 0) {
+      Swal.fire('Duración inválida', 'La duración debe estar expresada en bloques de 15 minutos.', 'warning');
+      return;
+    }
+    const payload: ServicePayload | Partial<ServicePayload> = this.isEditing && this.originalService
+      ? this.changedServiceFields()
+      : {
+        name: this.service.name.trim(),
+        description: this.service.description.trim(),
+        price: this.service.price,
+        durationMinutes: this.service.durationMinutes,
+        categoryId: this.service.categoryId
+      };
+    if (this.isEditing && Object.keys(payload).length === 0) {
+      this.serviceModalOpen = false;
+      return;
+    }
     this.savingService = true;
     const request = this.isEditing && this.editServiceId !== null
       ? this.servicesService.updateService(this.editServiceId, payload)
-      : this.servicesService.createService(payload);
+      : this.servicesService.createService(payload as ServicePayload);
     request.subscribe({
       next: response => {
         if (!response?.successful) { this.savingService = false; this.showError(response, 'No se pudo guardar el servicio.'); return; }
@@ -155,6 +190,7 @@ export class ServicesComponent implements OnInit {
           : [...this.services, saved];
         this.savingService = false;
         this.serviceModalOpen = false;
+        this.originalService = null;
         Swal.fire({ icon: 'success', title: this.isEditing ? 'Servicio actualizado' : 'Servicio creado', timer: 1300, showConfirmButton: false });
       },
       error: error => { this.savingService = false; this.showError(error, 'No se pudo guardar el servicio.'); }
@@ -163,18 +199,33 @@ export class ServicesComponent implements OnInit {
 
   toggleService(service: Service): void {
     if (!this.isAdmin || !service.id) return;
-    const action = service.active ? 'desactivar' : 'activar';
+    const activating = !service.active;
+    const action = activating ? 'activar' : 'desactivar';
     Swal.fire({ title: `¿Quieres ${action} "${service.name}"?`, icon: 'question', showCancelButton: true, confirmButtonText: 'Confirmar', cancelButtonText: 'Cancelar' }).then(result => {
       if (!result.isConfirmed) return;
-      this.servicesService.deleteService(service.id!).subscribe({
+      const request: Observable<any> = activating
+        ? this.servicesService.updateService(service.id!, { active: true })
+        : this.servicesService.deleteService(service.id!);
+      request.subscribe({
         next: response => {
-          if (!response?.successful) { this.showError(response, 'No se pudo cambiar el estado.'); return; }
-          this.services = this.services.map(item => item.id === service.id ? { ...item, active: false } : item);
-          Swal.fire({ icon: 'success', title: 'Servicio desactivado', timer: 1200, showConfirmButton: false });
+          if (!response?.successful) { this.showError(response, `No se pudo ${action} el servicio.`); return; }
+          this.services = this.services.map(item => item.id === service.id ? { ...item, active: activating } : item);
+          Swal.fire({ icon: 'success', title: activating ? 'Servicio activado' : 'Servicio desactivado', timer: 1200, showConfirmButton: false });
         },
-        error: error => this.showError(error, 'No se pudo desactivar el servicio.')
+        error: error => this.showError(error, `No se pudo ${action} el servicio.`)
       });
     });
+  }
+
+  private changedServiceFields(): Partial<ServicePayload> {
+    if (!this.originalService) return {};
+    const changes: Partial<ServicePayload> = {};
+    if (this.service.name.trim() !== this.originalService.name) changes.name = this.service.name.trim();
+    if (this.service.description.trim() !== this.originalService.description) changes.description = this.service.description.trim();
+    if (this.service.price !== this.originalService.price && this.service.price !== null) changes.price = this.service.price;
+    if (this.service.durationMinutes !== this.originalService.durationMinutes && this.service.durationMinutes !== null) changes.durationMinutes = this.service.durationMinutes;
+    if (this.service.categoryId !== this.originalService.categoryId) changes.categoryId = this.service.categoryId;
+    return changes;
   }
 
   openCategories(): void {
