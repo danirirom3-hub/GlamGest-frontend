@@ -20,6 +20,7 @@ import { SettingsComponent } from './components/settings/settings.component';
 import { ClientComponent } from './components/client/client.component';
 import { ClientGuard } from './guards/client.guard';
 import { MetricsComponent } from './components/metrics/metrics.component';
+import { PrivacyPolicyComponent } from './components/privacy-policy/privacy-policy.component';
 
 export const routes: Routes = [
 
@@ -27,6 +28,7 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent },
 
   { path: 'login', component: LoginComponent, canActivate: [LoginGuard] },
+  { path: 'privacy-policy', component: PrivacyPolicyComponent },
 
   { path: 'users', component: UsersComponent },
 

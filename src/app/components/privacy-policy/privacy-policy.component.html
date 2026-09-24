@@ -1,0 +1,35 @@
+<main class="policy-page" [class.required]="isRequired">
+  <article class="policy-card" aria-labelledby="policy-title">
+    <p class="eyebrow">GlamGest</p>
+    <h1 id="policy-title">Política de tratamiento de datos</h1>
+
+    <div *ngIf="isPolicyLoading" class="policy-status">Cargando política...</div>
+    <div *ngIf="!isPolicyLoading && policy" class="policy-document">
+      <div class="policy-meta">
+        <span>Versión {{ policy.version }}</span>
+        <span>Vigente desde {{ policy.effectiveDate }}</span>
+      </div>
+      <div class="policy-copy" role="document">{{ policy.content }}</div>
+    </div>
+    <p *ngIf="!isPolicyLoading && !policy && message" class="error-message" role="alert">{{ message }}</p>
+
+    <div *ngIf="isRequired" class="required-panel">
+      <strong>Tu aceptación es necesaria para continuar.</strong>
+      <p>No podrás acceder a la aplicación hasta confirmar que leíste y aceptas esta política.</p>
+      <label class="accept-option">
+        <input type="checkbox"
+          [(ngModel)]="accepted"
+          [disabled]="isLoading"
+          aria-required="true">
+        <span>He leído y acepto la política de tratamiento de datos.</span>
+      </label>
+      <button type="button" class="primary-button" (click)="confirm()" [disabled]="isLoading || !accepted || isPolicyLoading || !policy">
+        {{ isLoading ? 'Guardando...' : 'Aceptar y continuar' }}
+      </button>
+      <p *ngIf="message && policy" class="error-message" role="alert">{{ message }}</p>
+      <button type="button" class="logout-button" (click)="logout()">Cerrar sesión</button>
+    </div>
+
+    <button *ngIf="!isRequired" type="button" class="back-link" (click)="goBack()">Volver</button>
+  </article>
+</main>

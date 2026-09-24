@@ -70,13 +70,18 @@ export class LoginComponent {
             localStorage.setItem('id', String(userId));
           }
 
-           const role = res?.data?.role || res?.role;
-           if (role !== 'ADMIN' && role !== 'CLIENT') {
-             this.authService.logout();
-             this.message = 'La respuesta de autenticación no contiene un rol válido.';
-             this.messageType = 'error';
+           if (this.authService.isPrivacyPolicyPending()) {
+             this.router.navigate(['/privacy-policy']);
              return;
            }
+
+            const role = res?.data?.role || res?.role;
+            if (role !== 'ADMIN' && role !== 'CLIENT') {
+              this.authService.logout();
+              this.message = 'La respuesta de autenticación no contiene un rol válido.';
+              this.messageType = 'error';
+              return;
+            }
 
            this.message = 'Login exitoso. Redirigiendo...';
           this.messageType = 'success';

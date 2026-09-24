@@ -17,6 +17,11 @@ export class LoginGuard implements CanActivate {
       return true;
     }
 
+    if (this.authService.isPrivacyPolicyPending()) {
+      this.router.navigate(['/privacy-policy']);
+      return false;
+    }
+
     this.router.navigate([this.authService.getRole() === 'CLIENT' ? '/client' : '/dashboard']);
     return false;
   }

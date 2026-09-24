@@ -20,11 +20,12 @@ export class UsersComponent {
   };
 
   // Datos del formulario
-  user: { name: string; email: string; password: string; phone?: string } = {
+  user: { name: string; email: string; password: string; phone?: string; privacyPolicyAccepted: boolean } = {
     name: '',
     email: '',
     password: '',
-    phone: ''
+    phone: '',
+    privacyPolicyAccepted: false
   };
 
   // Mensaje y tipo para colores
@@ -44,6 +45,12 @@ export class UsersComponent {
       return;
     }
 
+    if (!this.user.privacyPolicyAccepted) {
+      this.message = 'Debes aceptar la política de tratamiento de datos.';
+      this.messageType = 'error';
+      return;
+    }
+
     if (this.user.password.length < 8) {
       this.message = 'La contraseña debe tener al menos 8 caracteres.';
       this.messageType = 'error';
@@ -54,7 +61,8 @@ export class UsersComponent {
       name: this.user.name,
       email: this.user.email,
       password: this.user.password,
-      phone: this.user.phone
+      phone: this.user.phone,
+      privacyPolicyAccepted: true
     };
 
     this.isLoading = true; // Activar carga
@@ -65,7 +73,7 @@ export class UsersComponent {
         if (res?.successful) {
           this.message = 'Usuario registrado correctamente.';
           this.messageType = 'success';
-           this.user = { name: '', email: '', password: '', phone: '' };
+           this.user = { name: '', email: '', password: '', phone: '', privacyPolicyAccepted: false };
         } else {
           this.message = res?.message || 'No se pudo registrar el usuario.';
           this.messageType = 'error';

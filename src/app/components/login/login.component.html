@@ -37,6 +37,10 @@
       <button type="submit">Ingresar</button>
     </form>
 
+    <p class="privacy-login-note">
+      Si tu política de tratamiento de datos requiere actualización, te la mostraremos después de iniciar sesión.
+    </p>
+
     <!-- Mensaje dinámico -->
     <div *ngIf="message" 
          [ngClass]="{'mensaje-success': messageType === 'success', 'mensaje-error': messageType === 'error'}" 

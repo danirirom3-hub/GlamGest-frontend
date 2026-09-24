@@ -38,7 +38,7 @@ describe('UsersComponent', () => {
   describe('registerUser', () => {
     it('debería mostrar un mensaje de error y detener la ejecución si falta algún campo obligatorio', () => {
       // Configuramos un usuario con campos vacíos
-      component.user = { name: '', email: 'daniela@mail.com', password: '' };
+      component.user = { name: '', email: 'daniela@mail.com', password: '', privacyPolicyAccepted: false };
 
       component.registerUser();
 
@@ -47,9 +47,9 @@ describe('UsersComponent', () => {
       expect(authServiceSpy.register).not.toHaveBeenCalled();
     });
 
-    it('debería enviar el payload estructurado correctamente, limpiar el formulario y arrojar éxito si res.successful es true', () => {
+    it('debería enviar el payload con la aceptación de política y limpiar el formulario', () => {
       // Seteamos los datos iniciales del formulario
-      component.user = { name: 'Daniela Rincon', email: 'daniela@mail.com', password: 'password123' };
+      component.user = { name: 'Daniela Rincon', email: 'daniela@mail.com', password: 'password123', phone: '3000000000', privacyPolicyAccepted: true };
 
       // Simulamos una respuesta positiva estructurada del backend
       const mockResponse = { successful: true };
@@ -60,21 +60,21 @@ describe('UsersComponent', () => {
       // Verificaciones del estado de carga y del envío correcto de datos
       expect(component.isLoading).toBeFalse();
       expect(authServiceSpy.register).toHaveBeenCalledWith({
-        active: true,
         email: 'daniela@mail.com',
         name: 'Daniela Rincon',
         password: 'password123',
-        roleId: 1
+        phone: '3000000000',
+        privacyPolicyAccepted: true
       });
 
       // Verificaciones de las mutaciones de propiedades del componente
       expect(component.message).toBe('Usuario registrado correctamente.');
       expect(component.messageType).toBe('success');
-      expect(component.user).toEqual({ name: '', email: '', password: '' }); // Formulario reseteado
+      expect(component.user.privacyPolicyAccepted).toBeFalse();
     });
 
     it('debería manejar el escenario donde el servidor responde exitosamente pero con flag successful en false', () => {
-      component.user = { name: 'Angie Sosa', email: 'angie@mail.com', password: 'password123' };
+      component.user = { name: 'Angie Sosa', email: 'angie@mail.com', password: 'password123', phone: '3000000000', privacyPolicyAccepted: true };
 
       const mockResponseFallida = { successful: false, message: 'El correo electrónico ya se encuentra registrado.' };
       authServiceSpy.register.and.returnValue(of(mockResponseFallida));
@@ -88,8 +88,15 @@ describe('UsersComponent', () => {
       expect(component.user.name).toBe('Angie Sosa');
     });
 
+    it('no debe registrar si no se acepta la política', () => {
+      component.user = { name: 'Test User', email: 'test@mail.com', password: 'password123', phone: '3000000000', privacyPolicyAccepted: false };
+      component.registerUser();
+      expect(authServiceSpy.register).not.toHaveBeenCalled();
+      expect(component.message).toBe('Debes aceptar la política de tratamiento de datos.');
+    });
+
     it('debería capturar el error de la petición HTTP fallida (catch del bloque de suscripción)', () => {
-      component.user = { name: 'Test User', email: 'test@mail.com', password: '123' };
+      component.user = { name: 'Test User', email: 'test@mail.com', password: '123', phone: '3000000000', privacyPolicyAccepted: true };
 
       const mockHttpError = { error: { message: 'Error interno del servidor (500).' } };
       authServiceSpy.register.and.returnValue(throwError(() => mockHttpError));

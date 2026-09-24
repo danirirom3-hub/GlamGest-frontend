@@ -15,7 +15,14 @@ describe('LoginComponent', () => {
   let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['login', 'saveToken', 'getUserId']);
+    authServiceSpy = jasmine.createSpyObj('AuthService', [
+      'login', 'saveToken', 'saveSession', 'getUserId', 'isPrivacyPolicyPending'
+    ]);
+    authServiceSpy.isPrivacyPolicyPending.and.returnValue(false);
+    authServiceSpy.saveSession.and.callFake((response: any) => {
+      const token = response?.data?.token || response?.token;
+      if (token) authServiceSpy.saveToken(token);
+    });
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
@@ -59,7 +66,8 @@ describe('LoginComponent', () => {
       const mockResponse = {
         data: {
           token: 'jwt-token-valido',
-          user: { id: 45 }
+          user: { id: 45 },
+          role: 'ADMIN'
         }
       };
       authServiceSpy.login.and.returnValue(of(mockResponse));
@@ -109,6 +117,25 @@ describe('LoginComponent', () => {
       expect(component.message).toBe('Credenciales inválidas o cuenta inactiva.');
       expect(component.messageType).toBe('error');
       expect(routerSpy.navigate).not.toHaveBeenCalled();
+    });
+
+    it('debería guardar el token y enviar a la aceptación si la política está pendiente', () => {
+      component.user = { email: 'pending@mail.com', password: 'password123' };
+      authServiceSpy.isPrivacyPolicyPending.and.returnValue(true);
+      authServiceSpy.login.and.returnValue(of({
+        data: {
+          token: 'jwt-pendiente',
+          role: 'ADMIN',
+          privacyPolicyAccepted: false,
+          privacyPolicyRequired: true,
+          privacyPolicyVersion: '2'
+        }
+      }));
+
+      component.onLogin();
+
+      expect(authServiceSpy.saveToken).toHaveBeenCalledWith('jwt-pendiente');
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/privacy-policy']);
     });
 
     it('debería manejar el error de la petición HTTP fallida', () => {

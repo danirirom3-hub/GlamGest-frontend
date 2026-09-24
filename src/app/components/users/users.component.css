@@ -212,3 +212,30 @@ button:disabled {
   .btn-back { font-size: 12px; padding: 6px 10px; }
   .btn:hover, .btn-back:hover { transform: none; box-shadow: none; }
 }
+
+.privacy-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  width: 100%;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.privacy-option input {
+  appearance: auto;
+  display: block;
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+  margin-top: 3px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.privacy-option a {
+  color: var(--primary);
+  text-decoration: underline;
+}

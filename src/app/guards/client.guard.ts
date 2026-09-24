@@ -7,6 +7,10 @@ export class ClientGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router) {}
 
   canActivate(): boolean {
+    if (this.authService.isLoggedIn() && this.authService.isPrivacyPolicyPending()) {
+      this.router.navigate(['/privacy-policy']);
+      return false;
+    }
     if (this.authService.isLoggedIn() && this.authService.getRole() === 'CLIENT') return true;
     if (this.authService.isLoggedIn() && this.authService.getRole() === 'ADMIN') {
       this.router.navigate(['/dashboard']);
