@@ -60,6 +60,11 @@
         <span>Acepto la política de tratamiento de datos. <a [routerLink]="['/privacy-policy']" [queryParams]="{ returnUrl: '/users' }">Leer política</a></span>
       </label>
 
+      <re-captcha
+        [siteKey]="recaptchaSiteKey"
+        (resolved)="onRecaptchaResolved($event)">
+      </re-captcha>
+
       <button class="btn" type="submit" [disabled]="isLoading">
         <span *ngIf="!isLoading">Registrar usuario</span>
         <span *ngIf="isLoading">Registrando...</span>

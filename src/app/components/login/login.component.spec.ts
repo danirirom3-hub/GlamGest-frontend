@@ -59,8 +59,18 @@ describe('LoginComponent', () => {
       expect(authServiceSpy.login).not.toHaveBeenCalled();
     });
 
+    it('no debería enviar el formulario si el captcha no está completado', () => {
+      component.user = { email: 'daniela@mail.com', password: 'password123' };
+
+      component.onLogin();
+
+      expect(component.message).toBe('Completa el captcha antes de iniciar sesión.');
+      expect(authServiceSpy.login).not.toHaveBeenCalled();
+    });
+
     it('debería procesar login exitoso, guardar token/userId en localStorage y redirigir tras 1.5s', fakeAsync(() => {
       component.user = { email: 'daniela@mail.com', password: 'password123' };
+      component.recaptchaToken = 'captcha-token';
 
       // Simulamos la respuesta estructurada del backend con token e id de usuario
       const mockResponse = {
@@ -75,7 +85,11 @@ describe('LoginComponent', () => {
       component.onLogin();
 
       // Validaciones inmediatas
-      expect(authServiceSpy.login).toHaveBeenCalledWith({ email: 'daniela@mail.com', password: 'password123' });
+      expect(authServiceSpy.login).toHaveBeenCalledWith({
+        email: 'daniela@mail.com',
+        password: 'password123',
+        recaptchaToken: 'captcha-token'
+      });
       expect(authServiceSpy.saveToken).toHaveBeenCalledWith('jwt-token-valido');
       
       // Verifica que guarde el id en las variantes de localStorage requeridas
@@ -93,6 +107,7 @@ describe('LoginComponent', () => {
 
     it('debería recurrir a authService.getUserId() si el backend no devuelve el id directamente', fakeAsync(() => {
       component.user = { email: 'angie@mail.com', password: 'password123' };
+      component.recaptchaToken = 'captcha-token';
 
       const mockResponseSinId = { token: 'jwt-token-valido' }; // Sin id de usuario en la respuesta
       authServiceSpy.login.and.returnValue(of(mockResponseSinId));
@@ -108,6 +123,7 @@ describe('LoginComponent', () => {
 
     it('debería mostrar mensaje de error si el backend responde sin un token válido', () => {
       component.user = { email: 'test@mail.com', password: 'wrongpassword' };
+      component.recaptchaToken = 'captcha-token';
       const mockResponseErr = { message: 'Credenciales inválidas o cuenta inactiva.' };
       
       authServiceSpy.login.and.returnValue(of(mockResponseErr));
@@ -121,6 +137,7 @@ describe('LoginComponent', () => {
 
     it('debería guardar el token y enviar a la aceptación si la política está pendiente', () => {
       component.user = { email: 'pending@mail.com', password: 'password123' };
+      component.recaptchaToken = 'captcha-token';
       authServiceSpy.isPrivacyPolicyPending.and.returnValue(true);
       authServiceSpy.login.and.returnValue(of({
         data: {
@@ -140,6 +157,7 @@ describe('LoginComponent', () => {
 
     it('debería manejar el error de la petición HTTP fallida', () => {
       component.user = { email: 'error@mail.com', password: 'any' };
+      component.recaptchaToken = 'captcha-token';
       const errorHttp = { error: { message: 'Error de conexión con el servidor.' } };
       
       authServiceSpy.login.and.returnValue(throwError(() => errorHttp));
@@ -148,6 +166,20 @@ describe('LoginComponent', () => {
 
       expect(component.message).toBe('Error de conexión con el servidor.');
       expect(component.messageType).toBe('error');
+    });
+
+    it('debería mostrar un mensaje amigable para un captcha inválido en HTTP 400', () => {
+      component.user = { email: 'error@mail.com', password: 'any' };
+      component.recaptchaToken = 'captcha-token';
+      authServiceSpy.login.and.returnValue(throwError(() => ({
+        status: 400,
+        error: { message: 'reCAPTCHA inválido' }
+      })));
+
+      component.onLogin();
+
+      expect(component.message).toBe('El captcha no es válido o ha expirado. Complétalo nuevamente.');
+      expect(component.recaptchaToken).toBeNull();
     });
   });
 });

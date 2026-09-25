@@ -34,6 +34,11 @@
           placeholder="Contraseña">
       </div>
 
+      <re-captcha
+        [siteKey]="recaptchaSiteKey"
+        (resolved)="onRecaptchaResolved($event)">
+      </re-captcha>
+
       <button type="submit">Ingresar</button>
     </form>
 

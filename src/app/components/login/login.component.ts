@@ -1,18 +1,25 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { LucideAngularModule, ArrowLeft } from 'lucide-angular';
+import { RecaptchaComponent, RecaptchaModule } from 'ng-recaptcha';
+import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, CommonModule, LucideAngularModule, RouterModule],
+  imports: [FormsModule, CommonModule, LucideAngularModule, RouterModule, RecaptchaModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+
+  @ViewChild(RecaptchaComponent) recaptchaComponent?: RecaptchaComponent;
+  readonly recaptchaSiteKey = environment.RECAPTCHA_SITE_KEY;
+  recaptchaToken: string | null = null;
 
   // Iconos
   icons = {
@@ -41,7 +48,19 @@ export class LoginComponent {
       return;
     }
 
-    this.authService.login(this.user).subscribe({
+    if (!this.recaptchaToken) {
+      this.message = 'Completa el captcha antes de iniciar sesión.';
+      this.messageType = 'error';
+      return;
+    }
+
+    const payload = {
+      email: this.user.email,
+      password: this.user.password,
+      recaptchaToken: this.recaptchaToken
+    };
+
+    this.authService.login(payload).pipe(finalize(() => this.resetRecaptcha())).subscribe({
       next: (res: any) => {
         const token =
           res?.data?.token ||
@@ -96,10 +115,29 @@ export class LoginComponent {
         }
       },
       error: (err) => {
-        this.message = this.getErrorMessage(err, 'Usuario o contraseña incorrectos.');
+        this.message = this.isInvalidRecaptchaError(err)
+          ? 'El captcha no es válido o ha expirado. Complétalo nuevamente.'
+          : this.getErrorMessage(err, 'Usuario o contraseña incorrectos.');
         this.messageType = 'error';
       }
     });
+  }
+
+  onRecaptchaResolved(token: string | null): void {
+    this.recaptchaToken = token;
+  }
+
+  private resetRecaptcha(): void {
+    this.recaptchaToken = null;
+    this.recaptchaComponent?.reset();
+  }
+
+  private isInvalidRecaptchaError(error: any): boolean {
+    if (error?.status !== 400) {
+      return false;
+    }
+    const details = JSON.stringify(error?.error || error?.message || '').toLowerCase();
+    return details.includes('recaptcha') || details.includes('captcha');
   }
 
   private getErrorMessage(error: any, fallback: string): string {

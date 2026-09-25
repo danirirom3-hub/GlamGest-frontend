@@ -50,6 +50,7 @@ describe('UsersComponent', () => {
     it('debería enviar el payload con la aceptación de política y limpiar el formulario', () => {
       // Seteamos los datos iniciales del formulario
       component.user = { name: 'Daniela Rincon', email: 'daniela@mail.com', password: 'password123', phone: '3000000000', privacyPolicyAccepted: true };
+      component.recaptchaToken = 'captcha-token';
 
       // Simulamos una respuesta positiva estructurada del backend
       const mockResponse = { successful: true };
@@ -64,7 +65,8 @@ describe('UsersComponent', () => {
         name: 'Daniela Rincon',
         password: 'password123',
         phone: '3000000000',
-        privacyPolicyAccepted: true
+        privacyPolicyAccepted: true,
+        recaptchaToken: 'captcha-token'
       });
 
       // Verificaciones de las mutaciones de propiedades del componente
@@ -75,6 +77,7 @@ describe('UsersComponent', () => {
 
     it('debería manejar el escenario donde el servidor responde exitosamente pero con flag successful en false', () => {
       component.user = { name: 'Angie Sosa', email: 'angie@mail.com', password: 'password123', phone: '3000000000', privacyPolicyAccepted: true };
+      component.recaptchaToken = 'captcha-token';
 
       const mockResponseFallida = { successful: false, message: 'El correo electrónico ya se encuentra registrado.' };
       authServiceSpy.register.and.returnValue(of(mockResponseFallida));
@@ -95,8 +98,18 @@ describe('UsersComponent', () => {
       expect(component.message).toBe('Debes aceptar la política de tratamiento de datos.');
     });
 
+    it('no debe registrar si no se completa el captcha', () => {
+      component.user = { name: 'Test User', email: 'test@mail.com', password: 'password123', phone: '3000000000', privacyPolicyAccepted: true };
+
+      component.registerUser();
+
+      expect(authServiceSpy.register).not.toHaveBeenCalled();
+      expect(component.message).toBe('Completa el captcha antes de registrar el usuario.');
+    });
+
     it('debería capturar el error de la petición HTTP fallida (catch del bloque de suscripción)', () => {
-      component.user = { name: 'Test User', email: 'test@mail.com', password: '123', phone: '3000000000', privacyPolicyAccepted: true };
+      component.user = { name: 'Test User', email: 'test@mail.com', password: 'password123', phone: '3000000000', privacyPolicyAccepted: true };
+      component.recaptchaToken = 'captcha-token';
 
       const mockHttpError = { error: { message: 'Error interno del servidor (500).' } };
       authServiceSpy.register.and.returnValue(throwError(() => mockHttpError));
@@ -106,6 +119,20 @@ describe('UsersComponent', () => {
       expect(component.isLoading).toBeFalse();
       expect(component.message).toBe('Error al registrar el usuario.');
       expect(component.messageType).toBe('error');
+    });
+
+    it('debería mostrar un mensaje amigable para un captcha inválido en HTTP 400', () => {
+      component.user = { name: 'Test User', email: 'test@mail.com', password: 'password123', phone: '3000000000', privacyPolicyAccepted: true };
+      component.recaptchaToken = 'captcha-token';
+      authServiceSpy.register.and.returnValue(throwError(() => ({
+        status: 400,
+        error: { message: 'Captcha inválido' }
+      })));
+
+      component.registerUser();
+
+      expect(component.message).toBe('El captcha no es válido o ha expirado. Complétalo nuevamente.');
+      expect(component.recaptchaToken).toBeNull();
     });
   });
 });
