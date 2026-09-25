@@ -1,0 +1,24 @@
+<div *ngIf="visible" class="lock-backdrop" role="presentation">
+  <section class="lock-dialog" role="dialog" aria-modal="true"
+    aria-labelledby="idle-lock-title" aria-describedby="idle-lock-description">
+    <div class="lock-brand" aria-hidden="true">G</div>
+    <span class="lock-eyebrow">GLAM<span>GEST</span></span>
+    <h2 id="idle-lock-title">Tu sesión está protegida</h2>
+    <p id="idle-lock-description">La bloqueamos por inactividad. Confirma tu contraseña para volver.</p>
+
+    <form (ngSubmit)="unlock()">
+      <label for="idle-lock-password">Contraseña</label>
+      <div class="password-field">
+        <input #passwordInput id="idle-lock-password" [type]="showPassword ? 'text' : 'password'"
+          [(ngModel)]="password" name="password" autocomplete="current-password" />
+        <button type="button" class="toggle-password" (click)="showPassword = !showPassword"
+          [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+          {{ showPassword ? 'Ocultar' : 'Mostrar' }}
+        </button>
+      </div>
+      <p *ngIf="message" class="lock-message" [class.error]="messageType === 'error'" role="alert">{{ message }}</p>
+      <button type="submit" class="unlock-button">Continuar de forma segura</button>
+    </form>
+    <p class="lock-footer">Tu información permanece segura mientras estás ausente.</p>
+  </section>
+</div>

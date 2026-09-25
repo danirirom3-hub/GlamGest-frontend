@@ -19,6 +19,8 @@ export class AuthService {
   private policyPendingSubject = new BehaviorSubject<boolean>(
     localStorage.getItem('privacyPolicyPending') === 'true'
   );
+  private sessionSubject = new BehaviorSubject<boolean>(!!localStorage.getItem('token'));
+  readonly session$ = this.sessionSubject.asObservable();
 
   constructor(private http: HttpClient) { }
 
@@ -44,9 +46,14 @@ export class AuthService {
     );
   }
 
+  unlock(password: string): Observable<any> {
+    return this.http.post(`${this.authUrl}/unlock`, { password });
+  }
+
   saveSession(response: any): void {
     const session = response?.data || response;
     if (session?.token) this.saveToken(session.token);
+    if (session?.token) this.sessionSubject.next(true);
     if (session?.role) localStorage.setItem('role', session.role);
     if (session?.userId !== undefined) localStorage.setItem('userId', String(session.userId));
     if (session?.clientId !== undefined && session.clientId !== null) {
@@ -91,6 +98,7 @@ export class AuthService {
     localStorage.removeItem('privacyPolicyPending');
     localStorage.removeItem('privacyPolicyVersion');
     this.policyPendingSubject.next(false);
+    this.sessionSubject.next(false);
   }
 
   // Verificar si el usuario está autenticado

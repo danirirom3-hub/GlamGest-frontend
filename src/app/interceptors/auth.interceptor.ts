@@ -12,13 +12,14 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const isPublicAuthRequest = request.url.endsWith('/auth/login') ||
     request.url.endsWith('/auth/register') ||
     (request.method === 'GET' && request.url.endsWith('/auth/policy'));
+  const isUnlockRequest = request.url.endsWith('/auth/unlock');
   const authorizedRequest = token && !isPublicAuthRequest
     ? request.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
     : request;
 
   return next(authorizedRequest).pipe(
     catchError((error) => {
-      if (error.status === 401) {
+      if (error.status === 401 && !isUnlockRequest) {
         authService.logout();
         if (!isPublicAuthRequest) {
           router.navigate(['/login'], { queryParams: { returnUrl: router.url } });
