@@ -34,6 +34,14 @@
           placeholder="Contraseña">
       </div>
 
+      <input
+        type="text"
+        name="website"
+        autocomplete="off"
+        tabindex="-1"
+        aria-hidden="true"
+        class="honeypot-field">
+
       <re-captcha
         [siteKey]="recaptchaSiteKey"
         (resolved)="onRecaptchaResolved($event)">

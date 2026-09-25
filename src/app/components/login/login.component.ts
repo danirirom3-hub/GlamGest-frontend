@@ -57,7 +57,8 @@ export class LoginComponent {
     const payload = {
       email: this.user.email,
       password: this.user.password,
-      recaptchaToken: this.recaptchaToken
+      recaptchaToken: this.recaptchaToken,
+      website: ''
     };
 
     this.authService.login(payload).pipe(finalize(() => this.resetRecaptcha())).subscribe({

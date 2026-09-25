@@ -88,7 +88,8 @@ describe('LoginComponent', () => {
       expect(authServiceSpy.login).toHaveBeenCalledWith({
         email: 'daniela@mail.com',
         password: 'password123',
-        recaptchaToken: 'captcha-token'
+        recaptchaToken: 'captcha-token',
+        website: ''
       });
       expect(authServiceSpy.saveToken).toHaveBeenCalledWith('jwt-token-valido');
       
