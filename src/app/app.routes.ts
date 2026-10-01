@@ -21,6 +21,8 @@ import { ClientComponent } from './components/client/client.component';
 import { ClientGuard } from './guards/client.guard';
 import { MetricsComponent } from './components/metrics/metrics.component';
 import { PrivacyPolicyComponent } from './components/privacy-policy/privacy-policy.component';
+import { ReportsComponent } from './components/reports/reports.component';
+import { AdminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
 
@@ -40,6 +42,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: 'metrics', component: MetricsComponent },
+      { path: 'reports', component: ReportsComponent, canActivate: [AdminGuard] },
       { path: '', redirectTo: 'metrics', pathMatch: 'full' }
     ]
   },

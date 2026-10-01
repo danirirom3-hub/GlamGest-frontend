@@ -1,0 +1,23 @@
+<section class="reports-page">
+  <header class="page-header">
+    <div><p class="eyebrow">Administración</p><h1>Reportes</h1><p class="subtitle">Descarga información clave de tu negocio por período.</p></div>
+    <div class="connection" *ngIf="online$ | async as online" [class.offline]="!online"><lucide-icon [img]="online ? icons.Wifi : icons.WifiOff" [size]="16"></lucide-icon>{{ online ? 'En línea' : 'Sin conexión' }}</div>
+  </header>
+
+  <div class="date-panel">
+    <label>Desde <input type="date" [(ngModel)]="from"></label>
+    <label>Hasta <input type="date" [(ngModel)]="to"></label>
+    <button class="apply-btn" [disabled]="!!loading" (click)="applyPeriod()"><lucide-icon [img]="icons.RefreshCw" [size]="15"></lucide-icon> Aplicar período</button>
+  </div>
+  <div class="error-state" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+  <div class="sync-note" *ngIf="lastSync"><lucide-icon [img]="icons.CalendarDays" [size]="14"></lucide-icon> Última sincronización: {{ lastSync | date:'dd/MM/yyyy HH:mm' }}</div>
+  <div class="reports-grid">
+    <article class="report-card" *ngFor="let report of reports" [class.cached]="cachedReports[report.type]">
+      <div class="report-icon"><lucide-icon [img]="report.format === 'pdf' ? icons.FileText : icons.FileSpreadsheet"></lucide-icon></div>
+      <div class="report-copy"><p class="eyebrow">{{ report.format === 'pdf' ? 'Documento PDF' : 'Hoja de cálculo' }}</p><h2>{{ report.title }}</h2><p>{{ report.description }}</p></div>
+      <button class="download-btn" [disabled]="!!loading" (click)="download(report)"><lucide-icon [img]="loading === report.type ? icons.RefreshCw : icons.Download" [class.spin]="loading === report.type" [size]="16"></lucide-icon>{{ loading === report.type ? 'Descargando...' : (report.format === 'pdf' ? 'Descargar PDF' : 'Descargar Excel') }}</button>
+      <span class="offline-copy" *ngIf="cachedReports[report.type]"><lucide-icon [img]="icons.WifiOff" [size]="13"></lucide-icon> Copia offline</span>
+    </article>
+  </div>
+</section>

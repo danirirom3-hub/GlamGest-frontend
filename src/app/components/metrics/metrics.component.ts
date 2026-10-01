@@ -11,6 +11,7 @@ import {
   RevenueMetric,
   ServiceMetric
 } from '../../services/dashboard-metrics.service';
+import { OfflineStoreService } from '../../services/offline-store.service';
 
 type DatePreset = 'today' | 'week' | 'month' | 'custom';
 
@@ -42,7 +43,7 @@ export class MetricsComponent implements OnInit {
   services: ServiceMetric[] = [];
   employees: EmployeeMetric[] = [];
 
-  constructor(private metricsService: DashboardMetricsService) {}
+  constructor(private metricsService: DashboardMetricsService, private offlineStore: OfflineStoreService) {}
 
   ngOnInit(): void {
     this.selectPreset('month');
@@ -86,11 +87,26 @@ export class MetricsComponent implements OnInit {
         this.employees = result.employees?.data ?? [];
         this.hasLoaded = true;
         this.loading = false;
+        void this.offlineStore.saveMetrics(result, this.from, this.to);
+        void this.offlineStore.saveLastPeriod(this.from, this.to);
       },
-      error: (error) => {
+      error: async (error) => {
         this.loading = false;
         this.hasLoaded = true;
-        this.errorMessage = error?.error?.message || 'No se pudieron cargar las métricas. Intenta nuevamente.';
+        const cached = !this.offlineStore.isOnline ? await this.offlineStore.getMetrics().catch(() => undefined) : undefined;
+        if (cached) {
+          const result = cached.value as any;
+          this.summary = result.summary?.data ?? null;
+          this.revenue = result.revenue?.data ?? [];
+          this.appointments = result.appointments?.data ?? [];
+          this.services = result.services?.data ?? [];
+          this.employees = result.employees?.data ?? [];
+          this.from = cached.from;
+          this.to = cached.to;
+          this.errorMessage = '';
+        } else {
+          this.errorMessage = error?.error?.message || 'No se pudieron cargar las métricas. Intenta nuevamente.';
+        }
       }
     });
   }

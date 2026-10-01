@@ -50,6 +50,11 @@
         <span class="menu-label">Métricas</span>
       </a>
 
+      <a *ngIf="isAdmin" routerLink="/admin/reports" routerLinkActive="activo" title="Reportes" aria-label="Reportes">
+        <lucide-icon [img]="icons.FileText"></lucide-icon>
+        <span class="menu-label">Reportes</span>
+      </a>
+
       <!--SETTINGS -->
       <a routerLink="/dashboard/settings" routerLinkActive="activo" title="Configuración" aria-label="Configuración">
         <lucide-icon [img]="icons.Settings"></lucide-icon>
