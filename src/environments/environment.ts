@@ -3,7 +3,7 @@ export const environment = {
   production: false,
 
   // URL del back
-  apiUrl: 'http://localhost:8080/api',
+  apiUrl: 'http://localhost:8081/api',
 
   // Clave publica de Google reCAPTCHA v2 Checkbox.
   RECAPTCHA_SITE_KEY: '6LdG2c0tAAAAALV-9EXvxHGzCKWJuvYnwhZO0J-_'

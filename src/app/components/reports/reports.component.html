@@ -13,11 +13,11 @@
 
   <div class="sync-note" *ngIf="lastSync"><lucide-icon [img]="icons.CalendarDays" [size]="14"></lucide-icon> Última sincronización: {{ lastSync | date:'dd/MM/yyyy HH:mm' }}</div>
   <div class="reports-grid">
-    <article class="report-card" *ngFor="let report of reports" [class.cached]="cachedReports[report.type]">
+    <article class="report-card" *ngFor="let report of reports" [class.cached]="cachedReport(report)">
       <div class="report-icon"><lucide-icon [img]="report.format === 'pdf' ? icons.FileText : icons.FileSpreadsheet"></lucide-icon></div>
       <div class="report-copy"><p class="eyebrow">{{ report.format === 'pdf' ? 'Documento PDF' : 'Hoja de cálculo' }}</p><h2>{{ report.title }}</h2><p>{{ report.description }}</p></div>
       <button class="download-btn" [disabled]="!!loading" (click)="download(report)"><lucide-icon [img]="loading === report.type ? icons.RefreshCw : icons.Download" [class.spin]="loading === report.type" [size]="16"></lucide-icon>{{ loading === report.type ? 'Descargando...' : (report.format === 'pdf' ? 'Descargar PDF' : 'Descargar Excel') }}</button>
-      <span class="offline-copy" *ngIf="cachedReports[report.type]"><lucide-icon [img]="icons.WifiOff" [size]="13"></lucide-icon> Copia offline</span>
+      <span class="offline-copy" *ngIf="cachedReport(report) as cached"><lucide-icon [img]="icons.WifiOff" [size]="13"></lucide-icon> Copia offline disponible · {{ cached.from }} al {{ cached.to }} · {{ cached.syncedAt | date:'dd/MM/yyyy HH:mm' }}</span>
     </article>
   </div>
 </section>

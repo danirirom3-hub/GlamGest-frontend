@@ -29,6 +29,10 @@ describe('ReportsService', () => {
       expect(result.blob).toBe(blob);
       expect(result.fileName).toBe('ventas-enero.xlsx');
       expect(result.fromCache).toBeFalse();
+      expect(offlineStore.saveReport).toHaveBeenCalledWith(jasmine.objectContaining({
+        key: 'sales:excel:2026-01-01:2026-01-31',
+        type: 'sales', format: 'excel', from: '2026-01-01', to: '2026-01-31'
+      }));
     });
 
     const request = http.expectOne(request => request.url === `${environment.apiUrl}/reports/sales/excel`);
@@ -40,11 +44,25 @@ describe('ReportsService', () => {
 
   it('usa una copia IndexedDB cuando no hay conexión', () => {
     Object.defineProperty(offlineStore, 'isOnline', { value: false });
-    offlineStore.getReport.and.resolveTo({ key: 'sales', blob: new Blob(['old']), fileName: 'ventas.xlsx', contentType: 'application/octet-stream', syncedAt: '2026-01-02T10:00:00Z' });
+    offlineStore.getReport.and.resolveTo({ key: 'sales:excel:2026-01-01:2026-01-31', type: 'sales', format: 'excel', from: '2026-01-01', to: '2026-01-31', blob: new Blob(['old']), fileName: 'ventas.xlsx', contentType: 'application/octet-stream', syncedAt: '2026-01-02T10:00:00Z' });
 
     service.download(definition, '2026-01-01', '2026-01-31').subscribe(result => {
       expect(result.fromCache).toBeTrue();
       expect(result.fileName).toBe('ventas.xlsx');
+      expect(result.from).toBe('2026-01-01');
+      expect(result.to).toBe('2026-01-31');
     });
+  });
+
+  it('no devuelve la copia de otro período y muestra un error offline', () => {
+    Object.defineProperty(offlineStore, 'isOnline', { value: false });
+    offlineStore.getReport.and.resolveTo(undefined);
+
+    service.download(definition, '2026-02-01', '2026-02-28').subscribe({
+      next: () => fail('No debía devolver una copia de otro período'),
+      error: error => expect(error.message).toBe('No existe una copia offline para este período. Conéctate para descargarla.')
+    });
+
+    expect(offlineStore.getReport).toHaveBeenCalledWith('sales:excel:2026-02-01:2026-02-28');
   });
 });

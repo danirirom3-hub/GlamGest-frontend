@@ -3,6 +3,10 @@ import { BehaviorSubject } from 'rxjs';
 
 export interface StoredReport {
   key: string;
+  type: string;
+  format: string;
+  from: string;
+  to: string;
   blob: Blob;
   fileName: string;
   contentType: string;
@@ -12,7 +16,7 @@ export interface StoredReport {
 @Injectable({ providedIn: 'root' })
 export class OfflineStoreService {
   private readonly databaseName = 'glam-gest-offline';
-  private readonly databaseVersion = 1;
+  private readonly databaseVersion = 2;
   private readonly onlineSubject = new BehaviorSubject<boolean>(this.readOnlineState());
   readonly online$ = this.onlineSubject.asObservable();
   private databasePromise?: Promise<IDBDatabase>;
@@ -32,6 +36,10 @@ export class OfflineStoreService {
 
   async getReport(key: string): Promise<StoredReport | undefined> {
     return this.get<StoredReport>('reports', key);
+  }
+
+  async listReports(): Promise<StoredReport[]> {
+    return this.getAll<StoredReport>('reports');
   }
 
   async saveMetrics(value: unknown, from: string, to: string, syncedAt = new Date().toISOString()): Promise<void> {
@@ -64,6 +72,9 @@ export class OfflineStoreService {
       const request = indexedDB.open(this.databaseName, this.databaseVersion);
       request.onupgradeneeded = () => {
         const database = request.result;
+        // Version 2 keeps the existing object stores and records intact. Legacy
+        // records remain readable, but are not eligible for exact period lookup
+        // until they contain the new report metadata.
         ['reports', 'metrics', 'settings'].forEach(store => {
           if (!database.objectStoreNames.contains(store)) database.createObjectStore(store);
         });
@@ -89,6 +100,15 @@ export class OfflineStoreService {
     return new Promise<T | undefined>((resolve, reject) => {
       const request = database.transaction(storeName, 'readonly').objectStore(storeName).get(key);
       request.onsuccess = () => resolve(request.result as T | undefined);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  private async getAll<T>(storeName: string): Promise<T[]> {
+    const database = await this.openDatabase();
+    return new Promise<T[]>((resolve, reject) => {
+      const request = database.transaction(storeName, 'readonly').objectStore(storeName).getAll();
+      request.onsuccess = () => resolve(request.result as T[]);
       request.onerror = () => reject(request.error);
     });
   }

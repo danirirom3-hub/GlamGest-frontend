@@ -8,13 +8,17 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
+ARG API_URL=https://DOMINIO_REAL_DEL_BACKEND/api
+RUN sed -i "s|https://DOMINIO_REAL_DEL_BACKEND/api|${API_URL}|g" src/environments/environment.prod.ts \
+    && npm run build
 
 # ETAPA 2: SERVIR CON NGINX 
 FROM nginx:alpine
 
 # Limpia la carpeta por defecto de nginx
 RUN rm -rf /usr/share/nginx/html/*
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Angulargenera dist/<nombre-proyecto>/browser
 COPY --from=build /app/dist/glam-gest/browser/ /usr/share/nginx/html/

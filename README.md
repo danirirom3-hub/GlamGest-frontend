@@ -32,6 +32,36 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
+## Production API and CORS
+
+The production API URL is not configured yet because this repository does not contain a
+verified public backend URL. Before publishing, replace the placeholder in
+`src/environments/environment.prod.ts` with the real backend origin, including exactly one
+`/api` suffix:
+
+```ts
+apiUrl: 'https://DOMINIO_REAL_DEL_BACKEND/api'
+```
+
+Do not use `api.example.com` in a published build and do not add a second `/api`. The local
+development environment uses `http://localhost:8081/api` while the new backend test container
+is exposed on port `8081`.
+
+For a Docker build, inject the production API URL explicitly:
+
+```bash
+docker build --build-arg API_URL=http://localhost:8081/api -t glamgest-frontend:local .
+```
+
+The backend must allow the deployed frontend origin, for example:
+
+```text
+CORS_ALLOWED_ORIGINS=https://DOMINIO_REAL_DEL_FRONTEND
+```
+
+The actual frontend domain must replace the placeholder before deployment. API services use
+`environment.apiUrl`; no service should contain a hardcoded production API URL.
+
 ## Running unit tests
 
 Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).

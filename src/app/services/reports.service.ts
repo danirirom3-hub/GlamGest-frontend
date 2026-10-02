@@ -18,8 +18,17 @@ export interface ReportDefinition {
 export interface DownloadedReport {
   blob: Blob;
   fileName: string;
+  type: ReportType;
+  format: ReportFormat;
+  from: string;
+  to: string;
+  contentType: string;
   syncedAt: string;
   fromCache: boolean;
+}
+
+export function reportCacheKey(definition: { type: string; format: string }, from: string, to: string): string {
+  return `${definition.type}:${definition.format}:${from}:${to}`;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -29,12 +38,12 @@ export class ReportsService {
   constructor(private http: HttpClient, private offlineStore: OfflineStoreService) {}
 
   download(definition: ReportDefinition, fromDate: string, toDate: string): Observable<DownloadedReport> {
-    const key = definition.type;
+    const key = reportCacheKey(definition, fromDate, toDate);
     if (!this.offlineStore.isOnline) {
       return defer(() => from(this.offlineStore.getReport(key))).pipe(
         switchMap(cached => cached
           ? from([this.fromStoredReport(cached)])
-          : from(Promise.reject(new Error('No hay una copia offline de este reporte. Conéctate primero para descargarlo.'))))
+          : from(Promise.reject(new Error('No existe una copia offline para este período. Conéctate para descargarla.'))))
       );
     }
 
@@ -44,34 +53,53 @@ export class ReportsService {
       responseType: 'blob',
       observe: 'response'
     }).pipe(
-      map(response => this.toDownloadedReport(response, definition)),
-      switchMap(download => from(this.saveReport(key, download)).pipe(map(() => download)))
+      map(response => this.toDownloadedReport(response, definition, fromDate, toDate)),
+      switchMap(download => from(this.saveReport(key, download, fromDate, toDate)).pipe(map(() => ({ ...download, from: fromDate, to: toDate }))))
     );
   }
 
-  private toDownloadedReport(response: HttpResponse<Blob>, definition: ReportDefinition): DownloadedReport {
+  private toDownloadedReport(response: HttpResponse<Blob>, definition: ReportDefinition, from: string, to: string): DownloadedReport {
     const blob = response.body || new Blob([], { type: response.headers.get('Content-Type') || undefined });
     return {
       blob,
       fileName: this.extractFileName(response, definition),
+      type: definition.type,
+      format: definition.format,
+      from,
+      to,
+      contentType: blob.type || response.headers.get('Content-Type') || 'application/octet-stream',
       syncedAt: new Date().toISOString(),
       fromCache: false
     };
   }
 
-  private async saveReport(key: string, report: DownloadedReport): Promise<void> {
+  private async saveReport(key: string, report: DownloadedReport, from: string, to: string): Promise<void> {
     const stored: StoredReport = {
       key,
+      type: report.type,
+      format: report.format,
+      from,
+      to,
       blob: report.blob,
       fileName: report.fileName,
-      contentType: report.blob.type,
+      contentType: report.contentType,
       syncedAt: report.syncedAt
     };
     await this.offlineStore.saveReport(stored);
   }
 
   private fromStoredReport(report: StoredReport): DownloadedReport {
-    return { blob: report.blob, fileName: report.fileName, syncedAt: report.syncedAt, fromCache: true };
+    return {
+      blob: report.blob,
+      fileName: report.fileName,
+      type: report.type as ReportType,
+      format: report.format as ReportFormat,
+      from: report.from,
+      to: report.to,
+      contentType: report.contentType,
+      syncedAt: report.syncedAt,
+      fromCache: true
+    };
   }
 
   private extractFileName(response: HttpResponse<Blob>, definition: ReportDefinition): string {

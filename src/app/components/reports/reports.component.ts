@@ -3,8 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, BarChart3, CalendarDays, Download, FileSpreadsheet, FileText, Wifi, WifiOff, RefreshCw } from 'lucide-angular';
 import { Observable } from 'rxjs';
-import { OfflineStoreService } from '../../services/offline-store.service';
-import { DownloadedReport, ReportDefinition, ReportsService } from '../../services/reports.service';
+import { OfflineStoreService, StoredReport } from '../../services/offline-store.service';
+import { DownloadedReport, ReportDefinition, reportCacheKey, ReportsService } from '../../services/reports.service';
 
 @Component({
   selector: 'app-reports',
@@ -28,7 +28,7 @@ export class ReportsComponent implements OnInit {
   errorMessage = '';
   lastSync = '';
   online$: Observable<boolean> = this.offlineStore.online$;
-  cachedReports: Record<string, boolean> = {};
+  cachedReports: Record<string, StoredReport | undefined> = {};
 
   constructor(private reportsService: ReportsService, private offlineStore: OfflineStoreService) {}
 
@@ -38,12 +38,15 @@ export class ReportsComponent implements OnInit {
     const first = new Date(today.getFullYear(), today.getMonth(), 1);
     this.from = period?.from || this.toDateInput(first);
     this.to = period?.to || this.toDateInput(today);
-    if (!this.offlineStore.isOnline) this.lastSync = (await this.offlineStore.getReport('executive').catch(() => undefined))?.syncedAt || '';
+    await this.refreshCachedReports();
   }
 
   applyPeriod(): void {
     this.errorMessage = this.validatePeriod();
-    if (!this.errorMessage) void this.offlineStore.saveLastPeriod(this.from, this.to);
+    if (!this.errorMessage) {
+      void this.offlineStore.saveLastPeriod(this.from, this.to);
+      void this.refreshCachedReports();
+    }
   }
 
   download(definition: ReportDefinition): void {
@@ -53,13 +56,42 @@ export class ReportsComponent implements OnInit {
     this.reportsService.download(definition, this.from, this.to).subscribe({
       next: report => {
         this.saveBlob(report);
-        this.cachedReports[definition.type] = report.fromCache;
+        const key = reportCacheKey(definition, this.from, this.to);
+        this.cachedReports[key] = {
+          key,
+          type: report.type,
+          format: report.format,
+          from: report.from,
+          to: report.to,
+          blob: report.blob,
+          fileName: report.fileName,
+          contentType: report.contentType,
+          syncedAt: report.syncedAt
+        };
         this.lastSync = report.syncedAt;
         this.loading = null;
       },
       error: error => {
         this.loading = null;
         this.errorMessage = this.errorFor(error);
+      }
+    });
+  }
+
+  cacheKey(definition: ReportDefinition): string {
+    return reportCacheKey(definition, this.from, this.to);
+  }
+
+  cachedReport(definition: ReportDefinition): StoredReport | undefined {
+    return this.cachedReports[this.cacheKey(definition)];
+  }
+
+  private async refreshCachedReports(): Promise<void> {
+    const stored = await this.offlineStore.listReports().catch(() => []);
+    this.cachedReports = {};
+    stored.forEach(report => {
+      if (report.type && report.format && report.from && report.to) {
+        this.cachedReports[reportCacheKey(report, report.from, report.to)] = report;
       }
     });
   }
