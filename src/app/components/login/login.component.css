@@ -7,11 +7,13 @@
 /* Contenedor principal */
 .page {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
   background: var(--bg);
   padding: 20px;
+  overflow-y: auto;
 }
 
 /* Card del login */
@@ -217,4 +219,36 @@ button[type="submit"]:active {
   button[type="submit"] { padding: 12px; font-size: 13px; }
   .btn-back { font-size: 12px; padding: 6px 10px; }
   button[type="submit"]:hover, .btn-back:hover { transform: none; box-shadow: none; }
+}
+
+@media (max-height: 720px) {
+  .page {
+    align-items: flex-start;
+    padding: 12px 20px;
+  }
+
+  .login-container {
+    padding: 22px 28px;
+  }
+
+  .top-bar {
+    margin-bottom: 8px;
+  }
+
+  .subtitulo {
+    margin-bottom: 16px;
+  }
+
+  .input-group {
+    margin-bottom: 12px;
+  }
+
+  .input-group input,
+  .input-group select {
+    padding: 10px 12px;
+  }
+
+  .privacy-login-note {
+    margin-top: 10px;
+  }
 }

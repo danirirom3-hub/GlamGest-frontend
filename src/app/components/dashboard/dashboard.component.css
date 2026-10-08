@@ -23,6 +23,8 @@ body {
   padding: 25px 20px;
   animation: slideIn 0.4s ease;
   flex-shrink: 0;
+  min-height: 0;
+  overflow-y: auto;
   box-sizing: border-box;
   transition: width 0.25s ease, padding 0.25s ease;
 }
@@ -81,8 +83,11 @@ body {
 .menu {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   gap: 10px;
   margin-top: 40px;
+  overflow-y: auto;
 }
 
 .menu a {
@@ -269,8 +274,10 @@ body {
 
   .menu {
     flex-direction: row;
+    flex: initial;
     margin-top: 0;
     overflow-x: auto;
+    overflow-y: hidden;
     gap: 5px;
   }
 
