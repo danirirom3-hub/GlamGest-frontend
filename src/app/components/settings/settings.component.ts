@@ -18,6 +18,7 @@ export class SettingsComponent implements OnInit {
   backups: BackupInfo[] = [];
   isLoadingBackups = false;
   isCreatingBackup = false;
+  selectedSection: 'visual' | 'backups' = 'visual';
 
   constructor(
     private backupsService: BackupsService,
@@ -40,6 +41,10 @@ export class SettingsComponent implements OnInit {
     localStorage.setItem('theme', theme);
 
     this.currentTheme = theme;
+  }
+
+  selectSection(section: 'visual' | 'backups'): void {
+    this.selectedSection = section;
   }
 
   ngOnInit() {

@@ -1,74 +1,122 @@
-<div class="settings-container">
-  <div class="header">
-    <h2>Personalización de la aplicación</h2>
-    <p>Selecciona y aplica el tema visual del sistema</p>
-  </div>
+<div class="settings-page">
+  <header class="settings-header">
+    <div>
+      <span class="eyebrow">Preferencias</span>
+      <h1>Configuración</h1>
+      <p>Personaliza la apariencia y administra tus copias de seguridad.</p>
+    </div>
+  </header>
 
-  <div class="section">
-    <h3>Tema visual</h3>
-    <div class="themes-grid">
+  <div class="settings-layout">
+    <nav class="settings-nav" aria-label="Secciones de configuración">
+      <span class="nav-title">Configuración del sistema</span>
 
-      <!-- NEUTRO -->
-      <div class="theme-card" [class.active]="isActive('default')" (click)="setTheme('default')">
-        <div class="preview default"></div>
-        <div class="theme-info">
-          <h4>Neutro</h4>
-          <span>Estilo limpio</span>
-        </div>
-        <button>Aplicar</button>
-      </div>
-
-      <!-- OSCURO -->
-      <div class="theme-card" [class.active]="isActive('dark')" (click)="setTheme('dark')">
-        <div class="preview dark"></div>
-        <div class="theme-info">
-          <h4>Oscuro</h4>
-          <span>Modo nocturno</span>
-        </div>
-        <button>Aplicar</button>
-      </div>
-
-     <!-- FEMENINO -->
-<div class="theme-card" [class.active]="isActive('femenino')" (click)="setTheme('femenino')">
-  <div class="preview femenino"></div>
-
-  <div class="theme-info">
-    <h4>Femenino</h4>
-    <span>Elegante / spa / suave</span>
-  </div>
-
-  <button>Aplicar</button>
-  </div>
-
-  <div class="section backup-section">
-    <div class="backup-heading">
-      <div>
-        <h3>Copias de seguridad</h3>
-        <p>Crea y restaura copias completas de la base de datos.</p>
-      </div>
-      <button type="button" class="backup-create" (click)="createBackup()" [disabled]="isCreatingBackup">
-        {{ isCreatingBackup ? 'Creando...' : 'Crear backup' }}
+      <button
+        type="button"
+        class="settings-nav-item"
+        [class.active]="selectedSection === 'visual'"
+        [attr.aria-pressed]="selectedSection === 'visual'"
+        (click)="selectSection('visual')"
+      >
+        <span class="nav-icon" aria-hidden="true">Aa</span>
+        <span>
+          <strong>Visual</strong>
+          <small>Temas y apariencia</small>
+        </span>
       </button>
-    </div>
 
-    <p class="backup-loading" *ngIf="isLoadingBackups">Cargando historial...</p>
-    <p class="backup-empty" *ngIf="!isLoadingBackups && backups.length === 0">Todavía no hay backups creados.</p>
-    <div class="backup-list" *ngIf="backups.length > 0">
-      <article class="backup-item" *ngFor="let backup of backups">
-        <div>
-          <strong>{{ backup.createdAt | date:'dd/MM/yyyy HH:mm' }}</strong>
-          <span>{{ formatSize(backup.size) }} · {{ backup.status }}</span>
-          <small>{{ backup.sha256 }}</small>
-        </div>
-        <div class="backup-actions">
-          <button type="button" (click)="downloadBackup(backup)">Descargar</button>
-          <button type="button" (click)="restoreBackup(backup)">Restaurar</button>
-          <button type="button" (click)="deleteBackup(backup)">Eliminar</button>
-        </div>
-      </article>
-    </div>
-  </div>
+      <button
+        type="button"
+        class="settings-nav-item"
+        [class.active]="selectedSection === 'backups'"
+        [attr.aria-pressed]="selectedSection === 'backups'"
+        (click)="selectSection('backups')"
+      >
+        <span class="nav-icon" aria-hidden="true">DB</span>
+        <span>
+          <strong>Copias de seguridad</strong>
+          <small>Respaldo e historial</small>
+        </span>
+      </button>
+    </nav>
 
-</div>
+    <main class="settings-content">
+      <section class="settings-panel" *ngIf="selectedSection === 'visual'">
+        <div class="panel-heading">
+          <div>
+            <span class="panel-kicker">APARIENCIA</span>
+            <h2>Personalización visual</h2>
+            <p>Selecciona el estilo que quieres utilizar en GlamGest.</p>
+          </div>
+          <span class="panel-mark" aria-hidden="true">Aa</span>
+        </div>
+
+        <div class="themes-grid">
+          <article class="theme-card" [class.active]="isActive('default')" (click)="setTheme('default')">
+            <div class="preview default"></div>
+            <div class="theme-info">
+              <div>
+                <h3>Neutro</h3>
+                <span>Estilo limpio</span>
+              </div>
+              <span class="theme-status">{{ isActive('default') ? 'Activo' : 'Aplicar' }}</span>
+            </div>
+          </article>
+
+          <article class="theme-card" [class.active]="isActive('dark')" (click)="setTheme('dark')">
+            <div class="preview dark"></div>
+            <div class="theme-info">
+              <div>
+                <h3>Oscuro</h3>
+                <span>Modo nocturno</span>
+              </div>
+              <span class="theme-status">{{ isActive('dark') ? 'Activo' : 'Aplicar' }}</span>
+            </div>
+          </article>
+
+          <article class="theme-card" [class.active]="isActive('femenino')" (click)="setTheme('femenino')">
+            <div class="preview femenino"></div>
+            <div class="theme-info">
+              <div>
+                <h3>Femenino</h3>
+                <span>Elegante, spa y suave</span>
+              </div>
+              <span class="theme-status">{{ isActive('femenino') ? 'Activo' : 'Aplicar' }}</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="settings-panel" *ngIf="selectedSection === 'backups'">
+        <div class="panel-heading backup-heading">
+          <div>
+            <span class="panel-kicker">DATOS</span>
+            <h2>Copias de seguridad</h2>
+            <p>Crea y restaura copias completas de la base de datos.</p>
+          </div>
+          <button type="button" class="backup-create" (click)="createBackup()" [disabled]="isCreatingBackup">
+            {{ isCreatingBackup ? 'Creando...' : 'Crear backup' }}
+          </button>
+        </div>
+
+        <p class="backup-loading" *ngIf="isLoadingBackups">Cargando historial...</p>
+        <p class="backup-empty" *ngIf="!isLoadingBackups && backups.length === 0">Todavia no hay backups creados.</p>
+
+        <div class="backup-list" *ngIf="backups.length > 0">
+          <article class="backup-item" *ngFor="let backup of backups">
+            <div class="backup-details">
+              <strong>{{ backup.createdAt | date:'dd/MM/yyyy HH:mm' }}</strong>
+              <span>{{ formatSize(backup.size) }} · {{ backup.status }}</span>
+              <small>{{ backup.sha256 }}</small>
+            </div>
+            <div class="backup-actions">
+              <button type="button" (click)="downloadBackup(backup)">Descargar</button>
+              <button type="button" class="restore-action" (click)="restoreBackup(backup)">Restaurar</button>
+              <button type="button" class="delete-action" (click)="deleteBackup(backup)">Eliminar</button>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
   </div>
 </div>
