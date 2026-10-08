@@ -13,6 +13,14 @@ export interface StoredReport {
   syncedAt: string;
 }
 
+export interface StoredMetrics {
+  key: string;
+  value: unknown;
+  from: string;
+  to: string;
+  syncedAt: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class OfflineStoreService {
   private readonly databaseName = 'glam-gest-offline';
@@ -43,11 +51,17 @@ export class OfflineStoreService {
   }
 
   async saveMetrics(value: unknown, from: string, to: string, syncedAt = new Date().toISOString()): Promise<void> {
-    await this.put('metrics', 'latest', { value, from, to, syncedAt });
+    const key = this.metricsKey(from, to);
+    await this.put('metrics', key, { key, value, from, to, syncedAt } satisfies StoredMetrics);
   }
 
-  async getMetrics(): Promise<{ value: unknown; from: string; to: string; syncedAt: string } | undefined> {
-    return this.get('metrics', 'latest');
+  async getMetrics(from: string, to: string): Promise<StoredMetrics | undefined> {
+    const cached = await this.get<StoredMetrics>('metrics', this.metricsKey(from, to));
+    if (cached) return cached;
+
+    // Accept the previous single-entry cache only when its period is identical.
+    const legacy = await this.get<StoredMetrics>('metrics', 'latest');
+    return legacy?.from === from && legacy.to === to ? legacy : undefined;
   }
 
   async saveLastPeriod(from: string, to: string): Promise<void> {
@@ -56,6 +70,10 @@ export class OfflineStoreService {
 
   async getLastPeriod(): Promise<{ from: string; to: string } | undefined> {
     return this.get('settings', 'last-period');
+  }
+
+  private metricsKey(from: string, to: string): string {
+    return `period:${from}:${to}`;
   }
 
   private readOnlineState(): boolean {

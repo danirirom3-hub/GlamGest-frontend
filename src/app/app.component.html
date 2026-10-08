@@ -2,4 +2,8 @@
 <router-outlet></router-outlet>
 <app-idle-lock></app-idle-lock>
 
+<button class="install-app-button" *ngIf="showInstallButton" type="button" (click)="installApp()">
+  Instalar GlamGest
+</button>
+
 

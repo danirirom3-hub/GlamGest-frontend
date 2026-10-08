@@ -23,6 +23,7 @@
 
   <div class="loading-state" *ngIf="loading"><lucide-icon [img]="icons.RefreshCw" class="spin"></lucide-icon> Actualizando métricas...</div>
   <div class="error-state" *ngIf="errorMessage"><strong>No pudimos cargar los datos.</strong><span>{{ errorMessage }}</span><button (click)="loadMetrics()">Reintentar</button></div>
+  <div class="offline-note" *ngIf="fromCache && !loading">Sin conexión. Mostrando métricas sincronizadas el {{ syncedAt | date:'dd/MM/yyyy HH:mm' }}.</div>
 
   <ng-container *ngIf="!loading && !errorMessage">
     <div class="stat-grid" *ngIf="summary as data">

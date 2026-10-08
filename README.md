@@ -34,18 +34,15 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 
 ## Production API and CORS
 
-The production API URL is not configured yet because this repository does not contain a
-verified public backend URL. Before publishing, replace the placeholder in
-`src/environments/environment.prod.ts` with the real backend origin, including exactly one
-`/api` suffix:
+The production API URL is injected during the Docker build. Provide the real backend origin,
+including exactly one `/api` suffix:
 
 ```ts
 apiUrl: 'https://DOMINIO_REAL_DEL_BACKEND/api'
 ```
 
-Do not use `api.example.com` in a published build and do not add a second `/api`. The local
-development environment uses `http://localhost:8081/api` while the new backend test container
-is exposed on port `8081`.
+Do not use a placeholder in a published build and do not add a second `/api`. The local
+development environment uses `http://localhost:8081/api`.
 
 For a Docker build, inject the production API URL explicitly:
 
@@ -61,6 +58,20 @@ CORS_ALLOWED_ORIGINS=https://DOMINIO_REAL_DEL_FRONTEND
 
 The actual frontend domain must replace the placeholder before deployment. API services use
 `environment.apiUrl`; no service should contain a hardcoded production API URL.
+
+## PWA y uso offline
+
+La compilación de producción genera una PWA instalable desde Chrome o Edge. Para probarla
+localmente, ejecuta `npm run build` y sirve `dist/glam-gest/browser` mediante HTTP; el service
+worker no se activa correctamente con `file://`.
+
+Después de iniciar sesión con conexión, la aplicación conserva en el dispositivo las métricas
+por período y los reportes PDF/XLSX descargados. Sin conexión solo se muestran métricas y reportes
+que hayan sido sincronizados previamente. Las operaciones de creación y edición continúan
+requiriendo conexión.
+
+En un navegador compatible aparecerá el botón `Instalar GlamGest`. También se puede usar la
+opción de instalación de la barra de direcciones del navegador.
 
 ## Running unit tests
 

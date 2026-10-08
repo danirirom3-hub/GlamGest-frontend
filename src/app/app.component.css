@@ -1,0 +1,17 @@
+.install-app-button {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1000;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 18px;
+  color: #fff;
+  background: #6366f1;
+  box-shadow: 0 8px 24px rgba(30, 41, 59, .2);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.install-app-button:hover { background: #4f46e5; }

@@ -37,6 +37,8 @@ export class MetricsComponent implements OnInit {
   loading = false;
   errorMessage = '';
   hasLoaded = false;
+  fromCache = false;
+  syncedAt = '';
   summary: DashboardSummary | null = null;
   revenue: RevenueMetric[] = [];
   appointments: AppointmentStatusMetric[] = [];
@@ -86,6 +88,8 @@ export class MetricsComponent implements OnInit {
         this.services = [...(result.services?.data ?? [])].sort((a, b) => b.revenue - a.revenue || b.units - a.units);
         this.employees = result.employees?.data ?? [];
         this.hasLoaded = true;
+        this.fromCache = false;
+        this.syncedAt = new Date().toISOString();
         this.loading = false;
         void this.offlineStore.saveMetrics(result, this.from, this.to);
         void this.offlineStore.saveLastPeriod(this.from, this.to);
@@ -93,17 +97,21 @@ export class MetricsComponent implements OnInit {
       error: async (error) => {
         this.loading = false;
         this.hasLoaded = true;
-        const cached = !this.offlineStore.isOnline ? await this.offlineStore.getMetrics().catch(() => undefined) : undefined;
+        const cached = (!this.offlineStore.isOnline || error?.status === 0)
+          ? await this.offlineStore.getMetrics(this.from, this.to).catch(() => undefined)
+          : undefined;
         if (cached) {
           const result = cached.value as any;
           this.summary = result.summary?.data ?? null;
           this.revenue = result.revenue?.data ?? [];
           this.appointments = result.appointments?.data ?? [];
           this.services = result.services?.data ?? [];
-          this.employees = result.employees?.data ?? [];
-          this.from = cached.from;
-          this.to = cached.to;
-          this.errorMessage = '';
+           this.employees = result.employees?.data ?? [];
+           this.from = cached.from;
+           this.to = cached.to;
+           this.fromCache = true;
+           this.syncedAt = cached.syncedAt;
+           this.errorMessage = '';
         } else {
           this.errorMessage = error?.error?.message || 'No se pudieron cargar las métricas. Intenta nuevamente.';
         }

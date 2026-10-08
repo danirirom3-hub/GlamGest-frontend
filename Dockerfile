@@ -8,8 +8,8 @@ RUN npm install
 
 COPY . .
 
-ARG API_URL=https://DOMINIO_REAL_DEL_BACKEND/api
-RUN sed -i "s|https://DOMINIO_REAL_DEL_BACKEND/api|${API_URL}|g" src/environments/environment.prod.ts \
+ARG API_URL=http://localhost:8081/api
+RUN sed -i "s|http://localhost:8081/api|${API_URL}|g" src/environments/environment.prod.ts \
     && npm run build
 
 # ETAPA 2: SERVIR CON NGINX 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
-import { Observable, defer, from, map, switchMap } from 'rxjs';
+import { Observable, catchError, defer, from, map, switchMap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { OfflineStoreService, StoredReport } from './offline-store.service';
 
@@ -40,11 +40,7 @@ export class ReportsService {
   download(definition: ReportDefinition, fromDate: string, toDate: string): Observable<DownloadedReport> {
     const key = reportCacheKey(definition, fromDate, toDate);
     if (!this.offlineStore.isOnline) {
-      return defer(() => from(this.offlineStore.getReport(key))).pipe(
-        switchMap(cached => cached
-          ? from([this.fromStoredReport(cached)])
-          : from(Promise.reject(new Error('No existe una copia offline para este período. Conéctate para descargarla.'))))
-      );
+      return this.cachedReport(key);
     }
 
     const params = new HttpParams().set('from', fromDate).set('to', toDate);
@@ -54,7 +50,16 @@ export class ReportsService {
       observe: 'response'
     }).pipe(
       map(response => this.toDownloadedReport(response, definition, fromDate, toDate)),
-      switchMap(download => from(this.saveReport(key, download, fromDate, toDate)).pipe(map(() => ({ ...download, from: fromDate, to: toDate }))))
+      switchMap(download => from(this.saveReport(key, download, fromDate, toDate)).pipe(map(() => ({ ...download, from: fromDate, to: toDate })))),
+      catchError(error => error?.status === 0 ? this.cachedReport(key) : from(Promise.reject(error)))
+    );
+  }
+
+  private cachedReport(key: string): Observable<DownloadedReport> {
+    return defer(() => from(this.offlineStore.getReport(key))).pipe(
+      switchMap(cached => cached
+        ? from([this.fromStoredReport(cached)])
+        : from(Promise.reject(new Error('No existe una copia offline para este período. Conéctate para descargarla.'))))
     );
   }
 
