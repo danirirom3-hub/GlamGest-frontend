@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, finalize, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface PrivacyPolicy {
@@ -50,6 +50,12 @@ export class AuthService {
     return this.http.post(`${this.authUrl}/unlock`, { password });
   }
 
+  logoutRemote(): Observable<void> {
+    return this.http.post<void>(`${this.authUrl}/logout`, {}).pipe(
+      finalize(() => this.clearLocalSession())
+    );
+  }
+
   saveSession(response: any): void {
     const session = response?.data || response;
     if (session?.token) this.saveToken(session.token);
@@ -89,6 +95,10 @@ export class AuthService {
 
   // Cerrar sesión eliminando el token
   logout(): void {
+    this.clearLocalSession();
+  }
+
+  private clearLocalSession(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('user_id');

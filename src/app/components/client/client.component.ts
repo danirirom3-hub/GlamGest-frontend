@@ -178,8 +178,10 @@ export class ClientComponent implements OnInit {
   }
 
   logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+    this.authService.logoutRemote().subscribe({
+      error: () => this.router.navigate(['/login']),
+      complete: () => this.router.navigate(['/login'])
+    });
   }
 
   getServiceName(id?: number): string {

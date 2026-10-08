@@ -38,8 +38,37 @@
   </div>
 
   <button>Aplicar</button>
-</div>
+  </div>
 
+  <div class="section backup-section">
+    <div class="backup-heading">
+      <div>
+        <h3>Copias de seguridad</h3>
+        <p>Crea y restaura copias completas de la base de datos.</p>
+      </div>
+      <button type="button" class="backup-create" (click)="createBackup()" [disabled]="isCreatingBackup">
+        {{ isCreatingBackup ? 'Creando...' : 'Crear backup' }}
+      </button>
     </div>
+
+    <p class="backup-loading" *ngIf="isLoadingBackups">Cargando historial...</p>
+    <p class="backup-empty" *ngIf="!isLoadingBackups && backups.length === 0">Todavía no hay backups creados.</p>
+    <div class="backup-list" *ngIf="backups.length > 0">
+      <article class="backup-item" *ngFor="let backup of backups">
+        <div>
+          <strong>{{ backup.createdAt | date:'dd/MM/yyyy HH:mm' }}</strong>
+          <span>{{ formatSize(backup.size) }} · {{ backup.status }}</span>
+          <small>{{ backup.sha256 }}</small>
+        </div>
+        <div class="backup-actions">
+          <button type="button" (click)="downloadBackup(backup)">Descargar</button>
+          <button type="button" (click)="restoreBackup(backup)">Restaurar</button>
+          <button type="button" (click)="deleteBackup(backup)">Eliminar</button>
+        </div>
+      </article>
+    </div>
+  </div>
+
+</div>
   </div>
 </div>

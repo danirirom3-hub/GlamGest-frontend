@@ -129,3 +129,34 @@ button:hover {
 button:active {
   transform: scale(0.96);
 }
+
+.backup-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.backup-heading h3 { margin-bottom: 0; }
+.backup-heading p { margin-top: 5px; }
+.backup-create { width: auto; margin-top: 0; background: var(--primary); color: #fff; }
+.backup-loading, .backup-empty { margin-top: 15px; }
+.backup-list { display: grid; gap: 10px; }
+.backup-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--bg);
+}
+.backup-item div:first-child { display: grid; gap: 4px; min-width: 0; }
+.backup-item span, .backup-item small { opacity: .7; overflow-wrap: anywhere; }
+.backup-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.backup-actions button { width: auto; margin-top: 0; padding: 8px 10px; }
+
+@media (max-width: 700px) {
+  .backup-heading, .backup-item { align-items: stretch; flex-direction: column; }
+  .backup-actions { display: grid; grid-template-columns: repeat(3, 1fr); }
+}

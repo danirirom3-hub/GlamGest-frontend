@@ -13,16 +13,26 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
     request.url.endsWith('/auth/register') ||
     (request.method === 'GET' && request.url.endsWith('/auth/policy'));
   const isUnlockRequest = request.url.endsWith('/auth/unlock');
+  const isLogoutRequest = request.url.endsWith('/auth/logout');
   const authorizedRequest = token && !isPublicAuthRequest
     ? request.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
     : request;
 
   return next(authorizedRequest).pipe(
     catchError((error) => {
-      if (error.status === 401 && !isUnlockRequest) {
+      if (error.status === 401 && !isUnlockRequest && !isLogoutRequest) {
+        const body = error?.error?.data || error?.error;
+        const sessionReplaced = body?.code === 'SESSION_REPLACED';
         authService.logout();
         if (!isPublicAuthRequest) {
           router.navigate(['/login'], { queryParams: { returnUrl: router.url } });
+          void Swal.fire(
+            sessionReplaced ? 'Sesión reemplazada' : 'Sesión expirada',
+            sessionReplaced
+              ? 'Tu sesión se cerró porque se inició sesión en otro navegador.'
+              : 'Tu sesión ya no es válida. Inicia sesión nuevamente.',
+            'warning'
+          );
         }
       } else if (error.status === 403) {
         const body = error?.error?.data || error?.error;

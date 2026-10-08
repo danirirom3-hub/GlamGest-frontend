@@ -79,8 +79,10 @@ export class IdleLockService implements OnDestroy {
     const elapsed = Date.now() - this.lastActivity;
     if (elapsed >= IDLE_LOGOUT_MS) {
       this.stop();
-      this.authService.logout();
-      void this.router.navigate(['/login'], { replaceUrl: true });
+      this.authService.logoutRemote().subscribe({
+        error: () => void this.router.navigate(['/login'], { replaceUrl: true }),
+        complete: () => void this.router.navigate(['/login'], { replaceUrl: true })
+      });
     } else if (elapsed >= IDLE_LOCK_MS) {
       this.lockedSubject.next(true);
       sessionStorage.setItem(IDLE_LOCK_STORAGE_KEY, 'true');

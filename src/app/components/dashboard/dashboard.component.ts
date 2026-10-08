@@ -65,18 +65,20 @@ export class DashboardComponent {
 
       if (!result.isConfirmed) return;
 
-      this.authService.logout();
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Sesión cerrada',
-        timer: 1000,
-        showConfirmButton: false
-      });
-
-      setTimeout(() => {
-        this.router.navigate(['/login']);
-      }, 1000);
+       this.authService.logoutRemote().subscribe({
+         error: () => {
+           void this.router.navigate(['/login']);
+         },
+         complete: () => {
+           Swal.fire({
+             icon: 'success',
+             title: 'Sesión cerrada',
+             timer: 1000,
+             showConfirmButton: false
+           });
+           setTimeout(() => this.router.navigate(['/login']), 1000);
+         }
+       });
 
     });
   }
