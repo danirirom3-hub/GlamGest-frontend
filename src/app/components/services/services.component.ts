@@ -62,6 +62,10 @@ export class ServicesComponent implements OnInit {
     );
   }
 
+  get activeCategories(): Category[] {
+    return this.categories.filter(category => category.active !== false);
+  }
+
   get selectedCategoryLabel(): string {
     return this.selectedCategoryId === null
       ? 'Todos los servicios'
@@ -107,9 +111,9 @@ export class ServicesComponent implements OnInit {
 
   loadCategories(): void {
     this.loadingCategories = true;
-    this.categoriesService.getCategories().subscribe({
+    this.categoriesService.getAdminCategories().subscribe({
       next: response => {
-        this.categories = this.unwrap(response).filter(category => category.active !== false);
+        this.categories = this.unwrap(response);
         this.loadingCategories = false;
       },
       error: error => {
@@ -291,13 +295,32 @@ export class ServicesComponent implements OnInit {
       if (!result.isConfirmed) return;
       this.categoriesService.deleteCategory(category.id!).subscribe({
         next: response => {
-          if (!response?.successful) { this.showError(response, 'No se pudo desactivar la categoría.'); return; }
-          this.categories = this.categories.filter(item => item.id !== category.id);
+          if (response && response.successful === false) { this.showError(response, 'No se pudo desactivar la categoría.'); return; }
+          this.categories = this.categories.map(item => item.id === category.id
+            ? { ...item, active: false }
+            : item);
           if (this.selectedCategoryId === category.id) this.selectedCategoryId = null;
           Swal.fire({ icon: 'success', title: 'Categoría desactivada', timer: 1200, showConfirmButton: false });
         },
         error: error => this.showError(error, 'No se pudo desactivar la categoría.')
       });
+    });
+  }
+
+  reactivateCategory(category: Category): void {
+    if (!category.id) return;
+    this.categoriesService.updateCategory(category.id, { active: true }).subscribe({
+      next: response => {
+        if (!response || response.successful === false) {
+          this.showError(response, 'No se pudo reactivar la categoría.');
+          return;
+        }
+        this.categories = this.categories.map(item => item.id === category.id
+          ? { ...item, active: true }
+          : item);
+        Swal.fire({ icon: 'success', title: 'Categoría reactivada', timer: 1200, showConfirmButton: false });
+      },
+      error: error => this.showError(error, 'No se pudo reactivar la categoría.')
     });
   }
 
@@ -308,5 +331,7 @@ export class ServicesComponent implements OnInit {
   private emptyService(): Service { return { active: true, name: '', price: null, description: '', durationMinutes: null, categoryId: null }; }
   private emptyCategory(): Category { return { name: '', description: '' }; }
   private unwrap<T>(response: { data: T } | T): T { return (response && typeof response === 'object' && 'data' in response ? response.data : response) as T; }
-  private showError(error: any, fallback: string): void { Swal.fire('Error', error?.error?.message || error?.message || fallback, 'error'); }
+  private showError(error: any, fallback: string): void {
+    Swal.fire('Error', error?.error?.message || error?.error?.error || error?.message || fallback, 'error');
+  }
 }

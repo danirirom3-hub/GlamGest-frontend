@@ -28,11 +28,15 @@ export class CategoriesService {
     return this.http.get<ApiResponse<Category[]>>(this.apiUrl, this.options());
   }
 
+  getAdminCategories(): Observable<ApiResponse<Category[]>> {
+    return this.http.get<ApiResponse<Category[]>>(`${this.apiUrl}/admin`, this.options());
+  }
+
   createCategory(category: Omit<Category, 'id' | 'active'>): Observable<ApiResponse<Category>> {
     return this.http.post<ApiResponse<Category>>(this.apiUrl, category, this.options());
   }
 
-  updateCategory(id: number, category: Omit<Category, 'id' | 'active'>): Observable<ApiResponse<Category>> {
+  updateCategory(id: number, category: Partial<Omit<Category, 'id'>>): Observable<ApiResponse<Category>> {
     return this.http.put<ApiResponse<Category>>(`${this.apiUrl}/${id}`, category, this.options());
   }
 

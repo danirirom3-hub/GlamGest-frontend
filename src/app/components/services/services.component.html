@@ -24,7 +24,7 @@
             <span class="category-link-content"><span class="category-dot all-dot"></span>Todos los servicios</span>
             <span class="category-count">{{ allVisibleServicesCount }}</span>
           </button>
-          <button type="button" *ngFor="let category of categories" [class.selected]="selectedCategoryId === category.id" (click)="selectCategory(category.id!)">
+           <button type="button" *ngFor="let category of activeCategories" [class.selected]="selectedCategoryId === category.id" (click)="selectCategory(category.id!)">
             <span class="category-link-content"><span class="category-dot"></span>{{ category.name }}</span>
             <span class="category-count">{{ categoryServiceCount(category.id!) }}</span>
           </button>
@@ -58,7 +58,7 @@
         <div class="modal-header"><div><p class="eyebrow">Catálogo</p><h2 id="service-modal-title">{{ isEditing ? 'Editar servicio' : 'Nuevo servicio' }}</h2></div><button class="close" type="button" (click)="closeServiceModal()">×</button></div>
         <form class="form-grid" (ngSubmit)="saveService()">
           <label>Nombre del servicio<input type="text" name="name" [(ngModel)]="service.name" placeholder="Ej. Masaje relajante"></label>
-          <label>Categoría<select name="categoryId" [(ngModel)]="service.categoryId"><option [ngValue]="null">Sin categoría</option><option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option></select></label>
+          <label>Categoría<select name="categoryId" [(ngModel)]="service.categoryId"><option [ngValue]="null">Sin categoría</option><option *ngFor="let category of activeCategories" [ngValue]="category.id">{{ category.name }}</option></select></label>
           <label>Precio<input type="number" name="price" min="0" [(ngModel)]="service.price" placeholder="80000"></label>
           <label>Duración del servicio
             <span class="duration-select">
@@ -81,8 +81,8 @@
       <section class="modal category-modal" role="dialog" aria-modal="true" aria-labelledby="category-modal-title" (click)="$event.stopPropagation()">
         <div class="modal-header"><div><p class="eyebrow">Catálogo</p><h2 id="category-modal-title">Gestionar categorías</h2></div><button class="close" type="button" (click)="closeCategoryModal()">×</button></div>
         <div class="category-layout">
-          <div class="category-list" *ngIf="!loadingCategories && categories.length"><div class="category-row" *ngFor="let item of categories"><div><strong>{{ item.name }}</strong><span>{{ item.description || 'Sin descripción' }}</span></div><div class="category-actions"><button type="button" (click)="editCategory(item)">Editar</button><button type="button" class="danger-link" (click)="deactivateCategory(item)">Desactivar</button></div></div></div>
-          <div class="empty compact" *ngIf="!loadingCategories && !categories.length">No hay categorías activas.</div>
+          <div class="category-list" *ngIf="!loadingCategories && categories.length"><div class="category-row" *ngFor="let item of categories"><div><strong>{{ item.name }}</strong><span>{{ item.description || 'Sin descripción' }}{{ item.active === false ? ' · Inactiva' : '' }}</span></div><div class="category-actions"><button type="button" (click)="editCategory(item)">Editar</button><button *ngIf="item.active !== false" type="button" class="danger-link" (click)="deactivateCategory(item)">Desactivar</button><button *ngIf="item.active === false" type="button" (click)="reactivateCategory(item)">Reactivar</button></div></div></div>
+          <div class="empty compact" *ngIf="!loadingCategories && !categories.length">No hay categorías.</div>
           <div class="loading compact" *ngIf="loadingCategories">Cargando categorías...</div>
           <div class="category-form" *ngIf="categoryFormOpen"><h3>{{ editCategoryId === null ? 'Nueva categoría' : 'Editar categoría' }}</h3><label>Nombre<input type="text" name="categoryName" [(ngModel)]="category.name" placeholder="Ej. Masajes"></label><label>Descripción<textarea name="categoryDescription" [(ngModel)]="category.description" placeholder="Describe la categoría..."></textarea></label><div class="modal-actions"><button class="btn-secondary" type="button" (click)="cancelCategoryForm()">Cancelar</button><button class="btn-primary" type="button" [disabled]="savingCategory" (click)="saveCategory()">{{ savingCategory ? 'Guardando...' : 'Guardar categoría' }}</button></div></div>
         </div>
