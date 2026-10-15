@@ -21,12 +21,12 @@ export class UsersComponent {
   readonly recaptchaSiteKey = environment.RECAPTCHA_SITE_KEY;
   recaptchaToken: string | null = null;
 
-  // Iconos
+  // Iconos utilizados en la vista.
   icons = {
     arrowLeft: ArrowLeft
   };
 
-  // Datos del formulario
+  // Valores del formulario de registro.
   user: { name: string; email: string; password: string; phone?: string; privacyPolicyAccepted: boolean } = {
     name: '',
     email: '',
@@ -35,14 +35,14 @@ export class UsersComponent {
     privacyPolicyAccepted: false
   };
 
-  // Mensaje y tipo para colores
+  // Mensaje mostrado y estilo visual asociado.
   message: string = '';
   messageType: 'success' | 'error' = 'success';
-  isLoading: boolean = false; // Estado de carga
+  isLoading: boolean = false; // Indica si hay una petición en curso.
 
   constructor(private authService: AuthService) {}
 
-  // Registrar usuario
+  // Registra un nuevo usuario interno.
   registerUser() {
     this.message = '';
 
@@ -79,11 +79,11 @@ export class UsersComponent {
       recaptchaToken: this.recaptchaToken
     };
 
-    this.isLoading = true; // Activar carga
+    this.isLoading = true; // Bloquea el formulario mientras se procesa la petición.
 
     this.authService.register(payload).pipe(finalize(() => this.resetRecaptcha())).subscribe({
       next: (res: any) => {
-        this.isLoading = false; // Desactivar carga
+        this.isLoading = false; // Permite volver a interactuar con el formulario.
         if (res?.successful) {
           this.message = 'Usuario registrado correctamente.';
           this.messageType = 'success';
@@ -94,7 +94,7 @@ export class UsersComponent {
         }
       },
       error: (err) => {
-        this.isLoading = false; // Desactivar carga
+        this.isLoading = false; // Permite volver a interactuar con el formulario.
         this.message = this.isInvalidRecaptchaError(err)
           ? 'El captcha no es válido o ha expirado. Complétalo nuevamente.'
           : this.getErrorMessage(err, 'Error al registrar el usuario.');

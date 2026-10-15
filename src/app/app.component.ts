@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { UsersComponent } from './components/users/users.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { FullCalendarModule } from '@fullcalendar/angular'; // se usará para agenda/calendario
+import { FullCalendarModule } from '@fullcalendar/angular'; // Módulo utilizado para mostrar la agenda y el calendario.
 import { Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { IdleLockComponent } from './components/idle-lock/idle-lock.component';
@@ -16,10 +16,10 @@ interface BeforeInstallPromptEvent extends Event {
 
 @Component({
   selector: 'app-root',
-  standalone: true, // no usa módulos, todo se importa directamente
+  standalone: true, // El componente importa directamente las dependencias que necesita.
   imports: [
     CommonModule,
-    RouterOutlet, // permite navegación por rutas
+    RouterOutlet, // Contenedor para mostrar la vista de la ruta actual.
     IdleLockComponent,
     UsersComponent,
     DashboardComponent,
@@ -29,7 +29,7 @@ interface BeforeInstallPromptEvent extends Event {
 })
 export class AppComponent implements OnInit {
 
-  title = 'glam-gest'; // nombre base del sistema
+  title = 'glam-gest'; // Nombre base de la aplicación.
   installEvent: BeforeInstallPromptEvent | null = null;
   showInstallButton = false;
 

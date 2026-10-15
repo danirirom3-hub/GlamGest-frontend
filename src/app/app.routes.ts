@@ -1,16 +1,16 @@
 import { Routes } from '@angular/router';
 
-// Componentes principales
+// Vistas principales de la aplicación.
 import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 import { UsersComponent } from './components/users/users.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 
-// Guards
+// Guards de acceso a las rutas.
 import { AuthGuard } from './guards/auth.guard';
 import { LoginGuard } from './guards/login.guard';
 
-// Componentes del dashboard
+// Vistas disponibles dentro del dashboard.
 import { ServicesComponent } from './components/services/services.component';
 import { ClientsComponent } from './components/clients/clients.component';
 import { SalesComponent } from './components/sales/sales.component';

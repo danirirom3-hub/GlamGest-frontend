@@ -1,4 +1,4 @@
-/* estilos base globales */
+/* Estilos base de la aplicación. */
 body {
   font-family: 'Poppins', 'Segoe UI', sans-serif;
   margin: 0;
@@ -7,7 +7,7 @@ body {
   color: var(--text);
 }
 
-/* variables del tema por defecto */
+/* Variables del tema claro. */
 :root {
   --bg: #f8fafc;
   --text: #1e293b;
@@ -15,7 +15,7 @@ body {
   --card: #ffffff;
 }
 
-/* variables para modo oscuro */
+/* Variables aplicadas al modo oscuro. */
 .dark {
   --bg: #0f172a;
   --text: #f1f5f9;
@@ -23,7 +23,7 @@ body {
   --card: #1e293b;
 }
 
-/* tema femenino tipo spa */
+/* Variables del tema rosa. */
 .femenino {
   --bg: #fff6f8;
   --text: #3a1f2a;
@@ -31,7 +31,7 @@ body {
   --card: #ffe4ec;
 }
 
-/* transición suave al cambiar tema */
+/* Transición visual al cambiar de tema. */
 body {
   transition: background 0.3s ease, color 0.3s ease;
 }

@@ -31,7 +31,7 @@ export interface ServicesResponse<T> {
 })
 export class ServicesService {
 
-  // URL base del backend tomada desde variables de entorno
+  // URL base de los endpoints de servicios.
   private apiUrl = `${environment.apiUrl}/services`;
 
   constructor(
@@ -39,7 +39,7 @@ export class ServicesService {
     private authService: AuthService
   ) { }
 
-  // Obtener headers con token de autenticación
+  // Construye los headers necesarios para las peticiones autenticadas.
   private getAuthHeaders(): HttpHeaders {
     const token = this.authService.getToken();
     return new HttpHeaders({
@@ -47,14 +47,14 @@ export class ServicesService {
     });
   }
 
-  // Crear servicio (ej: corte, manicure, etc.)
+  // Crea un servicio del catálogo.
   createService(data: ServicePayload): Observable<ServicesResponse<ServiceItem>> {
     return this.http.post<ServicesResponse<ServiceItem>>(this.apiUrl, data, {
       headers: this.getAuthHeaders()
     });
   }
 
-  // Obtener todos los servicios
+  // Obtiene los servicios activos del catálogo.
   getServices(): Observable<ServicesResponse<ServiceItem[]>> {
     return this.http.get<ServicesResponse<ServiceItem[]>>(this.apiUrl, {
       headers: this.getAuthHeaders()
@@ -68,21 +68,21 @@ export class ServicesService {
     });
   }
 
-  // Obtener servicio por ID
+  // Obtiene un servicio por su identificador.
   getServiceById(id: number): Observable<ServicesResponse<ServiceItem>> {
     return this.http.get<ServicesResponse<ServiceItem>>(`${this.apiUrl}/${id}`, {
       headers: this.getAuthHeaders()
     });
   }
 
-  // Actualizar servicio
+  // Actualiza los datos de un servicio.
   updateService(id: number, data: Partial<ServicePayload>): Observable<ServicesResponse<ServiceItem>> {
     return this.http.put<ServicesResponse<ServiceItem>>(`${this.apiUrl}/${id}`, data, {
       headers: this.getAuthHeaders()
     });
   }
 
-  // Eliminar servicio
+  // Desactiva un servicio sin eliminar sus registros relacionados.
   deleteService(id: number): Observable<ServicesResponse<void>> {
     return this.http.delete<ServicesResponse<void>>(`${this.apiUrl}/${id}`, {
       headers: this.getAuthHeaders()

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { EmployeesService } from '../../services/employees.service';
 import Swal from 'sweetalert2';
 
-/* Modelo de empleado */
+  /* Datos que representan a un empleado. */
 interface Employee {
   id: number;
   name: string;
@@ -21,7 +21,7 @@ interface Employee {
 })
 export class EmployeesComponent implements OnInit {
 
-  /* Datos del formulario */
+  /* Valores utilizados por el formulario de empleados. */
   employee: Employee = {
     id: 0,
     name: '',
@@ -29,10 +29,10 @@ export class EmployeesComponent implements OnInit {
     active: true
   };
 
-  /* Lista de empleados */
+  /* Empleados cargados desde la API. */
   employees: Employee[] = [];
 
-  /* Estado de la vista */
+  /* Estado actual de la pantalla. */
   showOnlyActive = false;
   isEditing = false;
   mensaje = '';
@@ -43,14 +43,14 @@ export class EmployeesComponent implements OnInit {
     this.loadEmployees();
   }
 
-  /* Empleados visibles según filtro */
+  /* Devuelve los empleados según el filtro seleccionado. */
   get visibleEmployees(): Employee[] {
     return this.showOnlyActive
       ? this.employees.filter(emp => emp.active)
       : this.employees;
   }
 
-  /* Obtener empleados */
+  /* Carga los empleados disponibles desde la API. */
   loadEmployees(): void {
     this.employeesService.getEmployees().subscribe({
       next: (res: any) => {
@@ -63,7 +63,7 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
-  /* Crear o actualizar */
+  /* Crea un empleado o actualiza el que está seleccionado. */
   onSubmit(): void {
     this.mensaje = '';
 
@@ -105,7 +105,7 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
-  /* Cargar datos en el formulario */
+  /* Carga los datos del empleado en el formulario de edición. */
   onEdit(emp: Employee): void {
     this.isEditing = true;
     this.employee = {
@@ -124,7 +124,7 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
-  /* Actualizar empleado */
+  /* Actualiza los datos del empleado seleccionado. */
   updateEmployee(): void {
     this.employeesService.updateEmployee(this.employee.id, {
       name: this.employee.name,
@@ -158,7 +158,7 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
-  /* Eliminar empleado */
+  /* Desactiva el empleado seleccionado. */
   onDelete(id: number): void {
 
     Swal.fire({
@@ -197,7 +197,7 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
-  /* Cancelar edición */
+  /* Cancela la edición y limpia el formulario. */
   onCancel(): void {
     this.resetForm();
 
@@ -209,7 +209,7 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
-  /* Reset del formulario */
+  /* Restablece los valores iniciales del formulario. */
   resetForm(): void {
     this.isEditing = false;
     this.employee = {
@@ -221,7 +221,7 @@ export class EmployeesComponent implements OnInit {
     this.mensaje = '';
   }
 
-  /* activar / desactivar empleado */
+  /* Cambia el estado activo del empleado. */
   toggleActive(emp: Employee): void {
 
     Swal.fire({

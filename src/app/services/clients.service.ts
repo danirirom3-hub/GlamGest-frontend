@@ -21,13 +21,13 @@ export class ClientsService {
     return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
   }
 
-  // Crear cliente
+  // Crea un cliente nuevo.
   createClient(data: any): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.post(this.apiUrl, data, { headers });
   }
 
-  // Obtener todos los clientes
+  // Obtiene el perfil del cliente autenticado.
   getMyProfile(): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.get(`${this.apiUrl}/me`, { headers });
@@ -38,19 +38,19 @@ export class ClientsService {
     return this.http.get(this.apiUrl, { headers });
   }
 
-  // Obtener cliente por ID
+  // Obtiene un cliente por su identificador.
   getClientById(id: number): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.get(`${this.apiUrl}/${id}`, { headers });
   }
 
-  // Actualizar cliente
+  // Actualiza los datos de un cliente.
   updateClient(id: number, data: any): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.put(`${this.apiUrl}/${id}`, data, { headers });
   }
 
-  // Eliminar cliente
+  // Desactiva un cliente.
   deleteClient(id: number): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.delete(`${this.apiUrl}/${id}`, { headers });

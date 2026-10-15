@@ -14,7 +14,7 @@ export interface PrivacyPolicy {
 })
 export class AuthService {
 
-  // URL base tomada desde variables de entorno
+  // URL base de los endpoints de autenticación.
   private authUrl = `${environment.apiUrl}/auth`;
   private policyPendingSubject = new BehaviorSubject<boolean>(
     localStorage.getItem('privacyPolicyPending') === 'true'
@@ -24,12 +24,12 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
-  // Iniciar sesión del usuario
+  // Autentica al usuario y devuelve los datos de su sesión.
   login(data: any): Observable<any> {
     return this.http.post(`${this.authUrl}/login`, data);
   }
 
-  // Registrar nuevo usuario
+  // Registra un nuevo usuario cliente.
   register(data: any): Observable<any> {
     return this.http.post(`${this.authUrl}/register`, data);
   }
@@ -83,17 +83,17 @@ export class AuthService {
     }
   }
 
-  // Guardar token en el almacenamiento local del navegador
+  // Guarda el token de sesión en el almacenamiento local del navegador.
   saveToken(token: string): void {
     localStorage.setItem('token', token);
   }
 
-  // Obtener token almacenado
+  // Devuelve el token de sesión almacenado.
   getToken(): string | null {
     return localStorage.getItem('token');
   }
 
-  // Cerrar sesión eliminando el token
+  // Limpia los datos locales de la sesión actual.
   logout(): void {
     this.clearLocalSession();
   }
@@ -111,7 +111,7 @@ export class AuthService {
     this.sessionSubject.next(false);
   }
 
-  // Verificar si el usuario está autenticado
+  // Indica si existe un token de sesión local.
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
@@ -147,7 +147,7 @@ export class AuthService {
     return Number.isNaN(parsed) ? null : parsed;
   }
 
-  // Obtener el ID del usuario actual desde localStorage o el token
+  // Obtiene el identificador del usuario desde la sesión local o el token.
   getUserId(): number | null {
     const storedUser =
       localStorage.getItem('userId') ||

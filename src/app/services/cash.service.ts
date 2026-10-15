@@ -11,7 +11,7 @@ export class CashService {
 
   constructor() {}
 
-  // Desde citas
+  // Agrega un concepto a partir de una cita.
   addItemFromAppointment(appointment: any) {
     const item = {
       client: appointment.client,
@@ -23,7 +23,7 @@ export class CashService {
     this.itemsSubject.next([...this.itemsSubject.value, item]);
   }
 
-  // Desde caja (extras)
+  // Agrega un concepto manual desde caja.
   addManualItem(item: any) {
     this.itemsSubject.next([...this.itemsSubject.value, item]);
   }

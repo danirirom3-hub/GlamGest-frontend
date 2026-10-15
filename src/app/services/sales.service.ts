@@ -32,7 +32,7 @@ export interface SaleResponse {
 })
 export class SalesService {
 
-  // URL base del backend tomada desde variables de entorno
+  // URL base de los endpoints de ventas.
   private apiUrl = `${environment.apiUrl}/sales`;
 
   constructor(
@@ -45,31 +45,31 @@ export class SalesService {
     return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
   }
 
-  // Crear venta
+  // Crea una venta con sus detalles.
   createSale(data: CreateSaleRequest): Observable<SaleResponse> {
     const headers = this.getAuthHeaders();
     return this.http.post<SaleResponse>(this.apiUrl, data, headers ? { headers } : {});
   }
 
-  // Obtener todas las ventas
+  // Obtiene el listado de ventas.
   getSales(): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.get(this.apiUrl, headers ? { headers } : {});
   }
 
-  // Obtener venta por ID
+  // Obtiene una venta por su identificador.
   getSaleById(id: number): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.get(`${this.apiUrl}/${id}`, headers ? { headers } : {});
   }
 
-  // Actualizar venta
+  // Actualiza los datos permitidos de una venta.
   updateSale(id: number, data: any): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.put(`${this.apiUrl}/${id}`, data, headers ? { headers } : {});
   }
 
-  // Eliminar venta
+  // Anula una venta.
   deleteSale(id: number): Observable<void> {
     const headers = this.getAuthHeaders();
     return this.http.delete<void>(`${this.apiUrl}/${id}`, headers ? { headers } : {});
