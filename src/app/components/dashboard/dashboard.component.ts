@@ -10,7 +10,8 @@ import {
   User,
   Settings,
    BarChart3,
-   FileText
+  FileText,
+  ScrollText
 } from 'lucide-angular';
 import { AuthService } from '../../services/auth.service';
 import Swal from 'sweetalert2';
@@ -34,8 +35,9 @@ export class DashboardComponent {
     Calendar,
     User,
     Settings,
-     BarChart3,
-     FileText
+    BarChart3,
+    FileText,
+    ScrollText
   };
 
   constructor(

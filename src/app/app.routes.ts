@@ -23,6 +23,7 @@ import { MetricsComponent } from './components/metrics/metrics.component';
 import { PrivacyPolicyComponent } from './components/privacy-policy/privacy-policy.component';
 import { ReportsComponent } from './components/reports/reports.component';
 import { AdminGuard } from './guards/admin.guard';
+import { AuditLogsComponent } from './components/audit-logs/audit-logs.component';
 
 export const routes: Routes = [
 
@@ -43,6 +44,7 @@ export const routes: Routes = [
     children: [
       { path: 'metrics', component: MetricsComponent },
       { path: 'reports', component: ReportsComponent, canActivate: [AdminGuard] },
+      { path: 'logs', component: AuditLogsComponent, canActivate: [AdminGuard] },
       { path: '', redirectTo: 'metrics', pathMatch: 'full' }
     ]
   },
