@@ -1,15 +1,15 @@
 <div class="settings-page">
   <header class="settings-header">
     <div>
-      <span class="eyebrow">Preferencias</span>
-      <h1>Configuración</h1>
-      <p>Personaliza la apariencia y administra tus copias de seguridad.</p>
+      <span class="eyebrow">{{ 'settings.eyebrow' | translate }}</span>
+      <h1>{{ 'settings.title' | translate }}</h1>
+      <p>{{ 'settings.description' | translate }}</p>
     </div>
   </header>
 
   <div class="settings-layout">
-    <nav class="settings-nav" aria-label="Secciones de configuración">
-      <span class="nav-title">Configuración del sistema</span>
+    <nav class="settings-nav" [attr.aria-label]="'settings.sectionsAria' | translate">
+       <span class="nav-title">{{ 'settings.system' | translate }}</span>
 
       <button
         type="button"
@@ -20,8 +20,8 @@
       >
         <span class="nav-icon" aria-hidden="true">Aa</span>
         <span>
-          <strong>Visual</strong>
-          <small>Temas y apariencia</small>
+           <strong>{{ 'settings.visual' | translate }}</strong>
+           <small>{{ 'settings.visualDescription' | translate }}</small>
         </span>
       </button>
 
@@ -34,19 +34,19 @@
       >
         <span class="nav-icon" aria-hidden="true">DB</span>
         <span>
-          <strong>Copias de seguridad</strong>
-          <small>Respaldo e historial</small>
+           <strong>{{ 'settings.backups' | translate }}</strong>
+           <small>{{ 'settings.backupsDescription' | translate }}</small>
         </span>
       </button>
     </nav>
 
     <main class="settings-content">
-      <section class="settings-panel" *ngIf="selectedSection === 'visual'">
+       <section class="settings-panel" *ngIf="selectedSection === 'visual'">
         <div class="panel-heading">
           <div>
-            <span class="panel-kicker">APARIENCIA</span>
-            <h2>Personalización visual</h2>
-            <p>Selecciona el estilo que quieres utilizar en GlamGest.</p>
+             <span class="panel-kicker">{{ 'settings.appearance' | translate }}</span>
+             <h2>{{ 'settings.appearance' | translate }}</h2>
+             <p>{{ 'settings.appearanceDescription' | translate }}</p>
           </div>
           <span class="panel-mark" aria-hidden="true">Aa</span>
         </div>
@@ -56,10 +56,10 @@
             <div class="preview default"></div>
             <div class="theme-info">
               <div>
-                <h3>Neutro</h3>
-                <span>Estilo limpio</span>
+               <h3>{{ 'settings.neutral' | translate }}</h3>
+               <span>{{ 'settings.cleanStyle' | translate }}</span>
               </div>
-              <span class="theme-status">{{ isActive('default') ? 'Activo' : 'Aplicar' }}</span>
+               <span class="theme-status">{{ isActive('default') ? ('settings.active' | translate) : ('settings.apply' | translate) }}</span>
             </div>
           </article>
 
@@ -67,10 +67,10 @@
             <div class="preview dark"></div>
             <div class="theme-info">
               <div>
-                <h3>Oscuro</h3>
-                <span>Modo nocturno</span>
+               <h3>{{ 'settings.dark' | translate }}</h3>
+               <span>{{ 'settings.nightMode' | translate }}</span>
               </div>
-              <span class="theme-status">{{ isActive('dark') ? 'Activo' : 'Aplicar' }}</span>
+               <span class="theme-status">{{ isActive('dark') ? ('settings.active' | translate) : ('settings.apply' | translate) }}</span>
             </div>
           </article>
 
@@ -78,41 +78,45 @@
             <div class="preview femenino"></div>
             <div class="theme-info">
               <div>
-                <h3>Femenino</h3>
-                <span>Elegante, spa y suave</span>
+               <h3>{{ 'settings.soft' | translate }}</h3>
+               <span>{{ 'settings.softMode' | translate }}</span>
               </div>
-              <span class="theme-status">{{ isActive('femenino') ? 'Activo' : 'Aplicar' }}</span>
+               <span class="theme-status">{{ isActive('femenino') ? ('settings.active' | translate) : ('settings.apply' | translate) }}</span>
             </div>
           </article>
         </div>
-      </section>
+         <div class="language-card">
+           <div><span class="panel-kicker">{{ 'settings.language' | translate }}</span><h2>{{ 'settings.languageTitle' | translate }}</h2><p>{{ 'settings.languageDescriptionFull' | translate }}</p></div>
+           <select [ngModel]="language" (ngModelChange)="setLanguage($event)"><option value="es">{{ 'settings.spanish' | translate }}</option><option value="en">{{ 'settings.english' | translate }}</option></select>
+         </div>
+       </section>
 
       <section class="settings-panel" *ngIf="selectedSection === 'backups'">
         <div class="panel-heading backup-heading">
           <div>
-            <span class="panel-kicker">DATOS</span>
-            <h2>Copias de seguridad</h2>
-            <p>Crea y restaura copias completas de la base de datos.</p>
+           <span class="panel-kicker">{{ 'settings.data' | translate }}</span>
+             <h2>{{ 'settings.backupsTitle' | translate }}</h2>
+             <p>{{ 'settings.backupsDescriptionFull' | translate }}</p>
           </div>
           <button type="button" class="backup-create" (click)="createBackup()" [disabled]="isCreatingBackup">
-            {{ isCreatingBackup ? 'Creando...' : 'Crear backup' }}
+             {{ isCreatingBackup ? ('settings.creatingBackup' | translate) : ('settings.createBackup' | translate) }}
           </button>
         </div>
 
-        <p class="backup-loading" *ngIf="isLoadingBackups">Cargando historial...</p>
-        <p class="backup-empty" *ngIf="!isLoadingBackups && backups.length === 0">Todavia no hay backups creados.</p>
+         <p class="backup-loading" *ngIf="isLoadingBackups">{{ 'settings.historyLoading' | translate }}</p>
+         <p class="backup-empty" *ngIf="!isLoadingBackups && backups.length === 0">{{ 'settings.noBackups' | translate }}</p>
 
         <div class="backup-list" *ngIf="backups.length > 0">
           <article class="backup-item" *ngFor="let backup of backups">
             <div class="backup-details">
-              <strong>{{ backup.createdAt | date:'dd/MM/yyyy HH:mm' }}</strong>
+               <strong>{{ backup.createdAt | localizedDate }}</strong>
               <span>{{ formatSize(backup.size) }} · {{ backup.status }}</span>
               <small>{{ backup.sha256 }}</small>
             </div>
             <div class="backup-actions">
-              <button type="button" (click)="downloadBackup(backup)">Descargar</button>
-              <button type="button" class="restore-action" (click)="restoreBackup(backup)">Restaurar</button>
-              <button type="button" class="delete-action" (click)="deleteBackup(backup)">Eliminar</button>
+               <button type="button" (click)="downloadBackup(backup)">{{ 'settings.download' | translate }}</button>
+               <button type="button" class="restore-action" (click)="restoreBackup(backup)">{{ 'settings.restore' | translate }}</button>
+               <button type="button" class="delete-action" (click)="deleteBackup(backup)">{{ 'common.delete' | translate }}</button>
             </div>
           </article>
         </div>

@@ -1,35 +1,35 @@
 <main class="policy-page" [class.required]="isRequired">
   <article class="policy-card" aria-labelledby="policy-title">
     <p class="eyebrow">GlamGest</p>
-    <h1 id="policy-title">Política de tratamiento de datos</h1>
+    <h1 id="policy-title">{{ 'privacy.title' | translate }}</h1>
 
-    <div *ngIf="isPolicyLoading" class="policy-status">Cargando política...</div>
+    <div *ngIf="isPolicyLoading" class="policy-status">{{ 'privacy.loading' | translate }}</div>
     <div *ngIf="!isPolicyLoading && policy" class="policy-document">
       <div class="policy-meta">
-        <span>Versión {{ policy.version }}</span>
-        <span>Vigente desde {{ policy.effectiveDate }}</span>
+        <span>{{ 'privacy.version' | translate:{ version: policy.version } }}</span>
+        <span>{{ 'privacy.effective' | translate:{ date: (policy.effectiveDate | localizedDate) } }}</span>
       </div>
       <div class="policy-copy" role="document">{{ policy.content }}</div>
     </div>
     <p *ngIf="!isPolicyLoading && !policy && message" class="error-message" role="alert">{{ message }}</p>
 
     <div *ngIf="isRequired" class="required-panel">
-      <strong>Tu aceptación es necesaria para continuar.</strong>
-      <p>No podrás acceder a la aplicación hasta confirmar que leíste y aceptas esta política.</p>
+      <strong>{{ 'privacy.requiredTitle' | translate }}</strong>
+      <p>{{ 'privacy.requiredText' | translate }}</p>
       <label class="accept-option">
         <input type="checkbox"
           [(ngModel)]="accepted"
           [disabled]="isLoading"
           aria-required="true">
-        <span>He leído y acepto la política de tratamiento de datos.</span>
+        <span>{{ 'privacy.accept' | translate }}</span>
       </label>
       <button type="button" class="primary-button" (click)="confirm()" [disabled]="isLoading || !accepted || isPolicyLoading || !policy">
-        {{ isLoading ? 'Guardando...' : 'Aceptar y continuar' }}
+        {{ (isLoading ? 'privacy.saving' : 'privacy.acceptContinue') | translate }}
       </button>
       <p *ngIf="message && policy" class="error-message" role="alert">{{ message }}</p>
-      <button type="button" class="logout-button" (click)="logout()">Cerrar sesión</button>
+      <button type="button" class="logout-button" (click)="logout()">{{ 'privacy.logout' | translate }}</button>
     </div>
 
-    <button *ngIf="!isRequired" type="button" class="back-link" (click)="goBack()">Volver</button>
+    <button *ngIf="!isRequired" type="button" class="back-link" (click)="goBack()">{{ 'privacy.back' | translate }}</button>
   </article>
 </main>

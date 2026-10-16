@@ -10,6 +10,7 @@ import { ServicesService } from '../../services/services.service';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import Swal from 'sweetalert2';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AppointmentsComponent', () => {
   let component: AppointmentsComponent;
@@ -48,14 +49,15 @@ describe('AppointmentsComponent', () => {
     servicesServiceSpy = jasmine.createSpyObj('ServicesService', ['getServices']);
 
     // Configuración de respuestas por defecto para observables
-    clientsServiceSpy.getClients.and.returnValue(of(mockClients));
-    employeesServiceSpy.getEmployees.and.returnValue(of(mockEmployees));
-    servicesServiceSpy.getServices.and.returnValue(of(mockServices));
-    appointmentsServiceSpy.getAppointments.and.returnValue(of(mockAppointments));
+    clientsServiceSpy.getClients.and.returnValue(of(mockClients.map(c => ({ ...c }))) as any);
+    employeesServiceSpy.getEmployees.and.returnValue(of(mockEmployees.map(e => ({ ...e }))));
+    servicesServiceSpy.getServices.and.returnValue(of(mockServices.map(s => ({ ...s }))) as any);
+    appointmentsServiceSpy.getAppointments.and.returnValue(of(mockAppointments.map(a => ({ ...a }))));
 
     await TestBed.configureTestingModule({
       imports: [AppointmentsComponent],
       providers: [
+        provideTranslateService(),
         { provide: CashService, useValue: cashServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: AppointmentsService, useValue: appointmentsServiceSpy },
@@ -94,7 +96,7 @@ describe('AppointmentsComponent', () => {
     fixture.detectChanges();
 
     expect(component.appointments.length).toBe(0);
-    expect(Swal.fire).toHaveBeenCalledWith('Error', 'No se pudieron cargar las citas.', 'error');
+    expect(Swal.fire).toHaveBeenCalledWith('common.error', 'appointments.loadError', 'error');
   });
 
   describe('scheduleAppointment', () => {
@@ -105,7 +107,7 @@ describe('AppointmentsComponent', () => {
       component.selectedClient = ''; // Campo vacío para detonar el error
       component.scheduleAppointment();
 
-      expect(Swal.fire).toHaveBeenCalledWith('Campos incompletos', 'Debes llenar todos los campos.', 'warning');
+      expect(Swal.fire).toHaveBeenCalledWith('common.error', 'appointments.incomplete', 'warning');
     });
 
     it('debería crear una cita exitosamente y reiniciar el formulario', () => {

@@ -7,19 +7,19 @@
     </div>
 
     <p class="frase">
-      Organiza, gestiona y crece sin complicaciones.
+      {{ 'home.tagline' | translate }}
     </p>
 
     <div class="acciones">
 
       <button routerLink="/login" class="btn primary">
         <lucide-icon [img]="icons.logIn"></lucide-icon>
-        <span>Iniciar sesión</span>
+        <span>{{ 'home.login' | translate }}</span>
       </button>
 
       <button routerLink="/users" class="btn secondary">
         <lucide-icon [img]="icons.userPlus"></lucide-icon>
-        <span>Crear cuenta</span>
+        <span>{{ 'home.createAccount' | translate }}</span>
       </button>
 
     </div>

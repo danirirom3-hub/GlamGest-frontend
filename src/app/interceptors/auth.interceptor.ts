@@ -3,11 +3,13 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import Swal from 'sweetalert2';
+import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  const translate = inject(TranslateService);
   const token = authService.getToken();
   const isPublicAuthRequest = request.url.endsWith('/auth/login') ||
     request.url.endsWith('/auth/register') ||
@@ -27,10 +29,8 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
         if (!isPublicAuthRequest) {
           router.navigate(['/login'], { queryParams: { returnUrl: router.url } });
           void Swal.fire(
-            sessionReplaced ? 'Sesión reemplazada' : 'Sesión expirada',
-            sessionReplaced
-              ? 'Tu sesión se cerró porque se inició sesión en otro navegador.'
-              : 'Tu sesión ya no es válida. Inicia sesión nuevamente.',
+            translate.instant(sessionReplaced ? 'errors.sessionReplacedTitle' : 'errors.sessionExpiredTitle'),
+            translate.instant(sessionReplaced ? 'errors.sessionReplacedText' : 'errors.sessionExpiredText'),
             'warning'
           );
         }
@@ -46,12 +46,12 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
           authService.markPrivacyPolicyPending(body?.privacyPolicyVersion);
           router.navigate(['/privacy-policy']);
           Swal.fire(
-            'Política pendiente',
-            'Debes aceptar la política de tratamiento de datos para continuar.',
+            translate.instant('errors.policyPendingTitle'),
+            translate.instant('errors.policyPendingText'),
             'warning'
           );
         } else {
-          Swal.fire('Permisos insuficientes', 'No tienes permisos para realizar esta acción.', 'warning');
+          Swal.fire(translate.instant('errors.forbiddenTitle'), translate.instant('errors.forbidden'), 'warning');
         }
       }
       return throwError(() => error);

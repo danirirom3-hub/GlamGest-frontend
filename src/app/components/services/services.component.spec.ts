@@ -3,6 +3,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ServicesComponent } from './services.component';
 import { ServicesService } from '../../services/services.service';
+import { CategoriesService } from '../../services/categories.service';
+import { AuthService } from '../../services/auth.service';
+import { provideTranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 import Swal from 'sweetalert2';
 
@@ -10,98 +13,98 @@ describe('ServicesComponent', () => {
   let component: ServicesComponent;
   let fixture: ComponentFixture<ServicesComponent>;
   let servicesServiceSpy: jasmine.SpyObj<ServicesService>;
+  let categoriesServiceSpy: jasmine.SpyObj<CategoriesService>;
+  let authServiceSpy: jasmine.SpyObj<AuthService>;
 
-  // Datos de prueba simulados
   const mockServicesList = [
-    { id: 1, active: true, name: 'Corte de Cabello', price: 25000, description: 'Corte moderno', durationMinutes: 30 },
-    { id: 2, active: false, name: 'Tintura Completa', price: 80000, description: 'Tintura sin amoniaco', durationMinutes: 120 }
+    { id: 1, active: true, name: 'Corte de Cabello', price: 25000, description: 'Corte moderno', durationMinutes: 30, categoryId: null },
+    { id: 2, active: false, name: 'Tintura Completa', price: 80000, description: 'Tintura sin amoniaco', durationMinutes: 120, categoryId: null }
   ];
 
   beforeEach(async () => {
-    // Crear el espía para el servicio con todos sus métodos relacionales
-    servicesServiceSpy = jasmine.createSpyObj('ServicesService', ['getServices', 'createService', 'updateService', 'deleteService']);
-    
-    // Simular que el backend retorna la lista inicial por defecto para el ngOnInit
-    servicesServiceSpy.getServices.and.returnValue(of({ data: mockServicesList }));
+    servicesServiceSpy = jasmine.createSpyObj('ServicesService', ['getAdminServices', 'createService', 'updateService', 'deleteService']);
+    categoriesServiceSpy = jasmine.createSpyObj('CategoriesService', ['getAdminCategories', 'createCategory', 'updateCategory', 'deleteCategory']);
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['getRole']);
+
+    servicesServiceSpy.getAdminServices.and.returnValue(of({ data: mockServicesList.map(s => ({ ...s })) }) as any);
+    categoriesServiceSpy.getAdminCategories.and.returnValue(of({ data: [] }) as any);
+    authServiceSpy.getRole.and.returnValue('ADMIN');
 
     await TestBed.configureTestingModule({
       imports: [ServicesComponent],
       providers: [
-        { provide: ServicesService, useValue: servicesServiceSpy }
+        provideTranslateService(),
+        { provide: ServicesService, useValue: servicesServiceSpy },
+        { provide: CategoriesService, useValue: categoriesServiceSpy },
+        { provide: AuthService, useValue: authServiceSpy }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ServicesComponent);
     component = fixture.componentInstance;
-    
-    // Espiar SweetAlert globalmente para evitar que se abran popups reales en pantalla
+
     spyOn(Swal, 'fire').and.returnValue(Promise.resolve({ isConfirmed: true } as any));
   });
 
   it('debería crear el componente e inicializar los servicios', () => {
-    fixture.detectChanges(); // Ejecuta ngOnInit
+    fixture.detectChanges();
     expect(component).toBeTruthy();
-    expect(servicesServiceSpy.getServices).toHaveBeenCalled();
+    expect(servicesServiceSpy.getAdminServices).toHaveBeenCalled();
     expect(component.services.length).toBe(2);
   });
 
-  it('debería filtrar los servicios activos según el flag showOnlyActive', () => {
+  it('debería filtrar los servicios según el estado seleccionado', () => {
     fixture.detectChanges();
-    
-    component.showOnlyActive = true;
-    expect(component.filteredServices.length).toBe(1); // Solo el id: 1 está activo
 
-    component.toggleFiltro(); // Cambia a false
-    expect(component.filteredServices.length).toBe(2); // Retorna todos
+    component.statusFilter = 'active';
+    expect(component.filteredServices.length).toBe(1);
+
+    component.statusFilter = 'all';
+    expect(component.filteredServices.length).toBe(2);
+
+    component.statusFilter = 'inactive';
+    expect(component.filteredServices.length).toBe(1);
   });
 
   it('debería validar campos vacíos y no enviar el formulario si falta información', () => {
-    component.service = { active: true, name: '', price: null, description: '', durationMinutes: null };
-    
+    fixture.detectChanges();
+    component.service = { active: true, name: '', price: null, description: '', durationMinutes: null, categoryId: null };
+
     component.saveService();
 
-    expect(Swal.fire).toHaveBeenCalledWith('Campos incompletos', jasmine.any(String), 'warning');
+    expect(Swal.fire).toHaveBeenCalledWith('common.error', 'services.incomplete', 'warning');
     expect(servicesServiceSpy.createService).not.toHaveBeenCalled();
   });
 
   it('debería crear un nuevo servicio exitosamente', () => {
     fixture.detectChanges();
     component.isEditing = false;
-    component.service = { active: true, name: 'Manicura', price: 15000, description: 'Uñas limpias', durationMinutes: 20 };
+    component.service = { active: true, name: 'Manicura', price: 15000, description: 'Uñas limpias', durationMinutes: 30, categoryId: null };
 
-    servicesServiceSpy.createService.and.returnValue(of({ successful: true, data: { id: 3, name: 'Manicura', active: true } }));
+    servicesServiceSpy.createService.and.returnValue(of({ successful: true, data: { id: 3, name: 'Manicura', active: true } } as any));
 
     component.saveService();
 
     expect(servicesServiceSpy.createService).toHaveBeenCalled();
-    expect(component.services.length).toBe(3); // Se agrega a la lista local
+    expect(component.services.length).toBe(3);
   });
 
   it('debería cargar los datos en el formulario al presionar editar', () => {
+    fixture.detectChanges();
     const servicioSeleccionado = mockServicesList[0];
-    
-    component.editService(servicioSeleccionado);
+
+    component.openEditService(servicioSeleccionado);
 
     expect(component.isEditing).toBeTrue();
     expect(component.editServiceId).toBe(1);
     expect(component.service.name).toBe('Corte de Cabello');
-  });
-
-  it('debería limpiar el formulario al cancelar la edición', () => {
-    component.isEditing = true;
-    component.editServiceId = 44;
-
-    component.cancelEdit();
-
-    expect(component.isEditing).toBeFalse();
-    expect(component.editServiceId).toBeNull();
-    expect(component.service.name).toBe('');
+    expect(component.serviceModalOpen).toBeTrue();
   });
 
   it('debería manejar errores del backend al fallar la carga de datos', () => {
-    servicesServiceSpy.getServices.and.returnValue(throwError(() => new Error('Error de conexión')));
-    
-    component.loadServices();
+    servicesServiceSpy.getAdminServices.and.returnValue(throwError(() => new Error('Error de conexión')));
+
+    component.loadData();
 
     expect(component.services.length).toBe(0);
     expect(Swal.fire).toHaveBeenCalled();

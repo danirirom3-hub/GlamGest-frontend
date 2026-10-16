@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { IdleLockComponent } from './components/idle-lock/idle-lock.component';
 import { IDLE_LOCK_STORAGE_KEY } from './services/idle-lock.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -23,6 +24,7 @@ interface BeforeInstallPromptEvent extends Event {
     IdleLockComponent,
     UsersComponent,
     DashboardComponent,
+    TranslateModule,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']

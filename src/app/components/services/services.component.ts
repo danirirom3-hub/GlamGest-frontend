@@ -3,9 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import Swal from 'sweetalert2';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { CategoriesService, Category } from '../../services/categories.service';
 import { ServicePayload, ServicesService } from '../../services/services.service';
+import { ApiErrorMapper } from '../../services/api-error.mapper';
+import { LanguageService } from '../../services/language.service';
 
 interface Service {
   id?: number;
@@ -21,7 +24,7 @@ interface Service {
 @Component({
   selector: 'app-services',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, TranslateModule],
   templateUrl: './services.component.html',
   styleUrls: ['./services.component.css']
 })
@@ -50,7 +53,10 @@ export class ServicesComponent implements OnInit {
   constructor(
     private servicesService: ServicesService,
     private categoriesService: CategoriesService,
-    private authService: AuthService
+    private authService: AuthService,
+    private translate: TranslateService,
+    private errorMapper: ApiErrorMapper,
+    private languageService: LanguageService
   ) {}
 
   get isAdmin(): boolean { return this.authService.getRole() === 'ADMIN'; }
@@ -68,8 +74,8 @@ export class ServicesComponent implements OnInit {
 
   get selectedCategoryLabel(): string {
     return this.selectedCategoryId === null
-      ? 'Todos los servicios'
-      : this.categories.find(category => category.id === this.selectedCategoryId)?.name || 'Servicios';
+      ? this.translate.instant('services.all')
+      : this.categories.find(category => category.id === this.selectedCategoryId)?.name || this.translate.instant('services.title');
   }
 
   get allVisibleServicesCount(): number {
@@ -103,7 +109,7 @@ export class ServicesComponent implements OnInit {
       },
       error: error => {
         this.loading = false;
-        this.showError(error, 'No se pudieron cargar los servicios.');
+        this.showError(error, 'services.loadError');
       }
     });
     this.loadCategories();
@@ -118,7 +124,7 @@ export class ServicesComponent implements OnInit {
       },
       error: error => {
         this.loadingCategories = false;
-        this.showError(error, 'No se pudieron cargar las categorías.');
+        this.showError(error, 'services.categoriesLoadError');
       }
     });
   }
@@ -161,11 +167,11 @@ export class ServicesComponent implements OnInit {
 
   saveService(): void {
     if (!this.service.name.trim() || this.service.price === null || this.service.durationMinutes === null || !this.service.description.trim()) {
-      Swal.fire('Campos incompletos', 'Completa nombre, descripción, precio y duración.', 'warning');
+      Swal.fire(this.translate.instant('common.error'), this.translate.instant('services.incomplete'), 'warning');
       return;
     }
     if (this.service.durationMinutes <= 0 || this.service.durationMinutes % 15 !== 0) {
-      Swal.fire('Duración inválida', 'La duración debe estar expresada en bloques de 15 minutos.', 'warning');
+      Swal.fire(this.translate.instant('common.error'), this.translate.instant('services.invalidDuration'), 'warning');
       return;
     }
     const payload: ServicePayload | Partial<ServicePayload> = this.isEditing && this.originalService
@@ -187,7 +193,7 @@ export class ServicesComponent implements OnInit {
       : this.servicesService.createService(payload as ServicePayload);
     request.subscribe({
       next: response => {
-        if (!response?.successful) { this.savingService = false; this.showError(response, 'No se pudo guardar el servicio.'); return; }
+        if (!response?.successful) { this.savingService = false; this.showError(response, 'services.saveError'); return; }
         const saved = response.data || { ...payload, active: true, id: this.editServiceId };
         this.services = this.isEditing
           ? this.services.map(item => item.id === this.editServiceId ? { ...item, ...saved } : item)
@@ -195,28 +201,29 @@ export class ServicesComponent implements OnInit {
         this.savingService = false;
         this.serviceModalOpen = false;
         this.originalService = null;
-        Swal.fire({ icon: 'success', title: this.isEditing ? 'Servicio actualizado' : 'Servicio creado', timer: 1300, showConfirmButton: false });
+        Swal.fire({ icon: 'success', title: this.translate.instant(this.isEditing ? 'services.updated' : 'services.created'), timer: 1300, showConfirmButton: false });
       },
-      error: error => { this.savingService = false; this.showError(error, 'No se pudo guardar el servicio.'); }
+      error: error => { this.savingService = false; this.showError(error, 'services.saveError'); }
     });
   }
 
   toggleService(service: Service): void {
     if (!this.isAdmin || !service.id) return;
     const activating = !service.active;
-    const action = activating ? 'activar' : 'desactivar';
-    Swal.fire({ title: `¿Quieres ${action} "${service.name}"?`, icon: 'question', showCancelButton: true, confirmButtonText: 'Confirmar', cancelButtonText: 'Cancelar' }).then(result => {
+    const action = this.translate.instant(activating ? 'services.actionActivate' : 'services.actionDeactivate');
+    const toggleError = this.translate.instant('services.toggleError', { action });
+    Swal.fire({ title: this.translate.instant('services.toggleQuestion', { action, name: service.name }), icon: 'question', showCancelButton: true, confirmButtonText: this.translate.instant('common.confirm'), cancelButtonText: this.translate.instant('common.cancel') }).then(result => {
       if (!result.isConfirmed) return;
       const request: Observable<any> = activating
         ? this.servicesService.updateService(service.id!, { active: true })
         : this.servicesService.deleteService(service.id!);
       request.subscribe({
         next: response => {
-          if (!response?.successful) { this.showError(response, `No se pudo ${action} el servicio.`); return; }
+          if (!response?.successful) { this.showErrorText(response, toggleError); return; }
           this.services = this.services.map(item => item.id === service.id ? { ...item, active: activating } : item);
-          Swal.fire({ icon: 'success', title: activating ? 'Servicio activado' : 'Servicio desactivado', timer: 1200, showConfirmButton: false });
+          Swal.fire({ icon: 'success', title: this.translate.instant(activating ? 'services.activated' : 'services.deactivated'), timer: 1200, showConfirmButton: false });
         },
-        error: error => this.showError(error, `No se pudo ${action} el servicio.`)
+        error: error => this.showErrorText(error, toggleError)
       });
     });
   }
@@ -264,7 +271,7 @@ export class ServicesComponent implements OnInit {
 
   saveCategory(): void {
     if (!this.category.name.trim()) {
-      Swal.fire('Campo incompleto', 'Ingresa el nombre de la categoría.', 'warning');
+      Swal.fire(this.translate.instant('common.error'), this.translate.instant('services.categoryIncomplete'), 'warning');
       return;
     }
     const payload = { name: this.category.name.trim(), description: this.category.description.trim() };
@@ -275,7 +282,7 @@ export class ServicesComponent implements OnInit {
       : this.categoriesService.createCategory(payload);
     request.subscribe({
       next: response => {
-        if (!response?.successful) { this.savingCategory = false; this.showError(response, 'No se pudo guardar la categoría.'); return; }
+        if (!response?.successful) { this.savingCategory = false; this.showError(response, 'services.categorySaveError'); return; }
         const saved = response.data || { ...payload, id: this.editCategoryId, active: true };
         this.categories = this.editCategoryId === null
           ? [...this.categories, saved]
@@ -283,26 +290,26 @@ export class ServicesComponent implements OnInit {
         this.savingCategory = false;
         this.categoryFormOpen = false;
         this.editCategoryId = null;
-        Swal.fire({ icon: 'success', title: editingCategory ? 'Categoría actualizada' : 'Categoría creada', timer: 1200, showConfirmButton: false });
+        Swal.fire({ icon: 'success', title: this.translate.instant(editingCategory ? 'services.categoryUpdated' : 'services.categoryCreated'), timer: 1200, showConfirmButton: false });
       },
-      error: error => { this.savingCategory = false; this.showError(error, 'No se pudo guardar la categoría.'); }
+      error: error => { this.savingCategory = false; this.showError(error, 'services.categorySaveError'); }
     });
   }
 
   deactivateCategory(category: Category): void {
     if (!category.id) return;
-    Swal.fire({ title: `¿Desactivar "${category.name}"?`, text: 'Los servicios existentes conservarán su categoría.', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, desactivar', cancelButtonText: 'Cancelar', confirmButtonColor: '#dc2626' }).then(result => {
+    Swal.fire({ title: this.translate.instant('services.categoryDeactivateTitle', { name: category.name }), text: this.translate.instant('services.categoryDeactivateText'), icon: 'warning', showCancelButton: true, confirmButtonText: this.translate.instant('common.yesDeactivate'), cancelButtonText: this.translate.instant('common.cancel'), confirmButtonColor: '#dc2626' }).then(result => {
       if (!result.isConfirmed) return;
       this.categoriesService.deleteCategory(category.id!).subscribe({
         next: response => {
-          if (response && response.successful === false) { this.showError(response, 'No se pudo desactivar la categoría.'); return; }
+          if (response && response.successful === false) { this.showError(response, 'services.categoryDeactivateError'); return; }
           this.categories = this.categories.map(item => item.id === category.id
             ? { ...item, active: false }
             : item);
           if (this.selectedCategoryId === category.id) this.selectedCategoryId = null;
-          Swal.fire({ icon: 'success', title: 'Categoría desactivada', timer: 1200, showConfirmButton: false });
+          Swal.fire({ icon: 'success', title: this.translate.instant('services.categoryDeactivated'), timer: 1200, showConfirmButton: false });
         },
-        error: error => this.showError(error, 'No se pudo desactivar la categoría.')
+        error: error => this.showError(error, 'services.categoryDeactivateError')
       });
     });
   }
@@ -312,26 +319,34 @@ export class ServicesComponent implements OnInit {
     this.categoriesService.updateCategory(category.id, { active: true }).subscribe({
       next: response => {
         if (!response || response.successful === false) {
-          this.showError(response, 'No se pudo reactivar la categoría.');
+          this.showError(response, 'services.categoryReactivateError');
           return;
         }
         this.categories = this.categories.map(item => item.id === category.id
           ? { ...item, active: true }
           : item);
-        Swal.fire({ icon: 'success', title: 'Categoría reactivada', timer: 1200, showConfirmButton: false });
+        Swal.fire({ icon: 'success', title: this.translate.instant('services.categoryReactivated'), timer: 1200, showConfirmButton: false });
       },
-      error: error => this.showError(error, 'No se pudo reactivar la categoría.')
+      error: error => this.showError(error, 'services.categoryReactivateError')
     });
   }
 
-  categoryName(service: Service): string { return service.categoryName || this.categories.find(item => item.id === service.categoryId)?.name || 'Sin categoría'; }
+  categoryName(service: Service): string { return service.categoryName || this.categories.find(item => item.id === service.categoryId)?.name || this.translate.instant('services.none'); }
 
-  formatPrice(price: number | null): string { return price === null ? '-' : new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(price); }
+  formatPrice(price: number | null): string {
+    if (price === null) return '-';
+    const locale = this.languageService.currentLanguage === 'en' ? 'en-US' : 'es-CO';
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(price);
+  }
 
   private emptyService(): Service { return { active: true, name: '', price: null, description: '', durationMinutes: null, categoryId: null }; }
   private emptyCategory(): Category { return { name: '', description: '' }; }
   private unwrap<T>(response: { data: T } | T): T { return (response && typeof response === 'object' && 'data' in response ? response.data : response) as T; }
-  private showError(error: any, fallback: string): void {
-    Swal.fire('Error', error?.error?.message || error?.error?.error || error?.message || fallback, 'error');
+  private showError(error: any, fallbackKey: string): void {
+    this.showErrorText(error, this.translate.instant(fallbackKey));
+  }
+
+  private showErrorText(error: any, fallbackText: string): void {
+    Swal.fire(this.translate.instant('common.error'), this.errorMapper.resolve(error, fallbackText), 'error');
   }
 }

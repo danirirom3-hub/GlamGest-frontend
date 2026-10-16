@@ -5,6 +5,7 @@ import { LoginComponent } from './login.component';
 import { AuthService } from '../../services/auth.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -16,7 +17,7 @@ describe('LoginComponent', () => {
 
   beforeEach(async () => {
     authServiceSpy = jasmine.createSpyObj('AuthService', [
-      'login', 'saveToken', 'saveSession', 'getUserId', 'isPrivacyPolicyPending'
+      'login', 'saveToken', 'saveSession', 'getUserId', 'isPrivacyPolicyPending', 'logout'
     ]);
     authServiceSpy.isPrivacyPolicyPending.and.returnValue(false);
     authServiceSpy.saveSession.and.callFake((response: any) => {
@@ -28,6 +29,7 @@ describe('LoginComponent', () => {
     await TestBed.configureTestingModule({
       imports: [LoginComponent], // Componente Standalone
       providers: [
+        provideTranslateService(),
         { provide: AuthService, useValue: authServiceSpy },
         { provide: Router, useValue: routerSpy },
         { 
@@ -54,7 +56,7 @@ describe('LoginComponent', () => {
       component.user = { email: '', password: '' };
       component.onLogin();
 
-      expect(component.message).toBe('Debes ingresar correo y contraseña.');
+      expect(component.message).toBe('auth.missingCredentials');
       expect(component.messageType).toBe('error');
       expect(authServiceSpy.login).not.toHaveBeenCalled();
     });
@@ -64,7 +66,7 @@ describe('LoginComponent', () => {
 
       component.onLogin();
 
-      expect(component.message).toBe('Completa el captcha antes de iniciar sesión.');
+      expect(component.message).toBe('auth.captchaRequired');
       expect(authServiceSpy.login).not.toHaveBeenCalled();
     });
 
@@ -98,7 +100,7 @@ describe('LoginComponent', () => {
       expect(localStorage.setItem).toHaveBeenCalledWith('user_id', '45');
       expect(localStorage.setItem).toHaveBeenCalledWith('id', '45');
 
-      expect(component.message).toBe('Login exitoso. Redirigiendo...');
+      expect(component.message).toBe('auth.success');
       expect(component.messageType).toBe('success');
 
       // Avanzamos los 1500ms del setTimeout
@@ -179,7 +181,7 @@ describe('LoginComponent', () => {
 
       component.onLogin();
 
-      expect(component.message).toBe('El captcha no es válido o ha expirado. Complétalo nuevamente.');
+      expect(component.message).toBe('auth.invalidCaptcha');
       expect(component.recaptchaToken).toBeNull();
     });
   });

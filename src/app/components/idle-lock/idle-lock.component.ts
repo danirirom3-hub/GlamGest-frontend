@@ -2,12 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IdleLockService } from '../../services/idle-lock.service';
 
 @Component({
   selector: 'app-idle-lock',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './idle-lock.component.html',
   styleUrls: ['./idle-lock.component.css']
 })
@@ -20,7 +21,7 @@ export class IdleLockComponent implements OnInit, OnDestroy {
   messageType: 'error' | 'info' = 'info';
   private subscription?: Subscription;
 
-  constructor(private idleLock: IdleLockService) {}
+  constructor(private idleLock: IdleLockService, private translate: TranslateService) {}
 
   ngOnInit(): void {
     this.subscription = this.idleLock.locked$.subscribe(locked => {
@@ -41,7 +42,7 @@ export class IdleLockComponent implements OnInit, OnDestroy {
 
   unlock(): void {
     if (!this.password) {
-      this.message = 'Ingresa tu contraseña para continuar.';
+      this.message = this.translate.instant('idleLock.required');
       this.messageType = 'error';
       return;
     }
@@ -51,8 +52,8 @@ export class IdleLockComponent implements OnInit, OnDestroy {
       error: error => {
         this.messageType = 'error';
         this.message = error?.status === 401
-          ? 'La contraseña es incorrecta.'
-          : 'No se pudo conectar con el servidor. Inténtalo nuevamente.';
+          ? this.translate.instant('idleLock.incorrect')
+          : this.translate.instant('idleLock.connectionError');
       }
     });
   }

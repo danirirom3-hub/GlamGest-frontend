@@ -10,8 +10,8 @@
         class="sidebar-toggle"
         type="button"
         (click)="toggleSidebar()"
-        [attr.aria-label]="sidebarCollapsed ? 'Expandir menú' : 'Contraer menú'"
-        [attr.title]="sidebarCollapsed ? 'Expandir menú' : 'Contraer menú'"
+        [attr.aria-label]="sidebarCollapsed ? ('nav.expand' | translate) : ('nav.collapse' | translate)"
+        [attr.title]="sidebarCollapsed ? ('nav.expand' | translate) : ('nav.collapse' | translate)"
       >
         <span aria-hidden="true">{{ sidebarCollapsed ? '›' : '‹' }}</span>
       </button>
@@ -20,57 +20,57 @@
     <!-- Navigation -->
     <nav class="menu">
 
-      <a routerLink="/dashboard/services" routerLinkActive="activo" title="Servicios" aria-label="Servicios">
+      <a routerLink="/dashboard/services" routerLinkActive="activo" [attr.title]="'nav.services' | translate" [attr.aria-label]="'nav.services' | translate">
         <lucide-icon [img]="icons.Scissors"></lucide-icon>
-        <span class="menu-label">Servicios</span>
+        <span class="menu-label">{{ 'nav.services' | translate }}</span>
       </a>
 
-      <a routerLink="/dashboard/clients" routerLinkActive="activo" title="Clientes" aria-label="Clientes">
+      <a routerLink="/dashboard/clients" routerLinkActive="activo" [attr.title]="'nav.clients' | translate" [attr.aria-label]="'nav.clients' | translate">
         <lucide-icon [img]="icons.Users"></lucide-icon>
-        <span class="menu-label">Clientes</span>
+        <span class="menu-label">{{ 'nav.clients' | translate }}</span>
       </a>
 
-      <a routerLink="/dashboard/employees" routerLinkActive="activo" title="Empleados" aria-label="Empleados">
+      <a routerLink="/dashboard/employees" routerLinkActive="activo" [attr.title]="'nav.employees' | translate" [attr.aria-label]="'nav.employees' | translate">
         <lucide-icon [img]="icons.User"></lucide-icon>
-        <span class="menu-label">Empleados</span>
+        <span class="menu-label">{{ 'nav.employees' | translate }}</span>
       </a>
 
-      <a routerLink="/dashboard/sales" routerLinkActive="activo" title="Ventas" aria-label="Ventas">
+      <a routerLink="/dashboard/sales" routerLinkActive="activo" [attr.title]="'nav.sales' | translate" [attr.aria-label]="'nav.sales' | translate">
         <lucide-icon [img]="icons.ShoppingCart"></lucide-icon>
-        <span class="menu-label">Ventas</span>
+        <span class="menu-label">{{ 'nav.sales' | translate }}</span>
       </a>
 
-      <a routerLink="/dashboard/appointments" routerLinkActive="activo" title="Citas" aria-label="Citas">
+      <a routerLink="/dashboard/appointments" routerLinkActive="activo" [attr.title]="'nav.appointments' | translate" [attr.aria-label]="'nav.appointments' | translate">
         <lucide-icon [img]="icons.Calendar"></lucide-icon>
-        <span class="menu-label">Citas</span>
+        <span class="menu-label">{{ 'nav.appointments' | translate }}</span>
       </a>
 
-      <a *ngIf="isAdmin" routerLink="/admin/metrics" routerLinkActive="activo" title="Métricas" aria-label="Métricas">
+      <a *ngIf="isAdmin" routerLink="/admin/metrics" routerLinkActive="activo" [attr.title]="'nav.metrics' | translate" [attr.aria-label]="'nav.metrics' | translate">
         <lucide-icon [img]="icons.BarChart3"></lucide-icon>
-        <span class="menu-label">Métricas</span>
+        <span class="menu-label">{{ 'nav.metrics' | translate }}</span>
       </a>
 
-      <a *ngIf="isAdmin" routerLink="/admin/reports" routerLinkActive="activo" title="Reportes" aria-label="Reportes">
+      <a *ngIf="isAdmin" routerLink="/admin/reports" routerLinkActive="activo" [attr.title]="'nav.reports' | translate" [attr.aria-label]="'nav.reports' | translate">
         <lucide-icon [img]="icons.FileText"></lucide-icon>
-        <span class="menu-label">Reportes</span>
+        <span class="menu-label">{{ 'nav.reports' | translate }}</span>
       </a>
 
-      <a *ngIf="isAdmin" routerLink="/admin/logs" routerLinkActive="activo" title="Logs" aria-label="Logs">
+      <a *ngIf="isAdmin" routerLink="/admin/logs" routerLinkActive="activo" [attr.title]="'nav.logs' | translate" [attr.aria-label]="'nav.logs' | translate">
         <lucide-icon [img]="icons.ScrollText"></lucide-icon>
-        <span class="menu-label">Logs</span>
+        <span class="menu-label">{{ 'nav.logs' | translate }}</span>
       </a>
 
       <!--SETTINGS -->
-      <a routerLink="/dashboard/settings" routerLinkActive="activo" title="Configuración" aria-label="Configuración">
+      <a routerLink="/dashboard/settings" routerLinkActive="activo" [attr.title]="'nav.settings' | translate" [attr.aria-label]="'nav.settings' | translate">
         <lucide-icon [img]="icons.Settings"></lucide-icon>
-        <span class="menu-label">Configuración</span>
+        <span class="menu-label">{{ 'nav.settings' | translate }}</span>
       </a>
 
     </nav>
 
     <!-- Logout -->
-    <button class="logout-btn" (click)="logout()" title="Cerrar sesión" aria-label="Cerrar sesión">
-      <span class="menu-label">Cerrar sesión</span>
+    <button class="logout-btn" (click)="logout()" [title]="'nav.logout' | translate" [attr.aria-label]="'nav.logout' | translate">
+      <span class="menu-label">{{ 'nav.logout' | translate }}</span>
       <span class="logout-icon" aria-hidden="true">↪</span>
     </button>
 

@@ -7,11 +7,12 @@ import { RecaptchaComponent, RecaptchaModule } from 'ng-recaptcha';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, CommonModule, LucideAngularModule, RouterModule, RecaptchaModule],
+  imports: [FormsModule, CommonModule, LucideAngularModule, RouterModule, RecaptchaModule, TranslateModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -35,7 +36,8 @@ export class LoginComponent {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {}
 
   // Maneja el login
@@ -43,13 +45,13 @@ export class LoginComponent {
     this.message = '';
 
     if (!this.user.email || !this.user.password) {
-      this.message = 'Debes ingresar correo y contraseña.';
+      this.message = this.translate.instant('auth.missingCredentials');
       this.messageType = 'error';
       return;
     }
 
     if (!this.recaptchaToken) {
-      this.message = 'Completa el captcha antes de iniciar sesión.';
+      this.message = this.translate.instant('auth.captchaRequired');
       this.messageType = 'error';
       return;
     }
@@ -98,12 +100,12 @@ export class LoginComponent {
             const role = res?.data?.role || res?.role;
             if (role !== 'ADMIN' && role !== 'CLIENT') {
               this.authService.logout();
-              this.message = 'La respuesta de autenticación no contiene un rol válido.';
+              this.message = this.translate.instant('auth.invalidRole');
               this.messageType = 'error';
               return;
             }
 
-           this.message = 'Login exitoso. Redirigiendo...';
+           this.message = this.translate.instant('auth.success');
           this.messageType = 'success';
 
           setTimeout(() => {
@@ -111,14 +113,14 @@ export class LoginComponent {
           }, 1500);
 
         } else {
-          this.message = res?.message || 'No se pudo iniciar sesión.';
+          this.message = res?.message || this.translate.instant('auth.failed');
           this.messageType = 'error';
         }
       },
       error: (err) => {
         this.message = this.isInvalidRecaptchaError(err)
-          ? 'El captcha no es válido o ha expirado. Complétalo nuevamente.'
-          : this.getErrorMessage(err, 'Usuario o contraseña incorrectos.');
+          ? this.translate.instant('auth.invalidCaptcha')
+          : this.getErrorMessage(err, this.translate.instant('auth.invalidCredentials'));
         this.messageType = 'error';
       }
     });
@@ -143,7 +145,7 @@ export class LoginComponent {
 
   private getErrorMessage(error: any, fallback: string): string {
     if (error?.status === 0) {
-      return 'No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose en el puerto 8080.';
+      return this.translate.instant('common.connectionError');
     }
     return error?.error?.error || error?.error?.message || error?.message || fallback;
   }

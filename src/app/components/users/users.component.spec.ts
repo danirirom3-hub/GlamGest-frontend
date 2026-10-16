@@ -5,6 +5,7 @@ import { UsersComponent } from './users.component';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('UsersComponent', () => {
   let component: UsersComponent;
@@ -18,6 +19,7 @@ describe('UsersComponent', () => {
     await TestBed.configureTestingModule({
       imports: [UsersComponent], // Importación directa por ser Standalone
       providers: [
+        provideTranslateService(),
         { provide: AuthService, useValue: authServiceSpy },
         { 
           provide: ActivatedRoute, 
@@ -42,7 +44,7 @@ describe('UsersComponent', () => {
 
       component.registerUser();
 
-      expect(component.message).toBe('Completa todos los campos para registrar el usuario.');
+      expect(component.message).toBe('users.missingFields');
       expect(component.messageType).toBe('error');
       expect(authServiceSpy.register).not.toHaveBeenCalled();
     });
@@ -70,7 +72,7 @@ describe('UsersComponent', () => {
       });
 
       // Verificaciones de las mutaciones de propiedades del componente
-      expect(component.message).toBe('Usuario registrado correctamente.');
+      expect(component.message).toBe('users.success');
       expect(component.messageType).toBe('success');
       expect(component.user.privacyPolicyAccepted).toBeFalse();
     });
@@ -95,7 +97,7 @@ describe('UsersComponent', () => {
       component.user = { name: 'Test User', email: 'test@mail.com', password: 'password123', phone: '3000000000', privacyPolicyAccepted: false };
       component.registerUser();
       expect(authServiceSpy.register).not.toHaveBeenCalled();
-      expect(component.message).toBe('Debes aceptar la política de tratamiento de datos.');
+      expect(component.message).toBe('users.privacyRequired');
     });
 
     it('no debe registrar si no se completa el captcha', () => {
@@ -104,7 +106,7 @@ describe('UsersComponent', () => {
       component.registerUser();
 
       expect(authServiceSpy.register).not.toHaveBeenCalled();
-      expect(component.message).toBe('Completa el captcha antes de registrar el usuario.');
+      expect(component.message).toBe('users.captchaRequired');
     });
 
     it('debería capturar el error de la petición HTTP fallida (catch del bloque de suscripción)', () => {
@@ -117,7 +119,7 @@ describe('UsersComponent', () => {
       component.registerUser();
 
       expect(component.isLoading).toBeFalse();
-      expect(component.message).toBe('Error al registrar el usuario.');
+      expect(component.message).toBe('Error interno del servidor (500).');
       expect(component.messageType).toBe('error');
     });
 
@@ -131,7 +133,7 @@ describe('UsersComponent', () => {
 
       component.registerUser();
 
-      expect(component.message).toBe('El captcha no es válido o ha expirado. Complétalo nuevamente.');
+      expect(component.message).toBe('users.captchaInvalid');
       expect(component.recaptchaToken).toBeNull();
     });
   });

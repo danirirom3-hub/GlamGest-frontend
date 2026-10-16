@@ -12,22 +12,21 @@ import {
   ServiceMetric
 } from '../../services/dashboard-metrics.service';
 import { OfflineStoreService } from '../../services/offline-store.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
+import { LanguageService } from '../../services/language.service';
 
 type DatePreset = 'today' | 'week' | 'month' | 'custom';
 
 @Component({
   selector: 'app-metrics',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, TranslateModule, LocalizedDatePipe],
   templateUrl: './metrics.component.html',
   styleUrls: ['./metrics.component.css']
 })
 export class MetricsComponent implements OnInit {
   readonly icons = { BarChart3, CalendarDays, RefreshCw, TrendingUp, Users, ShoppingBag, Receipt };
-  readonly statusLabels: Record<string, string> = {
-    PENDING: 'Pendiente', CONFIRMED: 'Confirmada', COMPLETED: 'Completada',
-    CANCELLED: 'Cancelada', NO_SHOW: 'No asistió'
-  };
 
   preset: DatePreset = 'month';
   from = '';
@@ -45,7 +44,12 @@ export class MetricsComponent implements OnInit {
   services: ServiceMetric[] = [];
   employees: EmployeeMetric[] = [];
 
-  constructor(private metricsService: DashboardMetricsService, private offlineStore: OfflineStoreService) {}
+  constructor(
+    private metricsService: DashboardMetricsService,
+    private offlineStore: OfflineStoreService,
+    private translate: TranslateService,
+    private languageService: LanguageService
+  ) {}
 
   ngOnInit(): void {
     this.selectPreset('month');
@@ -113,17 +117,22 @@ export class MetricsComponent implements OnInit {
            this.syncedAt = cached.syncedAt;
            this.errorMessage = '';
         } else {
-          this.errorMessage = error?.error?.message || 'No se pudieron cargar las métricas. Intenta nuevamente.';
+          this.errorMessage = error?.error?.message || this.translate.instant('metrics.loadError');
         }
       }
     });
   }
 
   formatCurrency(value = 0): string {
-    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 2 }).format(value);
+    const locale = this.languageService.currentLanguage === 'en' ? 'en-US' : 'es-CO';
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: 'ARS', maximumFractionDigits: 2 }).format(value);
   }
 
-  statusName(label: string): string { return this.statusLabels[label] || label; }
+  statusName(label: string): string {
+    const key = `metrics.status.${label}`;
+    const translated = this.translate.instant(key);
+    return translated === key ? label : translated;
+  }
 
   statusPercent(value: number): number {
     const total = this.appointments.reduce((sum, item) => sum + item.value, 0);

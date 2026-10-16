@@ -4,11 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { LucideAngularModule, Calendar, User, LogOut } from 'lucide-angular';
 import Swal from 'sweetalert2';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { ClientsService } from '../../services/clients.service';
 import { AppointmentsService } from '../../services/appointments.service';
 import { ServicesService } from '../../services/services.service';
 import { EmployeesService } from '../../services/employees.service';
+import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
 
 interface ClientAppointment {
   id: number;
@@ -28,7 +30,7 @@ interface CatalogOption {
 @Component({
   selector: 'app-client',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, RouterModule, LucideAngularModule, TranslateModule, LocalizedDatePipe],
   templateUrl: './client.component.html',
   styleUrls: ['../dashboard/dashboard.component.css', './client.component.css']
 })
@@ -53,7 +55,8 @@ export class ClientComponent implements OnInit {
     private appointmentsService: AppointmentsService,
     private servicesService: ServicesService,
     private employeesService: EmployeesService,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -79,7 +82,7 @@ export class ClientComponent implements OnInit {
       },
       error: (error) => {
         this.isLoadingAppointments = false;
-        this.appointmentsError = this.getErrorMessage(error, 'No se pudieron cargar tus citas.');
+        this.appointmentsError = this.getErrorMessage(error, this.translate.instant('portal.loadAppointmentsError'));
       }
     });
   }
@@ -96,7 +99,7 @@ export class ClientComponent implements OnInit {
     this.servicesService.getServices().subscribe({
       next: response => this.services = response?.data || response || [],
       error: error => {
-        this.catalogError = this.getErrorMessage(error, 'No se pudieron cargar los servicios.');
+        this.catalogError = this.getErrorMessage(error, this.translate.instant('portal.loadServicesError'));
         complete();
       },
       complete
@@ -104,7 +107,7 @@ export class ClientComponent implements OnInit {
     this.employeesService.getEmployees().subscribe({
       next: response => this.employees = response?.data || response || [],
       error: error => {
-        this.catalogError = this.catalogError || this.getErrorMessage(error, 'No se pudieron cargar los empleados.');
+        this.catalogError = this.catalogError || this.getErrorMessage(error, this.translate.instant('portal.loadEmployeesError'));
         complete();
       },
       complete
@@ -113,7 +116,7 @@ export class ClientComponent implements OnInit {
 
   saveAppointment(): void {
     if (!this.form.appointmentDatetime || !this.form.serviceId || !this.form.employeeId) {
-      Swal.fire('Campos incompletos', 'Completa fecha, servicio y empleado.', 'warning');
+      Swal.fire(this.translate.instant('common.error'), this.translate.instant('portal.incomplete'), 'warning');
       return;
     }
 
@@ -139,11 +142,11 @@ export class ClientComponent implements OnInit {
         this.isLoading = false;
         this.resetForm();
         this.loadAppointments();
-        Swal.fire({ icon: 'success', title: editingId === null ? 'Cita agendada' : 'Cita actualizada', timer: 1200, showConfirmButton: false });
+        Swal.fire({ icon: 'success', title: this.translate.instant(editingId === null ? 'portal.createdTitle' : 'portal.updatedTitle'), timer: 1200, showConfirmButton: false });
       },
       error: (error) => {
         this.isLoading = false;
-        Swal.fire('Error', this.getErrorMessage(error, 'No se pudo guardar la cita.'), 'error');
+        Swal.fire(this.translate.instant('common.error'), this.getErrorMessage(error, this.translate.instant('portal.saveError')), 'error');
       }
     });
   }
@@ -159,14 +162,14 @@ export class ClientComponent implements OnInit {
   }
 
   cancelAppointment(appointment: ClientAppointment): void {
-    Swal.fire({ title: '¿Cancelar cita?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, cancelar', cancelButtonText: 'No' }).then(result => {
+    Swal.fire({ title: this.translate.instant('portal.cancelTitle'), icon: 'warning', showCancelButton: true, confirmButtonText: this.translate.instant('portal.cancelConfirm'), cancelButtonText: this.translate.instant('common.no') }).then(result => {
       if (!result.isConfirmed) return;
       this.deletingId = appointment.id;
       this.appointmentsService.deleteAppointment(appointment.id).subscribe({
-        next: () => { this.deletingId = null; this.loadAppointments(); Swal.fire('Cita cancelada', '', 'success'); },
+        next: () => { this.deletingId = null; this.loadAppointments(); Swal.fire(this.translate.instant('portal.cancelled'), '', 'success'); },
         error: (error) => {
           this.deletingId = null;
-          Swal.fire('Error', this.getErrorMessage(error, 'No se pudo cancelar la cita.'), 'error');
+          Swal.fire(this.translate.instant('common.error'), this.getErrorMessage(error, this.translate.instant('portal.cancelError')), 'error');
         }
       });
     });
@@ -185,16 +188,16 @@ export class ClientComponent implements OnInit {
   }
 
   getServiceName(id?: number): string {
-    return this.services.find(service => service.id === id)?.name || `Servicio #${id || ''}`;
+    return this.services.find(service => service.id === id)?.name || this.translate.instant('portal.serviceFallback', { id: id || '' });
   }
 
   getEmployeeName(id?: number): string {
-    return this.employees.find(employee => employee.id === id)?.name || `Empleado #${id || ''}`;
+    return this.employees.find(employee => employee.id === id)?.name || this.translate.instant('portal.employeeFallback', { id: id || '' });
   }
 
   private getErrorMessage(error: any, fallback: string): string {
-    if (error?.status === 401) return 'Tu sesión expiró. Inicia sesión nuevamente.';
-    if (error?.status === 403) return 'No tienes permisos para realizar esta acción.';
+    if (error?.status === 401) return this.translate.instant('portal.sessionExpired');
+    if (error?.status === 403) return this.translate.instant('portal.forbidden');
     if (error?.error && typeof error.error === 'object') {
       const validationErrors = Object.values(error.error).filter(value => typeof value === 'string');
       if (validationErrors.length > 0) return validationErrors.join(' ');

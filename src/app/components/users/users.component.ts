@@ -5,13 +5,14 @@ import { LucideAngularModule, ArrowLeft } from 'lucide-angular';
 import { RouterModule } from '@angular/router';
 import { RecaptchaComponent, RecaptchaModule } from 'ng-recaptcha';
 import { finalize } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [FormsModule, CommonModule, LucideAngularModule, RouterModule, RecaptchaModule],
+  imports: [FormsModule, CommonModule, LucideAngularModule, RouterModule, RecaptchaModule, TranslateModule],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
@@ -40,32 +41,32 @@ export class UsersComponent {
   messageType: 'success' | 'error' = 'success';
   isLoading: boolean = false; // Indica si hay una petición en curso.
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private translate: TranslateService) {}
 
   // Registra un nuevo usuario interno.
   registerUser() {
     this.message = '';
 
     if (!this.user.name || !this.user.email || !this.user.password || !this.user.phone) {
-      this.message = 'Completa todos los campos para registrar el usuario.';
+      this.message = this.translate.instant('users.missingFields');
       this.messageType = 'error';
       return;
     }
 
     if (!this.user.privacyPolicyAccepted) {
-      this.message = 'Debes aceptar la política de tratamiento de datos.';
+      this.message = this.translate.instant('users.privacyRequired');
       this.messageType = 'error';
       return;
     }
 
     if (this.user.password.length < 8) {
-      this.message = 'La contraseña debe tener al menos 8 caracteres.';
+      this.message = this.translate.instant('users.passwordLength');
       this.messageType = 'error';
       return;
     }
 
     if (!this.recaptchaToken) {
-      this.message = 'Completa el captcha antes de registrar el usuario.';
+      this.message = this.translate.instant('users.captchaRequired');
       this.messageType = 'error';
       return;
     }
@@ -85,19 +86,19 @@ export class UsersComponent {
       next: (res: any) => {
         this.isLoading = false; // Permite volver a interactuar con el formulario.
         if (res?.successful) {
-          this.message = 'Usuario registrado correctamente.';
+          this.message = this.translate.instant('users.success');
           this.messageType = 'success';
            this.user = { name: '', email: '', password: '', phone: '', privacyPolicyAccepted: false };
         } else {
-          this.message = res?.message || 'No se pudo registrar el usuario.';
+          this.message = res?.message || this.translate.instant('users.registerError');
           this.messageType = 'error';
         }
       },
       error: (err) => {
         this.isLoading = false; // Permite volver a interactuar con el formulario.
         this.message = this.isInvalidRecaptchaError(err)
-          ? 'El captcha no es válido o ha expirado. Complétalo nuevamente.'
-          : this.getErrorMessage(err, 'Error al registrar el usuario.');
+          ? this.translate.instant('users.captchaInvalid')
+          : this.getErrorMessage(err, this.translate.instant('users.genericError'));
         this.messageType = 'error';
       }
     });
@@ -122,7 +123,7 @@ export class UsersComponent {
 
   private getErrorMessage(error: any, fallback: string): string {
     if (error?.status === 0) {
-      return 'No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose en el puerto 8080.';
+      return this.translate.instant('common.connectionError');
     }
     const validationErrors = error?.error?.data;
     if (validationErrors && typeof validationErrors === 'object') {

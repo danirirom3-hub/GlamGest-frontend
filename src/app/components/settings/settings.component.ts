@@ -1,14 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BackupsService, BackupInfo } from '../../services/backups.service';
 import { AuthService } from '../../services/auth.service';
 import Swal from 'sweetalert2';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { LanguageService, SupportedLanguage } from '../../services/language.service';
+import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, TranslateModule, LocalizedDatePipe],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css']
 })
@@ -19,12 +23,20 @@ export class SettingsComponent implements OnInit {
   isLoadingBackups = false;
   isCreatingBackup = false;
   selectedSection: 'visual' | 'backups' = 'visual';
+  language: SupportedLanguage;
 
   constructor(
     private backupsService: BackupsService,
     private authService: AuthService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private languageService: LanguageService,
+    private translate: TranslateService
+  ) { this.language = this.languageService.currentLanguage; }
+
+  setLanguage(language: SupportedLanguage): void {
+    this.languageService.setLanguage(language);
+    this.language = language;
+  }
 
   setTheme(theme: string) {
     const body = document.body;
@@ -70,7 +82,7 @@ export class SettingsComponent implements OnInit {
         this.isLoadingBackups = false;
         // The auth interceptor handles expired or replaced sessions globally.
         if (error?.status === 401 || error?.status === 403) return;
-        void Swal.fire('Backups', 'No se pudo cargar el historial de backups.', 'error');
+        void Swal.fire(this.translate.instant('settings.backups'), this.translate.instant('settings.loadHistoryError'), 'error');
       },
       complete: () => this.isLoadingBackups = false
     });
@@ -82,11 +94,11 @@ export class SettingsComponent implements OnInit {
     this.backupsService.create().subscribe({
       next: backup => {
         this.backups = [backup, ...this.backups];
-        Swal.fire('Backup creado', 'La copia de seguridad se creó correctamente.', 'success');
+        Swal.fire(this.translate.instant('settings.backupCreated'), this.translate.instant('settings.backupCreatedDescription'), 'success');
       },
       error: error => {
         this.isCreatingBackup = false;
-        void Swal.fire('Backup', this.errorMessage(error), 'error');
+        void Swal.fire(this.translate.instant('settings.backups'), this.errorMessage(error), 'error');
       },
       complete: () => this.isCreatingBackup = false
     });
@@ -104,53 +116,53 @@ export class SettingsComponent implements OnInit {
         link.click();
         URL.revokeObjectURL(url);
       },
-      error: error => Swal.fire('Backup', this.errorMessage(error), 'error')
+      error: error => Swal.fire(this.translate.instant('settings.backups'), this.errorMessage(error), 'error')
     });
   }
 
   restoreBackup(backup: BackupInfo): void {
     Swal.fire({
-      title: '¿Restaurar este backup?',
-      text: 'Se creará una copia de seguridad automática antes de restaurar. Esta acción reemplazará los datos actuales.',
+      title: this.translate.instant('settings.restoreTitle'),
+      text: this.translate.instant('settings.restoreText'),
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Restaurar',
-      cancelButtonText: 'Cancelar',
+      confirmButtonText: this.translate.instant('common.restore'),
+      cancelButtonText: this.translate.instant('common.cancel'),
       confirmButtonColor: '#dc2626'
     }).then(result => {
       if (!result.isConfirmed) return;
       this.backupsService.restore(backup.id).subscribe({
         next: () => {
           void Swal.fire({
-            title: 'Restauración completada',
-            text: 'La base de datos fue restaurada correctamente. Por seguridad, debes iniciar sesión nuevamente.',
+            title: this.translate.instant('settings.restoreDoneTitle'),
+            text: this.translate.instant('settings.restoreDoneText'),
             icon: 'success',
-            confirmButtonText: 'Ir al login',
+            confirmButtonText: this.translate.instant('common.goToLogin'),
             allowOutsideClick: false
           }).then(() => {
             this.authService.logout();
             void this.router.navigate(['/login'], { replaceUrl: true });
           });
         },
-        error: error => Swal.fire('Restauración', this.errorMessage(error), 'error')
+        error: error => Swal.fire(this.translate.instant('settings.restore'), this.errorMessage(error), 'error')
       });
     });
   }
 
   deleteBackup(backup: BackupInfo): void {
     Swal.fire({
-      title: '¿Eliminar backup?',
-      text: 'No podrás recuperar este archivo desde el sistema.',
+      title: this.translate.instant('settings.deleteTitle'),
+      text: this.translate.instant('settings.backupDeleteDescription'),
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Eliminar',
-      cancelButtonText: 'Cancelar',
+      confirmButtonText: this.translate.instant('common.delete'),
+      cancelButtonText: this.translate.instant('common.cancel'),
       confirmButtonColor: '#dc2626'
     }).then(result => {
       if (!result.isConfirmed) return;
       this.backupsService.delete(backup.id).subscribe({
         next: () => this.backups = this.backups.filter(item => item.id !== backup.id),
-        error: error => Swal.fire('Backup', this.errorMessage(error), 'error')
+        error: error => Swal.fire(this.translate.instant('settings.backups'), this.errorMessage(error), 'error')
       });
     });
   }
@@ -162,7 +174,7 @@ export class SettingsComponent implements OnInit {
   }
 
   private errorMessage(error: any): string {
-    return error?.error?.message || error?.error?.error || error?.message || 'No se pudo completar la operación.';
+    return error?.error?.message || error?.error?.error || error?.message || this.translate.instant('settings.operationError');
   }
 
   isActive(theme: string): boolean {

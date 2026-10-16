@@ -1,35 +1,35 @@
 <section class="clients-page">
   <header class="clients-header">
     <div>
-      <span class="eyebrow">Directorio</span>
-      <h1>Clientes</h1>
-      <p>Administra la información de tus clientes y consulta su historial.</p>
+      <span class="eyebrow">{{ 'clients.eyebrow' | translate }}</span>
+      <h1>{{ 'clients.title' | translate }}</h1>
+      <p>{{ 'clients.description' | translate }}</p>
     </div>
-    <button class="primary-button" type="button" (click)="openNew()">+ Nuevo cliente</button>
+    <button class="primary-button" type="button" (click)="openNew()">+ {{ 'clients.new' | translate }}</button>
   </header>
 
   <div class="clients-toolbar">
     <label class="search-field">
-      <span>Buscar</span>
-      <input type="search" [(ngModel)]="searchText" (ngModelChange)="onSearchChange()" placeholder="Nombre, correo o teléfono...">
+      <span>{{ 'clients.searchLabel' | translate }}</span>
+      <input type="search" [(ngModel)]="searchText" (ngModelChange)="onSearchChange()" [placeholder]="'clients.searchPlaceholder' | translate">
     </label>
     <label class="sort-field">
-      <span>Ordenar por</span>
+      <span>{{ 'clients.sortLabel' | translate }}</span>
       <select [(ngModel)]="sort" (ngModelChange)="onSortChange()">
-        <option value="recent">Más recientes</option>
-        <option value="oldest">Más antiguos</option>
-        <option value="name-asc">Nombre A-Z</option>
-        <option value="name-desc">Nombre Z-A</option>
+        <option value="recent">{{ 'clients.recent' | translate }}</option>
+        <option value="oldest">{{ 'clients.oldest' | translate }}</option>
+        <option value="name-asc">{{ 'clients.nameAZ' | translate }}</option>
+        <option value="name-desc">{{ 'clients.nameZA' | translate }}</option>
       </select>
     </label>
-    <span class="results-count">{{ totalItems }} cliente(s)</span>
+    <span class="results-count">{{ totalItems }} {{ 'clients.results' | translate }}</span>
   </div>
 
-  <div class="loading-state" *ngIf="loading">Cargando clientes...</div>
+  <div class="loading-state" *ngIf="loading">{{ 'clients.loading' | translate }}</div>
   <div class="empty-state" *ngIf="!loading && !clients.length">
-    <h2>{{ searchText ? 'No encontramos clientes' : 'No hay clientes registrados' }}</h2>
-    <p>{{ searchText ? 'Prueba con otro nombre, correo o teléfono.' : 'Agrega tu primer cliente para empezar a gestionar.' }}</p>
-    <button *ngIf="!searchText" class="secondary-button" type="button" (click)="openNew()">Crear cliente</button>
+    <h2>{{ searchText ? ('clients.notFound' | translate) : ('clients.empty' | translate) }}</h2>
+    <p>{{ searchText ? ('clients.notFoundDescription' | translate) : ('clients.emptyDescription' | translate) }}</p>
+    <button *ngIf="!searchText" class="secondary-button" type="button" (click)="openNew()">{{ 'clients.create' | translate }}</button>
   </div>
 
   <div class="client-groups" *ngIf="!loading && clients.length">
@@ -41,17 +41,17 @@
             <span class="avatar">{{ item.name.charAt(0).toUpperCase() }}</span>
             <div class="client-identity">
               <h3>{{ item.name }}</h3>
-              <span>Cliente #{{ item.id }}</span>
+              <span>{{ 'clients.clientNumber' | translate:{ id: item.id } }}</span>
             </div>
           </div>
           <dl class="client-details">
-            <div><dt>Correo</dt><dd>{{ item.email }}</dd></div>
-            <div><dt>Teléfono</dt><dd>{{ item.phone }}</dd></div>
-            <div *ngIf="item.registrationDate"><dt>Registro</dt><dd>{{ item.registrationDate | date:'dd/MM/yyyy' }}</dd></div>
+            <div><dt>{{ 'clients.email' | translate }}</dt><dd>{{ item.email }}</dd></div>
+            <div><dt>{{ 'clients.phone' | translate }}</dt><dd>{{ item.phone }}</dd></div>
+            <div *ngIf="item.registrationDate"><dt>{{ 'clients.registration' | translate }}</dt><dd>{{ item.registrationDate | localizedDate }}</dd></div>
           </dl>
           <div class="card-actions">
-            <button type="button" (click)="onEdit(item)">Editar</button>
-            <button type="button" class="danger" (click)="onDelete(item)">Desactivar</button>
+            <button type="button" (click)="onEdit(item)">{{ 'common.edit' | translate }}</button>
+            <button type="button" class="danger" (click)="onDelete(item)">{{ 'common.deactivate' | translate }}</button>
           </div>
         </article>
       </div>
@@ -59,23 +59,23 @@
   </div>
 
   <footer class="pagination" *ngIf="!loading && totalPages > 0">
-    <button type="button" (click)="previousPage()" [disabled]="page === 0">Anterior</button>
-    <span>Página {{ page + 1 }} de {{ totalPages }}</span>
-    <button type="button" (click)="nextPage()" [disabled]="page + 1 >= totalPages">Siguiente</button>
+    <button type="button" (click)="previousPage()" [disabled]="page === 0">{{ 'common.previous' | translate }}</button>
+    <span>{{ 'common.page' | translate }} {{ page + 1 }} {{ 'common.of' | translate }} {{ totalPages }}</span>
+    <button type="button" (click)="nextPage()" [disabled]="page + 1 >= totalPages">{{ 'common.next' | translate }}</button>
   </footer>
 </section>
 
 <div class="modal-backdrop" *ngIf="modalOpen" (click)="closeModal()">
   <section class="client-modal" role="dialog" aria-modal="true" aria-labelledby="client-modal-title" (click)="$event.stopPropagation()">
     <header class="modal-header">
-      <div><span class="eyebrow">Directorio</span><h2 id="client-modal-title">{{ isEditing ? 'Editar cliente' : 'Nuevo cliente' }}</h2></div>
-      <button class="close-button" type="button" aria-label="Cerrar" (click)="closeModal()">×</button>
+      <div><span class="eyebrow">{{ 'clients.eyebrow' | translate }}</span><h2 id="client-modal-title">{{ isEditing ? ('clients.edit' | translate) : ('clients.new' | translate) }}</h2></div>
+      <button class="close-button" type="button" [attr.aria-label]="'common.close' | translate" (click)="closeModal()">×</button>
     </header>
     <form (ngSubmit)="onSubmit()">
-      <label>Nombre<input type="text" [(ngModel)]="client.name" name="name" placeholder="Nombre completo" required></label>
-      <label>Correo<input type="email" [(ngModel)]="client.email" name="email" placeholder="correo@ejemplo.com" required></label>
-      <label>Teléfono<input type="tel" [(ngModel)]="client.phone" name="phone" placeholder="Número de teléfono" required></label>
-      <div class="modal-actions"><button class="secondary-button" type="button" (click)="closeModal()">Cancelar</button><button class="primary-button" type="submit">{{ isEditing ? 'Guardar cambios' : 'Crear cliente' }}</button></div>
+      <label>{{ 'clients.nameLabel' | translate }}<input type="text" [(ngModel)]="client.name" name="name" [placeholder]="'clients.namePlaceholder' | translate" required></label>
+      <label>{{ 'clients.email' | translate }}<input type="email" [(ngModel)]="client.email" name="email" [placeholder]="'clients.emailPlaceholder' | translate" required></label>
+      <label>{{ 'clients.phone' | translate }}<input type="tel" [(ngModel)]="client.phone" name="phone" [placeholder]="'clients.phonePlaceholder' | translate" required></label>
+      <div class="modal-actions"><button class="secondary-button" type="button" (click)="closeModal()">{{ 'common.cancel' | translate }}</button><button class="primary-button" type="submit">{{ isEditing ? ('clients.saveChanges' | translate) : ('clients.create' | translate) }}</button></div>
     </form>
   </section>
 </div>

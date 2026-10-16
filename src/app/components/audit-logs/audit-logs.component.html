@@ -1,33 +1,33 @@
 <section class="logs-page">
   <header class="logs-header">
     <div>
-      <span class="eyebrow">Administración</span>
-      <h1>Registro de actividad</h1>
-      <p>Consulta las operaciones y errores registrados en GlamGest.</p>
+      <span class="eyebrow">{{ 'auditLogs.admin' | translate }}</span>
+      <h1>{{ 'auditLogs.title' | translate }}</h1>
+      <p>{{ 'auditLogs.description' | translate }}</p>
     </div>
-    <span class="logs-count">{{ totalItems }} registro(s)</span>
+    <span class="logs-count">{{ totalItems }} {{ 'auditLogs.records' | translate }}</span>
   </header>
 
   <form class="filters-card" (ngSubmit)="search()">
-    <label>Desde<input type="date" name="from" [(ngModel)]="filters.from"></label>
-    <label>Hasta<input type="date" name="to" [(ngModel)]="filters.to"></label>
-    <label>Usuario<input type="search" name="user" [(ngModel)]="filters.user" placeholder="Correo del usuario"></label>
-    <label>Acción<select name="action" [(ngModel)]="filters.action"><option *ngFor="let action of actions" [ngValue]="action.value">{{ action.label }}</option></select></label>
-    <label>Módulo<select name="module" [(ngModel)]="filters.module"><option *ngFor="let module of modules" [ngValue]="module.value">{{ module.label }}</option></select></label>
-    <label>Estado HTTP<input type="number" name="status" [(ngModel)]="filters.status" placeholder="Ej. 409"></label>
-    <label class="text-filter">Descripción<input type="search" name="text" [(ngModel)]="filters.text" placeholder="Busca qué ocurrió"></label>
-    <div class="filter-actions"><button class="primary" type="submit">Buscar</button><button type="button" (click)="clearFilters()">Limpiar</button></div>
+    <label>{{ 'auditLogs.from' | translate }}<input type="date" name="from" [(ngModel)]="filters.from"></label>
+    <label>{{ 'auditLogs.to' | translate }}<input type="date" name="to" [(ngModel)]="filters.to"></label>
+    <label>{{ 'auditLogs.user' | translate }}<input type="search" name="user" [(ngModel)]="filters.user" [placeholder]="'auditLogs.userPlaceholder' | translate"></label>
+    <label>{{ 'auditLogs.action' | translate }}<select name="action" [(ngModel)]="filters.action"><option *ngFor="let action of actions" [ngValue]="action.value">{{ action.label }}</option></select></label>
+    <label>{{ 'auditLogs.module' | translate }}<select name="module" [(ngModel)]="filters.module"><option *ngFor="let module of modules" [ngValue]="module.value">{{ module.label }}</option></select></label>
+    <label>{{ 'auditLogs.status' | translate }}<input type="number" name="status" [(ngModel)]="filters.status" [placeholder]="'auditLogs.statusPlaceholder' | translate"></label>
+    <label class="text-filter">{{ 'auditLogs.descriptionLabel' | translate }}<input type="search" name="text" [(ngModel)]="filters.text" [placeholder]="'auditLogs.descriptionPlaceholder' | translate"></label>
+    <div class="filter-actions"><button class="primary" type="submit">{{ 'auditLogs.search' | translate }}</button><button type="button" (click)="clearFilters()">{{ 'auditLogs.clear' | translate }}</button></div>
   </form>
 
   <div class="table-card">
-    <p class="loading" *ngIf="loading">Cargando registros...</p>
+    <p class="loading" *ngIf="loading">{{ 'auditLogs.loading' | translate }}</p>
     <div class="table-scroll" *ngIf="!loading">
       <table *ngIf="logs.length; else emptyState">
-        <thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Módulo</th><th>Descripción</th><th>Estado</th></tr></thead>
+        <thead><tr><th>{{ 'auditLogs.date' | translate }}</th><th>{{ 'auditLogs.userCol' | translate }}</th><th>{{ 'auditLogs.actionCol' | translate }}</th><th>{{ 'auditLogs.moduleCol' | translate }}</th><th>{{ 'auditLogs.descriptionCol' | translate }}</th><th>{{ 'auditLogs.statusCol' | translate }}</th></tr></thead>
         <tbody>
           <tr *ngFor="let log of logs">
-            <td>{{ log.occurredAt | date:'dd/MM/yyyy HH:mm:ss' }}</td>
-            <td><strong>{{ log.userEmail || 'Sistema o anónimo' }}</strong><small>{{ log.role || 'Sin rol' }}</small></td>
+            <td>{{ log.occurredAt | localizedDate:{ day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' } }}</td>
+            <td><strong>{{ log.userEmail || ('auditLogs.systemAnonymous' | translate) }}</strong><small>{{ log.role || ('auditLogs.noRole' | translate) }}</small></td>
             <td><span class="action">{{ log.action }}</span><small>{{ log.httpMethod }} {{ log.endpoint }}</small></td>
             <td>{{ log.module }}</td>
             <td><span>{{ log.description }}</span><small *ngIf="log.errorMessage">{{ log.errorMessage }}</small></td>
@@ -35,12 +35,12 @@
           </tr>
         </tbody>
       </table>
-      <ng-template #emptyState><p class="empty">No hay registros para los filtros seleccionados.</p></ng-template>
+      <ng-template #emptyState><p class="empty">{{ 'auditLogs.empty' | translate }}</p></ng-template>
     </div>
     <footer class="pagination" *ngIf="!loading && totalPages > 0">
-      <button type="button" (click)="previousPage()" [disabled]="page === 0">Anterior</button>
-      <span>Página {{ page + 1 }} de {{ totalPages }}</span>
-      <button type="button" (click)="nextPage()" [disabled]="page + 1 >= totalPages">Siguiente</button>
+      <button type="button" (click)="previousPage()" [disabled]="page === 0">{{ 'auditLogs.previous' | translate }}</button>
+      <span>{{ 'auditLogs.page' | translate }} {{ page + 1 }} {{ 'auditLogs.of' | translate }} {{ totalPages }}</span>
+      <button type="button" (click)="nextPage()" [disabled]="page + 1 >= totalPages">{{ 'auditLogs.next' | translate }}</button>
     </footer>
   </div>
 </section>

@@ -4,24 +4,33 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, BarChart3, CalendarDays, Download, FileSpreadsheet, FileText, Wifi, WifiOff, RefreshCw } from 'lucide-angular';
 import { Observable } from 'rxjs';
 import { OfflineStoreService, StoredReport } from '../../services/offline-store.service';
-import { DownloadedReport, ReportDefinition, reportCacheKey, ReportsService } from '../../services/reports.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { DownloadedReport, ReportDefinition, ReportFormat, ReportType, reportCacheKey, ReportsService } from '../../services/reports.service';
+import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
 
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, TranslateModule, LocalizedDatePipe],
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.css']
 })
 export class ReportsComponent implements OnInit {
   readonly icons = { BarChart3, CalendarDays, Download, FileSpreadsheet, FileText, Wifi, WifiOff, RefreshCw };
-  readonly reports: ReportDefinition[] = [
-    { type: 'executive', format: 'pdf', title: 'Resumen ejecutivo', description: 'Una vista general del rendimiento del negocio.', fallbackName: 'resumen-ejecutivo.pdf' },
-    { type: 'appointments', format: 'pdf', title: 'Reporte de citas', description: 'Detalle de citas y estados del período.', fallbackName: 'reporte-citas.pdf' },
-    { type: 'sales', format: 'excel', title: 'Detalle de ventas', description: 'Información detallada de las ventas registradas.', fallbackName: 'detalle-ventas.xlsx' },
-    { type: 'services', format: 'excel', title: 'Servicios más vendidos', description: 'Servicios ordenados por desempeño comercial.', fallbackName: 'servicios-mas-vendidos.xlsx' },
-    { type: 'employees', format: 'excel', title: 'Rendimiento de empleados', description: 'Resultados del equipo durante el período.', fallbackName: 'rendimiento-empleados.xlsx' }
+  private readonly reportTypes: Array<{ type: ReportType; format: ReportFormat; fallbackName: string }> = [
+    { type: 'executive', format: 'pdf', fallbackName: 'resumen-ejecutivo.pdf' },
+    { type: 'appointments', format: 'pdf', fallbackName: 'reporte-citas.pdf' },
+    { type: 'sales', format: 'excel', fallbackName: 'detalle-ventas.xlsx' },
+    { type: 'services', format: 'excel', fallbackName: 'servicios-mas-vendidos.xlsx' },
+    { type: 'employees', format: 'excel', fallbackName: 'rendimiento-empleados.xlsx' }
   ];
+  get reports(): ReportDefinition[] {
+    return this.reportTypes.map(definition => ({
+      ...definition,
+      title: this.translate.instant(`reports.items.${definition.type}.title`),
+      description: this.translate.instant(`reports.items.${definition.type}.description`)
+    }));
+  }
   from = '';
   to = '';
   loading: string | null = null;
@@ -30,7 +39,11 @@ export class ReportsComponent implements OnInit {
   online$: Observable<boolean> = this.offlineStore.online$;
   cachedReports: Record<string, StoredReport | undefined> = {};
 
-  constructor(private reportsService: ReportsService, private offlineStore: OfflineStoreService) {}
+  constructor(
+    private reportsService: ReportsService,
+    private offlineStore: OfflineStoreService,
+    private translate: TranslateService
+  ) {}
 
   async ngOnInit(): Promise<void> {
     const period = await this.offlineStore.getLastPeriod().catch(() => undefined);
@@ -106,16 +119,16 @@ export class ReportsComponent implements OnInit {
   }
 
   private validatePeriod(): string {
-    if (!this.from || !this.to) return 'Selecciona una fecha inicial y una fecha final.';
-    if (this.to < this.from) return 'La fecha final no puede ser anterior a la fecha inicial.';
+    if (!this.from || !this.to) return this.translate.instant('reports.noDates');
+    if (this.to < this.from) return this.translate.instant('reports.invalidRange');
     return '';
   }
 
   private errorFor(error: any): string {
-    if (error?.status === 401) return 'Tu sesión expiró. Inicia sesión nuevamente.';
-    if (error?.status === 403) return 'No tienes permisos para descargar este reporte.';
-    if (error?.status === 404) return 'El reporte solicitado no está disponible.';
-    return error?.message || 'No se pudo descargar el reporte. Revisa tu conexión e inténtalo nuevamente.';
+    if (error?.status === 401) return this.translate.instant('reports.sessionExpired');
+    if (error?.status === 403) return this.translate.instant('reports.forbidden');
+    if (error?.status === 404) return this.translate.instant('reports.notFound');
+    return this.translate.instant('reports.downloadError');
   }
 
   private toDateInput(date: Date): string {

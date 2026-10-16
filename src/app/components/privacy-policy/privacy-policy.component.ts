@@ -2,12 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService, PrivacyPolicy } from '../../services/auth.service';
+import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
 
 @Component({
   selector: 'app-privacy-policy',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, TranslateModule, LocalizedDatePipe],
   templateUrl: './privacy-policy.component.html',
   styleUrls: ['./privacy-policy.component.css']
 })
@@ -22,7 +24,8 @@ export class PrivacyPolicyComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private translate: TranslateService
   ) {
     this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/home';
     this.loadPolicy();
@@ -40,14 +43,14 @@ export class PrivacyPolicyComponent {
       },
       error: () => {
         this.isPolicyLoading = false;
-        this.message = 'No se pudo cargar la política de tratamiento de datos.';
+        this.message = this.translate.instant('privacy.loadError');
       }
     });
   }
 
   confirm(): void {
     if (!this.accepted || this.isLoading) {
-      this.message = 'Debes aceptar la política para continuar.';
+      this.message = this.translate.instant('privacy.mustAccept');
       return;
     }
 
@@ -61,7 +64,7 @@ export class PrivacyPolicyComponent {
       },
       error: () => {
         this.isLoading = false;
-        this.message = 'No se pudo aceptar la política. Inténtalo nuevamente.';
+        this.message = this.translate.instant('privacy.acceptError');
       }
     });
   }

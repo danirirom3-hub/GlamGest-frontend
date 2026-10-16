@@ -2,8 +2,8 @@
   <div class="container">
 
     <div class="header">
-      <h2>Ventas</h2>
-      <p>Control de ingresos del salón</p>
+      <h2>{{ 'sales.title' | translate }}</h2>
+      <p>{{ 'sales.description' | translate }}</p>
     </div>
 
     <div class="tabs">
@@ -12,14 +12,14 @@
         [class.active]="view === 'create'"
         (click)="view = 'create'"
       >
-        Nueva Venta
+        {{ 'sales.newTab' | translate }}
       </button>
 
       <button
         [class.active]="view === 'history'"
         (click)="view = 'history'"
       >
-        Historial de Ventas
+        {{ 'sales.historyTab' | translate }}
       </button>
 
     </div>
@@ -29,13 +29,13 @@
       class="card fade-in"
     >
 
-      <h3>Datos del Cliente</h3>
+      <h3>{{ 'sales.clientData' | translate }}</h3>
 
       <div class="grid">
 
         <div class="form-group">
 
-          <label>Cliente</label>
+          <label>{{ 'sales.client' | translate }}</label>
 
           <select
             [(ngModel)]="selectedClientId"
@@ -43,7 +43,7 @@
           >
 
             <option value="">
-              Seleccionar cliente
+              {{ 'sales.selectClient' | translate }}
             </option>
 
             <option
@@ -59,24 +59,24 @@
 
         <div class="form-group">
 
-          <label>Método de pago</label>
+          <label>{{ 'sales.paymentMethod' | translate }}</label>
 
           <select [(ngModel)]="paymentMethod">
 
             <option value="">
-              Seleccionar método
+              {{ 'sales.selectMethod' | translate }}
             </option>
 
             <option value="Efectivo">
-              Efectivo
+              {{ 'sales.cash' | translate }}
             </option>
 
             <option value="Tarjeta">
-              Tarjeta
+              {{ 'sales.card' | translate }}
             </option>
 
             <option value="Transferencia">
-              Transferencia
+              {{ 'sales.transfer' | translate }}
             </option>
 
           </select>
@@ -91,14 +91,14 @@
           class="btn-primary"
           (click)="openAppointmentsModal()"
         >
-          Seleccionar Cita
+          {{ 'sales.selectAppointment' | translate }}
         </button>
 
         <button
           class="btn-primary"
           (click)="openModal()"
         >
-          + Agregar Servicio
+          {{ 'sales.addService' | translate }}
         </button>
 
       </div>
@@ -106,7 +106,7 @@
       <div class="form-group">
 
         <label>
-          Detalle de la venta
+          {{ 'sales.saleDetail' | translate }}
         </label>
 
         <div class="details-container">
@@ -146,13 +146,13 @@
               <div class="form-group">
 
                 <label>
-                  Empleado
+                  {{ 'sales.employee' | translate }}
                 </label>
 
                 <select [(ngModel)]="item.employeeId">
 
                   <option value="">
-                    Seleccionar empleado
+                    {{ 'sales.selectEmployee' | translate }}
                   </option>
 
                   <option
@@ -169,7 +169,7 @@
               <div class="form-group">
 
                 <label>
-                  Cantidad
+                  {{ 'sales.quantity' | translate }}
                 </label>
 
                 <input
@@ -184,7 +184,7 @@
               <div class="form-group">
 
                 <label>
-                  Valor Unitario
+                  {{ 'sales.unitPrice' | translate }}
                 </label>
 
                 <input
@@ -201,14 +201,11 @@
             <div class="detail-total">
 
               <span>
-                Subtotal
+                {{ 'sales.subtotal' | translate }}
               </span>
 
               <strong>
-                {{
-                  item.subtotal
-                    | currency:'COP':'symbol':'1.0-0'
-                }}
+                {{ formatCurrency(item.subtotal) }}
               </strong>
 
             </div>
@@ -222,11 +219,11 @@
       <div class="total-box">
 
         <span>
-          Total a pagar
+          {{ 'sales.total' | translate }}
         </span>
 
         <h2>
-          {{ getTotal() | currency:'COP':'symbol':'1.0-0' }}
+          {{ formatCurrency(getTotal()) }}
         </h2>
 
       </div>
@@ -250,7 +247,7 @@
         [disabled]="isLoading"
         (click)="registrarVenta()"
       >
-        {{ isLoading ? 'Procesando...' : 'Registrar Venta' }}
+        {{ (isLoading ? 'sales.processing' : 'sales.registerSale') | translate }}
       </button>
 
     </div>
@@ -261,14 +258,14 @@
     >
 
       <h3>
-        Historial de Ventas
+        {{ 'sales.historyTab' | translate }}
       </h3>
 
       <div
         class="empty"
         *ngIf="sales.length === 0"
       >
-        No hay ventas registradas
+        {{ 'sales.noSales' | translate }}
       </div>
 
       <div
@@ -290,24 +287,21 @@
                   sale.client?.name ||
                   sale.clientName ||
                   findClientName(sale.clientId) ||
-                  'Cliente General'
+                  ('sales.generalClient' | translate)
                 }}
               </h4>
 
               <p>
                 {{
                   (sale.date || sale.createdAt)
-                    | date:'dd/MM/yyyy HH:mm'
+                    | localizedDate:{ day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }
                 }}
               </p>
 
             </div>
 
             <div class="sale-total">
-              {{
-                sale.total
-                  | currency:'COP':'symbol':'1.0-0'
-              }}
+              {{ formatCurrency(sale.total) }}
             </div>
 
           </div>
@@ -319,9 +313,9 @@
               (click)="toggleSaleDetails(sale)"
             >
               {{
-                sale.showDetails
-                  ? 'Ocultar Detalle'
-                  : 'Ver Detalle'
+                (sale.showDetails
+                  ? 'sales.hideDetail'
+                  : 'sales.viewDetail') | translate
               }}
             </button>
 
@@ -336,7 +330,7 @@
               *ngIf="!sale.saleDetails || sale.saleDetails.length === 0"
               class="empty"
             >
-              No hay detalles disponibles
+              {{ 'sales.noDetails' | translate }}
             </div>
 
             <div
@@ -354,7 +348,7 @@
                 </h5>
 
                 <p>
-                  Empleado:
+                  {{ 'sales.employeeLabel' | translate }}
                   {{
                     detail.employee?.name ||
                     findEmployeeName(detail.employeeId)
@@ -362,29 +356,20 @@
                 </p>
 
                 <p>
-                  Cantidad:
+                  {{ 'sales.quantityLabel' | translate }}
                   {{ detail.quantity }}
                 </p>
 
                 <p>
-                  Valor Unitario:
-                  {{
-                    detail.unitPrice
-                      | currency:'COP':'symbol':'1.0-0'
-                  }}
+                  {{ 'sales.unitPriceLabel' | translate }}
+                  {{ formatCurrency(detail.unitPrice) }}
                 </p>
 
               </div>
 
               <div class="detail-price">
 
-                {{
-                  (
-                    detail.unitPrice *
-                    detail.quantity
-                  )
-                  | currency:'COP':'symbol':'1.0-0'
-                }}
+                {{ formatCurrency(detail.unitPrice * detail.quantity) }}
 
               </div>
 
@@ -408,7 +393,7 @@
         <div class="modal-header">
 
           <h3>
-            Seleccionar Servicio
+            {{ 'sales.selectServiceTitle' | translate }}
           </h3>
 
           <button
@@ -434,10 +419,7 @@
               </h4>
 
               <p>
-                {{
-                  service.price
-                    | currency:'COP':'symbol':'1.0-0'
-                }}
+                {{ formatCurrency(service.price) }}
               </p>
 
             </div>
@@ -446,7 +428,7 @@
               class="btn-add"
               (click)="addService(service)"
             >
-              Agregar
+              {{ 'sales.add' | translate }}
             </button>
 
           </div>
@@ -467,7 +449,7 @@
         <div class="modal-header">
 
           <h3>
-            Seleccionar Cita
+            {{ 'sales.selectAppointment' | translate }}
           </h3>
 
           <button
@@ -483,7 +465,7 @@
 
           <input
             type="text"
-            placeholder="Buscar cliente..."
+            [placeholder]="'sales.searchClient' | translate"
             [(ngModel)]="appointmentSearch"
           >
 
@@ -518,7 +500,7 @@
               </div>
 
               <p>
-                <strong>Servicio:</strong>
+                <strong>{{ 'sales.serviceLabel' | translate }}</strong>
                 {{
                   getAppointmentServiceName(
                     appointment
@@ -527,7 +509,7 @@
               </p>
 
               <p>
-                <strong>Empleado:</strong>
+                <strong>{{ 'sales.employeeLabel' | translate }}</strong>
                 {{
                   getAppointmentEmployeeName(
                     appointment
@@ -536,10 +518,10 @@
               </p>
 
               <p>
-                <strong>Fecha:</strong>
+                <strong>{{ 'sales.dateLabel' | translate }}</strong>
                 {{
                   appointment.appointmentDatetime
-                    | date:'dd/MM/yyyy HH:mm'
+                    | localizedDate:{ day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }
                 }}
               </p>
 
@@ -549,7 +531,7 @@
               class="btn-add"
               (click)="selectAppointment(appointment)"
             >
-              Seleccionar
+              {{ 'sales.select' | translate }}
             </button>
 
           </div>

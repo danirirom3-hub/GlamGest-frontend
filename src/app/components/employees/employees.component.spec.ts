@@ -5,6 +5,7 @@ import { EmployeesComponent } from './employees.component';
 import { EmployeesService } from '../../services/employees.service';
 import { of, throwError } from 'rxjs';
 import Swal from 'sweetalert2';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('EmployeesComponent', () => {
   let component: EmployeesComponent;
@@ -26,11 +27,12 @@ describe('EmployeesComponent', () => {
     ]);
 
     // Configuración por defecto al inicializar
-    employeesServiceSpy.getEmployees.and.returnValue(of({ data: mockEmployeesList }));
+    employeesServiceSpy.getEmployees.and.returnValue(of({ data: mockEmployeesList.map(e => ({ ...e })) }));
 
     await TestBed.configureTestingModule({
       imports: [EmployeesComponent], // Al ser Standalone se pasa a imports
       providers: [
+        provideTranslateService(),
         { provide: EmployeesService, useValue: employeesServiceSpy }
       ]
     }).compileComponents();
@@ -75,7 +77,7 @@ describe('EmployeesComponent', () => {
       component.employee = { id: 0, name: '', phone: '', active: true };
       component.onSubmit();
 
-      expect(Swal.fire).toHaveBeenCalledWith('Campos incompletos', 'Completa todos los campos antes de guardar.', 'warning');
+      expect(Swal.fire).toHaveBeenCalledWith('common.error', 'employees.incomplete', 'warning');
     });
 
     it('debería crear un empleado nuevo exitosamente', () => {
@@ -100,6 +102,7 @@ describe('EmployeesComponent', () => {
 
     it('debería llamar a updateEmployee si isEditing es true', () => {
       fixture.detectChanges();
+      component.employee = { id: 1, name: 'Daniela', phone: '3111111111', active: true };
       component.isEditing = true;
       spyOn(component, 'updateEmployee');
 

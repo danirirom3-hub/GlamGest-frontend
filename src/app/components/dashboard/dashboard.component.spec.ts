@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import Swal from 'sweetalert2';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -17,12 +18,19 @@ describe('DashboardComponent', () => {
   let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['logout']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['logout', 'logoutRemote', 'getRole']);
+    authServiceSpy.getRole.and.returnValue('ADMIN');
+    authServiceSpy.logoutRemote.and.returnValue(of(void 0));
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'createUrlTree', 'serializeUrl']);
+    (routerSpy as any).events = of({});
+    (routerSpy as any).url = '/';
+    routerSpy.createUrlTree.and.returnValue({} as any);
+    routerSpy.serializeUrl.and.returnValue('/');
 
     await TestBed.configureTestingModule({
       imports: [DashboardComponent], // Componente Standalone
       providers: [
+        provideTranslateService(),
         { provide: AuthService, useValue: authServiceSpy },
         { provide: Router, useValue: routerSpy },
         // Proveedor mock de ActivatedRoute por si RouterModule lo solicita internamente
@@ -60,12 +68,12 @@ describe('DashboardComponent', () => {
       tick(); // Resuelve la primera promesa del diálogo de confirmación
 
       // Verifica que se llame al método logout del servicio de autenticación
-      expect(authServiceSpy.logout).toHaveBeenCalled();
+      expect(authServiceSpy.logoutRemote).toHaveBeenCalled();
       
       // Verifica que se muestre el segundo SweetAlert de éxito
       expect(Swal.fire).toHaveBeenCalledWith(jasmine.objectContaining({
         icon: 'success',
-        title: 'Sesión cerrada'
+        title: 'dashboard.logoutSuccess'
       }));
 
       // Avanzamos el reloj virtual 1000ms para ejecutar el setTimeout interno
@@ -83,7 +91,7 @@ describe('DashboardComponent', () => {
       tick(); // Resuelve la promesa de Swal
 
       // Al cancelar, no debe llamar al servicio ni redirigir
-      expect(authServiceSpy.logout).not.toHaveBeenCalled();
+      expect(authServiceSpy.logoutRemote).not.toHaveBeenCalled();
       expect(routerSpy.navigate).not.toHaveBeenCalled();
     }));
   });

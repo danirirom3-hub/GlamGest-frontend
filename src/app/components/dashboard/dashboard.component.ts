@@ -15,11 +15,12 @@ import {
 } from 'lucide-angular';
 import { AuthService } from '../../services/auth.service';
 import Swal from 'sweetalert2';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule, TranslateModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -42,7 +43,8 @@ export class DashboardComponent {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {}
 
   get isAdmin(): boolean {
@@ -57,12 +59,12 @@ export class DashboardComponent {
   logout(): void {
 
     Swal.fire({
-      title: '¿Cerrar sesión?',
-      text: 'Tendrás que iniciar sesión nuevamente',
+      title: this.translate.instant('dashboard.logoutTitle'),
+      text: this.translate.instant('dashboard.logoutText'),
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Sí, salir',
-      cancelButtonText: 'Cancelar'
+      confirmButtonText: this.translate.instant('common.yesExit'),
+      cancelButtonText: this.translate.instant('common.cancel')
     }).then((result) => {
 
       if (!result.isConfirmed) return;
@@ -74,7 +76,7 @@ export class DashboardComponent {
          complete: () => {
            Swal.fire({
              icon: 'success',
-             title: 'Sesión cerrada',
+             title: this.translate.instant('dashboard.logoutSuccess'),
              timer: 1000,
              showConfirmButton: false
            });

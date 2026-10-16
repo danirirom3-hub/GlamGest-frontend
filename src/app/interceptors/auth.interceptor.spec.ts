@@ -1,10 +1,10 @@
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { HttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { provideTranslateService } from '@ngx-translate/core';
 import { AuthService } from '../services/auth.service';
 import { authInterceptor } from './auth.interceptor';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 describe('authInterceptor', () => {
   let http: HttpClient;
@@ -18,11 +18,13 @@ describe('authInterceptor', () => {
     ]);
     authServiceSpy.getToken.and.returnValue('token');
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    (routerSpy as any).url = '/';
 
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       providers: [
         provideHttpClient(withInterceptors([authInterceptor])),
+        provideHttpClientTesting(),
+        provideTranslateService(),
         { provide: AuthService, useValue: authServiceSpy },
         { provide: Router, useValue: routerSpy }
       ]

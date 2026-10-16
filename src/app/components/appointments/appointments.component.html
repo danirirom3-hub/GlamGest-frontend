@@ -2,14 +2,14 @@
   <div class="container">
 
     <div class="header">
-      <h2>Citas</h2>
-      <p>Gestiona la agenda del salón</p>
+      <h2>{{ 'appointments.title' | translate }}</h2>
+      <p>{{ 'appointments.description' | translate }}</p>
     </div>
 
     <div class="tabs">
-      <button [class.active]="view === 'create'" (click)="view = 'create'">Nueva Cita</button>
-      <button [class.active]="view === 'list'" (click)="view = 'list'">Agenda</button>
-      <button [class.active]="view === 'calendar'" (click)="view = 'calendar'">Calendario</button>
+      <button [class.active]="view === 'create'" (click)="view = 'create'">{{ 'appointments.newTab' | translate }}</button>
+      <button [class.active]="view === 'list'" (click)="view = 'list'">{{ 'appointments.agenda' | translate }}</button>
+      <button [class.active]="view === 'calendar'" (click)="view = 'calendar'">{{ 'appointments.calendar' | translate }}</button>
     </div>
 
     <div *ngIf="view === 'create'" class="card">
@@ -33,7 +33,7 @@
 
       <div class="details-field">
         <textarea [(ngModel)]="details"
-          placeholder="Agregar detalles de la cita (opcional)...">
+          [placeholder]="'appointments.details' | translate">
         </textarea>
       </div>
 
@@ -46,34 +46,34 @@
         </div>
 
         <div class="empty" *ngIf="!services || services.length === 0">
-          No hay servicios disponibles
+          {{ 'appointments.noServices' | translate }}
         </div>
       </div>
 
       <div class="empty" *ngIf="!employees || employees.length === 0">
-        No hay empleados disponibles
+        {{ 'appointments.noEmployees' | translate }}
       </div>
 
       <button class="btn-primary" (click)="scheduleAppointment()" [disabled]="isLoading">
-        <span *ngIf="!isLoading">Agendar cita</span>
-        <span *ngIf="isLoading">Cargando...</span>
+        <span *ngIf="!isLoading">{{ 'appointments.schedule' | translate }}</span>
+        <span *ngIf="isLoading">{{ 'appointments.loading' | translate }}</span>
       </button>
 
       <div class="alerta" *ngIf="showConfirmation">
-        Cita registrada correctamente
+        {{ 'appointments.scheduled' | translate }}
       </div>
     </div>
 
     <div *ngIf="view === 'list'" class="card">
 
       <div class="grid">
-        <input placeholder="Filtrar Cliente" [(ngModel)]="filterClient">
-        <input placeholder="Filtrar Empleado" [(ngModel)]="filterEmployee">
+        <input [placeholder]="'appointments.filterClient' | translate" [(ngModel)]="filterClient">
+        <input [placeholder]="'appointments.filterEmployee' | translate" [(ngModel)]="filterEmployee">
         <input type="date" [(ngModel)]="filterDate">
       </div>
 
       <div class="empty" *ngIf="filteredAppointments().length === 0">
-        No hay citas registradas que coincidan con la búsqueda
+        {{ 'appointments.empty' | translate }}
       </div>
 
       <div *ngFor="let c of filteredAppointments()" class="cita-card">
@@ -96,7 +96,7 @@
                     'pending': c.status !== 'sent_to_cash',
                     'sent_to_cash': c.status === 'sent_to_cash'
                   }">
-              {{ c.status === 'sent_to_cash' ? 'En caja' : 'Pendiente' }}
+              {{ c.status === 'sent_to_cash' ? ('appointments.cash' | translate) : ('appointments.pending' | translate) }}
             </span>
           </div>
         </div>
@@ -104,7 +104,7 @@
        
 
           <button class="btn-danger small" (click)="deleteAppointment(c)">
-            Eliminar
+            {{ 'appointments.delete' | translate }}
           </button>
         </div>
 

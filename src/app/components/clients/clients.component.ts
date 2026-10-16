@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { ClientsService, Client } from '../../services/clients.service';
 import Swal from 'sweetalert2';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
+import { ApiErrorMapper } from '../../services/api-error.mapper';
 
 interface ClientGroup {
   letter: string;
@@ -13,7 +16,7 @@ interface ClientGroup {
 @Component({
   selector: 'app-clients',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, TranslateModule, LocalizedDatePipe],
   templateUrl: './clients.component.html',
   styleUrls: ['./clients.component.css']
 })
@@ -32,7 +35,7 @@ export class ClientsComponent implements OnInit {
   editClientId: number | null = null;
   private readonly searchSubject = new Subject<string>();
 
-  constructor(private clientsService: ClientsService) {
+  constructor(private clientsService: ClientsService, private translate: TranslateService, private errorMapper: ApiErrorMapper) {
     this.searchSubject.pipe(debounceTime(300), distinctUntilChanged()).subscribe(() => {
       this.page = 0;
       this.loadClients();
@@ -66,7 +69,7 @@ export class ClientsComponent implements OnInit {
       error: () => {
         this.clients = [];
         this.loading = false;
-        void Swal.fire('Error', 'No se pudieron cargar los clientes.', 'error');
+        void Swal.fire(this.translate.instant('common.error'), this.translate.instant('clients.loadError'), 'error');
       }
     });
   }
@@ -109,7 +112,7 @@ export class ClientsComponent implements OnInit {
 
   onSubmit(): void {
     if (!this.client.name.trim() || !this.client.email.trim() || !this.client.phone.trim()) {
-      void Swal.fire('Campos incompletos', 'Completa todos los campos para guardar el cliente.', 'warning');
+      void Swal.fire(this.translate.instant('common.error'), this.translate.instant('clients.incomplete'), 'warning');
       return;
     }
     if (this.isEditing && this.editClientId != null) {
@@ -118,12 +121,12 @@ export class ClientsComponent implements OnInit {
     }
     this.clientsService.createClient(this.client).subscribe({
       next: response => {
-        if (!response.successful) { this.showError(response.message); return; }
+        if (!response.successful) { this.showError(this.errorMapper.localize(response.message, 'clients.createError')); return; }
         this.closeModal();
         this.loadClients();
-        void Swal.fire({ icon: 'success', title: 'Cliente creado', timer: 1200, showConfirmButton: false });
+        void Swal.fire({ icon: 'success', title: this.translate.instant('clients.created'), timer: 1200, showConfirmButton: false });
       },
-      error: error => this.showApiError(error, 'No se pudo crear el cliente.')
+      error: error => this.showApiError(error, this.translate.instant('clients.createError'))
     });
   }
 
@@ -131,24 +134,24 @@ export class ClientsComponent implements OnInit {
     if (this.editClientId == null) return;
     this.clientsService.updateClient(this.editClientId, this.client).subscribe({
       next: response => {
-        if (!response.successful) { this.showError(response.message); return; }
+        if (!response.successful) { this.showError(this.errorMapper.localize(response.message, 'clients.updateError')); return; }
         this.closeModal();
         this.loadClients();
-        void Swal.fire({ icon: 'success', title: 'Cliente actualizado', timer: 1200, showConfirmButton: false });
+        void Swal.fire({ icon: 'success', title: this.translate.instant('clients.updated'), timer: 1200, showConfirmButton: false });
       },
-      error: error => this.showApiError(error, 'No se pudo actualizar el cliente.')
+      error: error => this.showApiError(error, this.translate.instant('clients.updateError'))
     });
   }
 
   onDelete(client: Client): void {
     if (client.id == null) return;
     void Swal.fire({
-      title: `¿Desactivar a "${client.name}"?`,
-      text: 'El cliente se conservará en el historial.',
+      title: this.translate.instant('clients.deactivateQuestion', { name: client.name }),
+      text: this.translate.instant('clients.deactivateDescription'),
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Sí, desactivar',
-      cancelButtonText: 'Cancelar',
+      confirmButtonText: this.translate.instant('common.yesDeactivate'),
+      cancelButtonText: this.translate.instant('common.cancel'),
       confirmButtonColor: '#d33'
     }).then(result => {
       if (!result.isConfirmed) return;
@@ -156,9 +159,9 @@ export class ClientsComponent implements OnInit {
         next: () => {
           this.loadClients();
           if (this.editClientId === client.id) this.closeModal();
-          void Swal.fire({ icon: 'success', title: 'Cliente desactivado', timer: 1200, showConfirmButton: false });
+          void Swal.fire({ icon: 'success', title: this.translate.instant('clients.deactivated'), timer: 1200, showConfirmButton: false });
         },
-        error: error => this.showApiError(error, 'No se pudo desactivar el cliente.')
+        error: error => this.showApiError(error, this.translate.instant('clients.deactivateError'))
       });
     });
   }
@@ -171,9 +174,9 @@ export class ClientsComponent implements OnInit {
 
   private emptyClient(): Client { return { name: '', email: '', phone: '' }; }
 
-  private showError(message: string): void { void Swal.fire('Error', message, 'error'); }
+  private showError(message: string): void { void Swal.fire(this.translate.instant('common.error'), message, 'error'); }
 
   private showApiError(error: any, fallback: string): void {
-    this.showError(error?.error?.error || error?.error?.message || error?.message || fallback);
+    this.showError(this.errorMapper.resolve(error, fallback));
   }
 }

@@ -3,17 +3,20 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import Swal from 'sweetalert2';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { ClientsService } from '../../services/clients.service';
 import { SalesService } from '../../services/sales.service';
 import { EmployeesService } from '../../services/employees.service';
 import { ServicesService } from '../../services/services.service';
 import { AppointmentsService } from '../../services/appointments.service';
+import { LanguageService } from '../../services/language.service';
+import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
 
 @Component({
   selector: 'app-sales',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule, LocalizedDatePipe],
   templateUrl: './sales.component.html',
   styleUrls: ['./sales.component.css']
 })
@@ -24,8 +27,23 @@ export class SalesComponent implements OnInit {
     private salesService: SalesService,
     private employeesService: EmployeesService,
     private servicesService: ServicesService,
-    private appointmentsService: AppointmentsService
+    private appointmentsService: AppointmentsService,
+    private translate: TranslateService,
+    private languageService: LanguageService
   ) {}
+
+  formatCurrency(value: number): string {
+    const locale = this.languageService.currentLanguage === 'en' ? 'en-US' : 'es-CO';
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(value) || 0);
+  }
+
+  private showError(key: string): void {
+    Swal.fire({
+      icon: 'error',
+      title: this.translate.instant('common.error'),
+      text: this.translate.instant(key)
+    });
+  }
 
   errorMessage = '';
   successMessage = '';
@@ -81,11 +99,7 @@ export class SalesComponent implements OnInit {
 
         console.error(err);
 
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudieron cargar los clientes'
-        });
+        this.showError('sales.loadClientsError');
 
       }
 
@@ -107,11 +121,7 @@ export class SalesComponent implements OnInit {
 
         console.error(err);
 
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudieron cargar los servicios'
-        });
+        this.showError('sales.loadServicesError');
 
       }
 
@@ -133,11 +143,7 @@ export class SalesComponent implements OnInit {
 
         console.error(err);
 
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudieron cargar los empleados'
-        });
+        this.showError('sales.loadEmployeesError');
 
       }
 
@@ -175,11 +181,7 @@ export class SalesComponent implements OnInit {
 
         console.error(err);
 
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo cargar el historial de ventas'
-        });
+        this.showError('sales.loadSalesError');
 
       }
 
@@ -205,11 +207,7 @@ export class SalesComponent implements OnInit {
 
         console.error(err);
 
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudieron cargar las citas'
-        });
+        this.showError('sales.loadAppointmentsError');
 
       }
 
@@ -305,7 +303,7 @@ export class SalesComponent implements OnInit {
         appointment.clientId
       ) ||
 
-      'Cliente'
+      this.translate.instant('sales.clientFallback')
 
     );
 
@@ -325,7 +323,7 @@ export class SalesComponent implements OnInit {
         appointment.serviceId
       ) ||
 
-      'Servicio'
+      this.translate.instant('sales.serviceFallback')
 
     );
 
@@ -345,7 +343,7 @@ export class SalesComponent implements OnInit {
         appointment.employeeId
       ) ||
 
-      'Empleado'
+      this.translate.instant('sales.employeeFallback')
 
     );
 
@@ -457,8 +455,8 @@ export class SalesComponent implements OnInit {
 
     Swal.fire({
       icon: 'success',
-      title: 'Cita seleccionada',
-      text: 'La cita fue agregada correctamente',
+      title: this.translate.instant('sales.selectedTitle'),
+      text: this.translate.instant('sales.selectedText'),
       timer: 1800,
       showConfirmButton: false
     });
@@ -487,8 +485,8 @@ export class SalesComponent implements OnInit {
 
     Swal.fire({
       icon: 'success',
-      title: 'Servicio agregado',
-      text: `${service.name} fue agregado a la venta`,
+      title: this.translate.instant('sales.serviceAddedTitle'),
+      text: this.translate.instant('sales.serviceAddedText', { name: service.name }),
       timer: 1800,
       showConfirmButton: false
     });
@@ -500,12 +498,12 @@ export class SalesComponent implements OnInit {
   removeService(index: number): void {
 
     Swal.fire({
-      title: '¿Eliminar servicio?',
-      text: 'El servicio será removido de la venta',
+      title: this.translate.instant('sales.removeTitle'),
+      text: this.translate.instant('sales.removeText'),
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      confirmButtonText: this.translate.instant('common.yesDelete'),
+      cancelButtonText: this.translate.instant('common.cancel')
     }).then((result) => {
 
       if (result.isConfirmed) {
@@ -514,8 +512,8 @@ export class SalesComponent implements OnInit {
 
         Swal.fire({
           icon: 'success',
-          title: 'Eliminado',
-          text: 'Servicio eliminado correctamente',
+          title: this.translate.instant('sales.removedTitle'),
+          text: this.translate.instant('sales.removedText'),
           timer: 1800,
           showConfirmButton: false
         });
@@ -570,8 +568,8 @@ export class SalesComponent implements OnInit {
 
       Swal.fire({
         icon: 'warning',
-        title: 'Cliente requerido',
-        text: 'Debe seleccionar un cliente válido'
+        title: this.translate.instant('sales.clientRequiredTitle'),
+        text: this.translate.instant('sales.clientRequiredText')
       });
 
       return;
@@ -582,8 +580,8 @@ export class SalesComponent implements OnInit {
 
       Swal.fire({
         icon: 'warning',
-        title: 'Método de pago',
-        text: 'Seleccione un método de pago'
+        title: this.translate.instant('sales.paymentRequiredTitle'),
+        text: this.translate.instant('sales.paymentRequiredText')
       });
 
       return;
@@ -594,8 +592,8 @@ export class SalesComponent implements OnInit {
 
       Swal.fire({
         icon: 'warning',
-        title: 'Servicios requeridos',
-        text: 'Debe agregar al menos un servicio'
+        title: this.translate.instant('sales.servicesRequiredTitle'),
+        text: this.translate.instant('sales.servicesRequiredText')
       });
 
       return;
@@ -611,8 +609,8 @@ export class SalesComponent implements OnInit {
 
       Swal.fire({
         icon: 'warning',
-        title: 'Empleado requerido',
-        text: 'Debe asignar un empleado'
+        title: this.translate.instant('sales.employeeRequiredTitle'),
+        text: this.translate.instant('sales.employeeRequiredText')
       });
 
       return;
@@ -657,12 +655,12 @@ export class SalesComponent implements OnInit {
     };
 
     Swal.fire({
-      title: '¿Registrar venta?',
-      text: 'La venta será guardada en el sistema',
+      title: this.translate.instant('sales.confirmTitle'),
+      text: this.translate.instant('sales.confirmText'),
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Sí, registrar',
-      cancelButtonText: 'Cancelar'
+      confirmButtonText: this.translate.instant('common.yesRegister'),
+      cancelButtonText: this.translate.instant('common.cancel')
     }).then((result) => {
 
       if (result.isConfirmed) {
@@ -675,15 +673,15 @@ export class SalesComponent implements OnInit {
             next: () => {
 
               this.successMessage =
-                'Venta creada correctamente';
+                this.translate.instant('sales.successMessage');
 
               this.isLoading = false;
 
               Swal.fire({
                 icon: 'success',
-                title: 'Venta registrada',
-                text: 'La venta fue creada correctamente',
-                confirmButtonText: 'Aceptar'
+                title: this.translate.instant('sales.registeredTitle'),
+                text: this.translate.instant('sales.registeredText'),
+                confirmButtonText: this.translate.instant('common.accept')
               });
 
               this.resetForm();
@@ -698,13 +696,13 @@ export class SalesComponent implements OnInit {
 
                 err?.error?.message ||
 
-                'Error al registrar venta';
+                this.translate.instant('sales.error');
 
               this.isLoading = false;
 
               Swal.fire({
                 icon: 'error',
-                title: 'Error',
+                title: this.translate.instant('common.error'),
                 text: this.errorMessage
               });
 

@@ -4,6 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HomeComponent } from './home.component';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -13,6 +14,7 @@ describe('HomeComponent', () => {
     await TestBed.configureTestingModule({
       imports: [HomeComponent], // Al ser Standalone se importa directamente
       providers: [
+        provideTranslateService(),
         // Proveedor mock de ActivatedRoute para evitar fallos si el HTML usa routerLink
         { 
           provide: ActivatedRoute, 

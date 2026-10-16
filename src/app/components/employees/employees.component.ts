@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmployeesService } from '../../services/employees.service';
 import Swal from 'sweetalert2';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
   /* Datos que representan a un empleado. */
 interface Employee {
@@ -15,7 +16,7 @@ interface Employee {
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.css']
 })
@@ -37,7 +38,7 @@ export class EmployeesComponent implements OnInit {
   isEditing = false;
   mensaje = '';
 
-  constructor(private employeesService: EmployeesService) {}
+  constructor(private employeesService: EmployeesService, private translate: TranslateService) {}
 
   ngOnInit(): void {
     this.loadEmployees();
@@ -58,7 +59,7 @@ export class EmployeesComponent implements OnInit {
       },
       error: () => {
         this.employees = [];
-        Swal.fire('Error', 'Error al cargar los empleados.', 'error');
+        Swal.fire(this.translate.instant('common.error'), this.translate.instant('employees.loadError'), 'error');
       }
     });
   }
@@ -68,7 +69,7 @@ export class EmployeesComponent implements OnInit {
     this.mensaje = '';
 
     if (!this.employee.name || !this.employee.phone) {
-      Swal.fire('Campos incompletos', 'Completa todos los campos antes de guardar.', 'warning');
+      Swal.fire(this.translate.instant('common.error'), this.translate.instant('employees.incomplete'), 'warning');
       return;
     }
 
@@ -88,7 +89,7 @@ export class EmployeesComponent implements OnInit {
 
           Swal.fire({
             icon: 'success',
-            title: 'Empleado creado',
+            title: this.translate.instant('employees.created'),
             timer: 1500,
             showConfirmButton: false
           });
@@ -96,11 +97,11 @@ export class EmployeesComponent implements OnInit {
           this.resetForm();
 
         } else {
-          Swal.fire('Error', res?.message || 'No se pudo crear el empleado.', 'error');
+          Swal.fire(this.translate.instant('common.error'), res?.message || this.translate.instant('employees.createError'), 'error');
         }
       },
       error: (err) => {
-        Swal.fire('Error', err?.error?.message || 'Error al crear el empleado.', 'error');
+        Swal.fire(this.translate.instant('common.error'), err?.error?.message || this.translate.instant('employees.createError'), 'error');
       }
     });
   }
@@ -117,8 +118,8 @@ export class EmployeesComponent implements OnInit {
 
     Swal.fire({
       icon: 'info',
-      title: 'Editando empleado',
-      text: `Estás editando a "${emp.name}"`,
+      title: this.translate.instant('employees.editingTitle'),
+      text: this.translate.instant('employees.editingText', { name: emp.name }),
       timer: 1200,
       showConfirmButton: false
     });
@@ -141,7 +142,7 @@ export class EmployeesComponent implements OnInit {
 
           Swal.fire({
             icon: 'success',
-            title: 'Empleado actualizado',
+            title: this.translate.instant('employees.updated'),
             timer: 1500,
             showConfirmButton: false
           });
@@ -149,11 +150,11 @@ export class EmployeesComponent implements OnInit {
           this.resetForm();
 
         } else {
-          Swal.fire('Error', res?.message || 'No se pudo actualizar el empleado.', 'error');
+          Swal.fire(this.translate.instant('common.error'), res?.message || this.translate.instant('employees.updateError'), 'error');
         }
       },
       error: (err) => {
-        Swal.fire('Error', err?.error?.message || 'Error al actualizar el empleado.', 'error');
+        Swal.fire(this.translate.instant('common.error'), err?.error?.message || this.translate.instant('employees.updateError'), 'error');
       }
     });
   }
@@ -162,12 +163,12 @@ export class EmployeesComponent implements OnInit {
   onDelete(id: number): void {
 
     Swal.fire({
-      title: '¿Eliminar empleado?',
-      text: 'Esta acción no se puede deshacer',
+      title: this.translate.instant('employees.deleteTitle'),
+      text: this.translate.instant('employees.deleteText'),
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
+      confirmButtonText: this.translate.instant('common.yesDelete'),
+      cancelButtonText: this.translate.instant('common.cancel'),
       confirmButtonColor: '#d33'
     }).then((result) => {
 
@@ -180,7 +181,7 @@ export class EmployeesComponent implements OnInit {
 
           Swal.fire({
             icon: 'success',
-            title: 'Empleado eliminado',
+            title: this.translate.instant('employees.deleted'),
             timer: 1200,
             showConfirmButton: false
           });
@@ -190,7 +191,7 @@ export class EmployeesComponent implements OnInit {
           }
         },
         error: (err) => {
-          Swal.fire('Error', err?.error?.message || 'Error al eliminar el empleado.', 'error');
+          Swal.fire(this.translate.instant('common.error'), err?.error?.message || this.translate.instant('employees.deleteError'), 'error');
         }
       });
 
@@ -203,7 +204,7 @@ export class EmployeesComponent implements OnInit {
 
     Swal.fire({
       icon: 'info',
-      title: 'Edición cancelada',
+      title: this.translate.instant('employees.cancelTitle'),
       timer: 1000,
       showConfirmButton: false
     });
@@ -225,13 +226,14 @@ export class EmployeesComponent implements OnInit {
   toggleActive(emp: Employee): void {
 
     Swal.fire({
-      title: emp.active
-        ? `¿Desactivar a "${emp.name}"?`
-        : `¿Activar a "${emp.name}"?`,
+      title: this.translate.instant(
+        emp.active ? 'employees.toggleDeactivateQuestion' : 'employees.toggleActivateQuestion',
+        { name: emp.name }
+      ),
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Sí',
-      cancelButtonText: 'Cancelar'
+      confirmButtonText: this.translate.instant('common.yes'),
+      cancelButtonText: this.translate.instant('common.cancel')
     }).then((result) => {
 
       if (!result.isConfirmed) return;
@@ -249,17 +251,17 @@ export class EmployeesComponent implements OnInit {
 
             Swal.fire({
               icon: 'success',
-              title: emp.active ? 'Empleado desactivado' : 'Empleado activado',
+              title: this.translate.instant(emp.active ? 'employees.deactivated' : 'employees.activated'),
               timer: 1200,
               showConfirmButton: false
             });
 
           } else {
-            Swal.fire('Error', res?.message || 'No se pudo cambiar el estado.', 'error');
+            Swal.fire(this.translate.instant('common.error'), res?.message || this.translate.instant('employees.statusError'), 'error');
           }
         },
         error: () => {
-          Swal.fire('Error', 'Error al cambiar estado.', 'error');
+          Swal.fire(this.translate.instant('common.error'), this.translate.instant('employees.statusChangeError'), 'error');
         }
       });
 

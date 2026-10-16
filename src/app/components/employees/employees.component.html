@@ -4,11 +4,11 @@
 
     <div>
       <h2>
-        {{ isEditing ? 'Editar empleado' : 'Gestión de Empleados' }}
+        {{ isEditing ? ('employees.editTitle' | translate) : ('employees.title' | translate) }}
       </h2>
 
       <p class="subtitle">
-        Administra el personal del salón
+        {{ 'employees.description' | translate }}
       </p>
     </div>
 
@@ -20,7 +20,7 @@
       >
 
       <span>
-        Mostrar solo empleados activos
+        {{ 'employees.onlyActive' | translate }}
       </span>
     </div>
 
@@ -39,7 +39,7 @@
       <div class="form-group">
 
         <label for="name">
-          Nombre
+          {{ 'employees.name' | translate }}
         </label>
 
         <input
@@ -49,7 +49,7 @@
           [(ngModel)]="employee.name"
           required
           class="form-control"
-          placeholder="Ingrese el nombre"
+          [placeholder]="'employees.namePlaceholder' | translate"
         >
 
       </div>
@@ -57,7 +57,7 @@
       <div class="form-group">
 
         <label for="phone">
-          Teléfono
+          {{ 'employees.phone' | translate }}
         </label>
 
         <input
@@ -67,7 +67,7 @@
           [(ngModel)]="employee.phone"
           required
           class="form-control"
-          placeholder="Ingrese el teléfono"
+          [placeholder]="'employees.phonePlaceholder' | translate"
         >
 
       </div>
@@ -85,8 +85,8 @@
 
         {{
           isEditing
-            ? 'Actualizar empleado'
-            : 'Guardar empleado'
+            ? ('employees.update' | translate)
+            : ('employees.save' | translate)
         }}
       </button>
 
@@ -96,7 +96,7 @@
         (click)="onCancel()"
       >
         <i class="fa-solid fa-xmark"></i>
-        Cancelar
+        {{ 'employees.cancel' | translate }}
       </button>
 
     </div>
@@ -114,11 +114,11 @@
     <div class="section-title">
 
       <h3>
-        Lista de Empleados
+        {{ 'employees.list' | translate }}
       </h3>
 
       <span class="count">
-        {{ visibleEmployees.length }} empleados
+        {{ visibleEmployees.length }} {{ 'employees.count' | translate }}
       </span>
 
     </div>
@@ -127,7 +127,7 @@
       class="empty"
       *ngIf="!visibleEmployees || visibleEmployees.length === 0"
     >
-      No hay empleados disponibles
+      {{ 'employees.empty' | translate }}
     </div>
 
     <div
@@ -156,8 +156,8 @@
             >
               {{
                 emp.active
-                  ? 'Activo'
-                  : 'Inactivo'
+                  ? ('employees.active' | translate)
+                  : ('employees.inactive' | translate)
               }}
             </span>
 

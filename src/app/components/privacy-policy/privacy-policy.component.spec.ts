@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { provideTranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { PrivacyPolicyComponent } from './privacy-policy.component';
 
@@ -27,6 +28,7 @@ describe('PrivacyPolicyComponent', () => {
     await TestBed.configureTestingModule({
       imports: [PrivacyPolicyComponent],
       providers: [
+        provideTranslateService(),
         { provide: AuthService, useValue: authServiceSpy },
         { provide: Router, useValue: routerSpy },
         {
@@ -44,7 +46,7 @@ describe('PrivacyPolicyComponent', () => {
   it('mantiene bloqueado el avance si no se marca la aceptación', () => {
     component.confirm();
     expect(authServiceSpy.acceptPrivacyPolicy).not.toHaveBeenCalled();
-    expect(component.message).toBe('Debes aceptar la política para continuar.');
+    expect(component.message).toBe('privacy.mustAccept');
   });
 
   it('acepta la política y permite entrar a la aplicación', () => {
@@ -63,7 +65,7 @@ describe('PrivacyPolicyComponent', () => {
 
     component.confirm();
 
-    expect(component.message).toBe('No se pudo aceptar la política. Inténtalo nuevamente.');
+    expect(component.message).toBe('privacy.acceptError');
     expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
 });

@@ -5,9 +5,11 @@ import { Router } from '@angular/router';
 
 import { CashService } from '../../services/cash.service';
 import { AppointmentsService } from '../../services/appointments.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ClientsService } from '../../services/clients.service';
 import { EmployeesService } from '../../services/employees.service';
 import { ServicesService } from '../../services/services.service';
+import { LanguageService } from '../../services/language.service';
 
 import { FullCalendarModule } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -41,7 +43,7 @@ interface Employee {
 @Component({
   selector: 'app-appointments',
   standalone: true,
-  imports: [CommonModule, FormsModule, FullCalendarModule],
+  imports: [CommonModule, FormsModule, FullCalendarModule, TranslateModule],
   templateUrl: './appointments.component.html',
   styleUrls: ['./appointments.component.css']
 })
@@ -53,8 +55,27 @@ export class AppointmentsComponent implements OnInit {
     private appointmentsService: AppointmentsService,
     private clientsService: ClientsService,
     private employeesService: EmployeesService,
-    private servicesService: ServicesService
+    private servicesService: ServicesService,
+    private translate: TranslateService,
+    private languageService: LanguageService
   ) {}
+
+  private calendarButtonText(): Record<string, string> {
+    return {
+      today: this.translate.instant('calendar.today'),
+      month: this.translate.instant('calendar.month'),
+      week: this.translate.instant('calendar.week'),
+      day: this.translate.instant('calendar.day')
+    };
+  }
+
+  private applyCalendarLocale(): void {
+    this.calendarOptions = {
+      ...this.calendarOptions,
+      locale: this.languageService.currentLanguage === 'en' ? 'en' : esLocale,
+      buttonText: this.calendarButtonText()
+    };
+  }
 
   view: 'create' | 'list' | 'calendar' = 'create';
   selectedService: Service | null = null;
@@ -78,14 +99,14 @@ export class AppointmentsComponent implements OnInit {
 
   calendarOptions: any = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-    locale: esLocale,
+    locale: this.languageService.currentLanguage === 'en' ? 'en' : esLocale,
     initialView: 'dayGridMonth',
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
       right: 'dayGridMonth,timeGridWeek,timeGridDay'
     },
-    buttonText: { today: 'Hoy', month: 'Mes', week: 'Semana', day: 'Día' },
+    buttonText: this.calendarButtonText(),
     height: 'auto',
     expandRows: true,
     eventDisplay: 'block',
@@ -97,6 +118,7 @@ export class AppointmentsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadInitialData();
+    this.languageService.language$.subscribe(() => this.applyCalendarLocale());
   }
 
   loadInitialData(): void {
@@ -140,7 +162,7 @@ export class AppointmentsComponent implements OnInit {
       },
       error: () => {
         this.appointments = [];
-        Swal.fire('Error', 'No se pudieron cargar las citas.', 'error');
+        Swal.fire(this.translate.instant('common.error'), this.translate.instant('appointments.loadError'), 'error');
       }
     });
   }
@@ -149,7 +171,7 @@ export class AppointmentsComponent implements OnInit {
     if (this.isLoading) return;
 
     if (!this.selectedClient || !this.selectedEmployee || !this.selectedDate || !this.selectedTime || !this.selectedService) {
-      Swal.fire('Campos incompletos', 'Debes llenar todos los campos.', 'warning');
+      Swal.fire(this.translate.instant('common.error'), this.translate.instant('appointments.incomplete'), 'warning');
       return;
     }
 
@@ -187,8 +209,8 @@ export class AppointmentsComponent implements OnInit {
 
           Swal.fire({
             icon: 'success',
-            title: 'Cita agendada',
-            text: 'La cita fue registrada correctamente',
+            title: this.translate.instant('appointments.createdTitle'),
+            text: this.translate.instant('appointments.createdText'),
             timer: 1500,
             showConfirmButton: false
           });
@@ -198,19 +220,19 @@ export class AppointmentsComponent implements OnInit {
       },
       error: () => {
         this.isLoading = false;
-        Swal.fire('Error', 'No se pudo agendar la cita.', 'error');
+        Swal.fire(this.translate.instant('common.error'), this.translate.instant('appointments.createError'), 'error');
       }
     });
   }
 
   sendToCash(app: Appointment): void {
     Swal.fire({
-      title: 'Enviar a caja',
+      title: this.translate.instant('appointments.sendToCashTitle'),
       text: `${app.client} - ${app.service}`,
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Sí, enviar',
-      cancelButtonText: 'Cancelar'
+      confirmButtonText: this.translate.instant('common.yesSend'),
+      cancelButtonText: this.translate.instant('common.cancel')
     }).then(result => {
       if (!result.isConfirmed) return;
 
@@ -219,7 +241,7 @@ export class AppointmentsComponent implements OnInit {
 
       Swal.fire({
         icon: 'success',
-        title: 'Enviado a caja',
+        title: this.translate.instant('appointments.sentTitle'),
         timer: 1000,
         showConfirmButton: false
       });
@@ -230,12 +252,12 @@ export class AppointmentsComponent implements OnInit {
 
   deleteAppointment(app: Appointment): void {
     Swal.fire({
-      title: '¿Eliminar cita?',
+      title: this.translate.instant('appointments.deleteTitle'),
       text: `${app.client} - ${app.service}`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
+      confirmButtonText: this.translate.instant('common.yesDelete'),
+      cancelButtonText: this.translate.instant('common.cancel'),
       confirmButtonColor: '#d33'
     }).then((result) => {
       if (result.isConfirmed) {
@@ -245,14 +267,14 @@ export class AppointmentsComponent implements OnInit {
             this.updateCalendarEvents();
             Swal.fire({
               icon: 'success',
-              title: 'Eliminada',
-              text: 'La cita fue eliminada',
+              title: this.translate.instant('appointments.deletedTitle'),
+              text: this.translate.instant('appointments.deletedText'),
               timer: 1200,
               showConfirmButton: false
             });
           },
           error: () => {
-            Swal.fire('Error', 'No se pudo eliminar la cita.', 'error');
+            Swal.fire(this.translate.instant('common.error'), this.translate.instant('appointments.deleteError'), 'error');
           }
         });
       }
@@ -293,14 +315,14 @@ export class AppointmentsComponent implements OnInit {
   }
 
   getClientName(clientId: number): string {
-    return this.clients.find(c => c.id === clientId)?.name || 'Desconocido';
+    return this.clients.find(c => c.id === clientId)?.name || this.translate.instant('common.unknown');
   }
 
   getEmployeeName(employeeId: number): string {
-    return this.employees.find(e => e.id === employeeId)?.name || 'Desconocido';
+    return this.employees.find(e => e.id === employeeId)?.name || this.translate.instant('common.unknown');
   }
 
   getServiceName(serviceId: number): string {
-    return this.services.find(s => s.id === serviceId)?.name || 'Desconocido';
+    return this.services.find(s => s.id === serviceId)?.name || this.translate.instant('common.unknown');
   }
 }
