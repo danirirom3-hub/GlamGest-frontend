@@ -1,16 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ClientsService } from '../../services/clients.service';
+import { FormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { ClientsService, Client } from '../../services/clients.service';
 import Swal from 'sweetalert2';
 
-/* Modelo de cliente */
-interface Client {
-  id?: number;
-  name: string;
-  email: string;
-  phone: string;
-  registrationDate?: string;
+interface ClientGroup {
+  letter: string;
+  clients: Client[];
 }
 
 @Component({
@@ -21,201 +18,162 @@ interface Client {
   styleUrls: ['./clients.component.css']
 })
 export class ClientsComponent implements OnInit {
-
-  /* Datos del formulario */
-  client: Client = {
-    name: '',
-    email: '',
-    phone: ''
-  };
-
-  /* Lista de clientes */
   clients: Client[] = [];
-
-  /* Estado de la UI */
-  searchText: string = '';
-  isEditing: boolean = false;
+  client: Client = this.emptyClient();
+  searchText = '';
+  sort = 'recent';
+  page = 0;
+  size = 25;
+  totalItems = 0;
+  totalPages = 0;
+  loading = false;
+  modalOpen = false;
+  isEditing = false;
   editClientId: number | null = null;
-  mensaje: string = '';
+  private readonly searchSubject = new Subject<string>();
 
-  constructor(private clientsService: ClientsService) {}
-
-  ngOnInit(): void {
-    this.cargarClientes();
+  constructor(private clientsService: ClientsService) {
+    this.searchSubject.pipe(debounceTime(300), distinctUntilChanged()).subscribe(() => {
+      this.page = 0;
+      this.loadClients();
+    });
   }
 
-  /* Obtener clientes del backend */
-  cargarClientes(): void {
-    this.clientsService.getClients().subscribe({
-      next: (res: any) => {
-        this.clients = res?.data || res || [];
+  get groupedClients(): ClientGroup[] {
+    if (!this.sort.startsWith('name')) return [{ letter: '', clients: this.clients }];
+    const groups = new Map<string, Client[]>();
+    this.clients.forEach(client => {
+      const letter = (client.name.trim().charAt(0) || '#').toUpperCase();
+      const group = groups.get(letter) || [];
+      group.push(client);
+      groups.set(letter, group);
+    });
+    return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([letter, clients]) => ({ letter, clients }));
+  }
+
+  ngOnInit(): void { this.loadClients(); }
+
+  loadClients(): void {
+    this.loading = true;
+    this.clientsService.getClients(this.searchText, this.sort, this.page, this.size).subscribe({
+      next: response => {
+        this.clients = response.data.items;
+        this.totalItems = response.data.totalItems;
+        this.totalPages = response.data.totalPages;
+        this.page = response.data.page;
+        this.loading = false;
       },
       error: () => {
         this.clients = [];
-        Swal.fire('Error', 'No se pudieron cargar los clientes.', 'error');
+        this.loading = false;
+        void Swal.fire('Error', 'No se pudieron cargar los clientes.', 'error');
       }
     });
   }
 
-  /* Crear o actualizar cliente */
-  onSubmit(): void {
-    this.mensaje = '';
+  onSearchChange(): void { this.searchSubject.next(this.searchText); }
 
-    if (!this.client.name || !this.client.email || !this.client.phone) {
-      Swal.fire('Campos incompletos', 'Completa todos los campos para guardar el cliente.', 'warning');
-      return;
-    }
-
-    if (this.isEditing && this.editClientId != null) {
-      this.actualizarCliente();
-      return;
-    }
-
-    this.clientsService.createClient(this.client).subscribe({
-      next: (res: any) => {
-        if (res?.successful) {
-
-          const nuevo = res?.data || this.client;
-          this.clients.push(nuevo);
-
-          Swal.fire({
-            icon: 'success',
-            title: 'Cliente creado',
-            timer: 1500,
-            showConfirmButton: false
-          });
-
-          this.resetForm();
-
-        } else {
-          Swal.fire('Error', res?.message || 'No se pudo crear el cliente.', 'error');
-        }
-      },
-      error: (err) => {
-        Swal.fire('Error', err?.error?.message || 'Error al crear el cliente.', 'error');
-      }
-    });
+  onSortChange(): void {
+    this.page = 0;
+    this.loadClients();
   }
 
-  /* Cargar cliente en el formulario para editar */
+  previousPage(): void {
+    if (this.page === 0) return;
+    this.page--;
+    this.loadClients();
+  }
+
+  nextPage(): void {
+    if (this.page + 1 >= this.totalPages) return;
+    this.page++;
+    this.loadClients();
+  }
+
+  openNew(): void {
+    this.resetForm();
+    this.modalOpen = true;
+  }
+
+  closeModal(): void {
+    this.modalOpen = false;
+    this.resetForm();
+  }
+
   onEdit(client: Client): void {
     this.isEditing = true;
     this.editClientId = client.id ?? null;
-    this.client = {
-      name: client.name,
-      email: client.email,
-      phone: client.phone
-    };
+    this.client = { ...client };
+    this.modalOpen = true;
+  }
 
-    Swal.fire({
-      icon: 'info',
-      title: 'Editando cliente',
-      text: `Estás editando a "${client.name}"`,
-      timer: 1200,
-      showConfirmButton: false
+  onSubmit(): void {
+    if (!this.client.name.trim() || !this.client.email.trim() || !this.client.phone.trim()) {
+      void Swal.fire('Campos incompletos', 'Completa todos los campos para guardar el cliente.', 'warning');
+      return;
+    }
+    if (this.isEditing && this.editClientId != null) {
+      this.updateClient();
+      return;
+    }
+    this.clientsService.createClient(this.client).subscribe({
+      next: response => {
+        if (!response.successful) { this.showError(response.message); return; }
+        this.closeModal();
+        this.loadClients();
+        void Swal.fire({ icon: 'success', title: 'Cliente creado', timer: 1200, showConfirmButton: false });
+      },
+      error: error => this.showApiError(error, 'No se pudo crear el cliente.')
     });
   }
 
-  /* Eliminar cliente */
-  onDelete(client: Client): void {
-    if (client.id == null) {
-      Swal.fire('Error', 'No se pudo eliminar el cliente.', 'error');
-      return;
-    }
+  updateClient(): void {
+    if (this.editClientId == null) return;
+    this.clientsService.updateClient(this.editClientId, this.client).subscribe({
+      next: response => {
+        if (!response.successful) { this.showError(response.message); return; }
+        this.closeModal();
+        this.loadClients();
+        void Swal.fire({ icon: 'success', title: 'Cliente actualizado', timer: 1200, showConfirmButton: false });
+      },
+      error: error => this.showApiError(error, 'No se pudo actualizar el cliente.')
+    });
+  }
 
-    Swal.fire({
-      title: `¿Eliminar a "${client.name}"?`,
-      text: 'Esta acción no se puede deshacer',
+  onDelete(client: Client): void {
+    if (client.id == null) return;
+    void Swal.fire({
+      title: `¿Desactivar a "${client.name}"?`,
+      text: 'El cliente se conservará en el historial.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
+      confirmButtonText: 'Sí, desactivar',
       cancelButtonText: 'Cancelar',
       confirmButtonColor: '#d33'
-    }).then((result) => {
-
+    }).then(result => {
       if (!result.isConfirmed) return;
-
-      this.clientsService.deleteClient(client.id!).subscribe({ // 🔥 CORREGIDO AQUÍ
+      this.clientsService.deleteClient(client.id!).subscribe({
         next: () => {
-
-          this.clients = this.clients.filter((item) => item.id !== client.id);
-
-          Swal.fire({
-            icon: 'success',
-            title: 'Cliente eliminado',
-            timer: 1200,
-            showConfirmButton: false
-          });
-
-          if (this.editClientId === client.id) {
-            this.resetForm();
-          }
+          this.loadClients();
+          if (this.editClientId === client.id) this.closeModal();
+          void Swal.fire({ icon: 'success', title: 'Cliente desactivado', timer: 1200, showConfirmButton: false });
         },
-        error: (err) => {
-          Swal.fire('Error', err?.error?.message || 'Error al eliminar el cliente.', 'error');
-        }
+        error: error => this.showApiError(error, 'No se pudo desactivar el cliente.')
       });
-
     });
   }
 
-  /* Preparar formulario para nuevo cliente */
-  onNew(): void {
-    this.resetForm();
-    this.isEditing = false;
-
-    Swal.fire({
-      icon: 'info',
-      title: 'Nuevo cliente',
-      timer: 1000,
-      showConfirmButton: false
-    });
-  }
-
-  /* Actualizar cliente existente */
-  actualizarCliente(): void {
-    if (this.editClientId == null) {
-      Swal.fire('Error', 'No se seleccionó ningún cliente para editar.', 'error');
-      return;
-    }
-
-    this.clientsService.updateClient(this.editClientId, this.client).subscribe({
-      next: (res: any) => {
-        if (res?.successful) {
-
-          const actualizado = res?.data || { id: this.editClientId, ...this.client };
-
-          this.clients = this.clients.map((item) =>
-            item.id === this.editClientId ? actualizado : item
-          );
-
-          Swal.fire({
-            icon: 'success',
-            title: 'Cliente actualizado',
-            timer: 1500,
-            showConfirmButton: false
-          });
-
-          this.resetForm();
-
-        } else {
-          Swal.fire('Error', res?.message || 'No se pudo actualizar el cliente.', 'error');
-        }
-      },
-      error: (err) => {
-        Swal.fire('Error', err?.error?.message || 'Error al actualizar el cliente.', 'error');
-      }
-    });
-  }
-
-  /* Reset del formulario */
-  resetForm(): void {
+  private resetForm(): void {
     this.isEditing = false;
     this.editClientId = null;
-    this.client = {
-      name: '',
-      email: '',
-      phone: ''
-    };
+    this.client = this.emptyClient();
+  }
+
+  private emptyClient(): Client { return { name: '', email: '', phone: '' }; }
+
+  private showError(message: string): void { void Swal.fire('Error', message, 'error'); }
+
+  private showApiError(error: any, fallback: string): void {
+    this.showError(error?.error?.error || error?.error?.message || error?.message || fallback);
   }
 }

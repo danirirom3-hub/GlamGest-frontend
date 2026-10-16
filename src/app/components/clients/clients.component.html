@@ -1,88 +1,81 @@
-<div class="contenedor-clientes">
+<section class="clients-page">
+  <header class="clients-header">
+    <div>
+      <span class="eyebrow">Directorio</span>
+      <h1>Clientes</h1>
+      <p>Administra la información de tus clientes y consulta su historial.</p>
+    </div>
+    <button class="primary-button" type="button" (click)="openNew()">+ Nuevo cliente</button>
+  </header>
 
-  <!-- HEADER -->
-  <div class="header-clientes">
-
-    <input 
-      type="text" 
-      [(ngModel)]="searchText" 
-      placeholder="Buscar por nombre, correo o teléfono..."
-    >
-
-    <button class="btn-nuevo" (click)="onNew()">
-      Nuevo Cliente
-    </button>
-
+  <div class="clients-toolbar">
+    <label class="search-field">
+      <span>Buscar</span>
+      <input type="search" [(ngModel)]="searchText" (ngModelChange)="onSearchChange()" placeholder="Nombre, correo o teléfono...">
+    </label>
+    <label class="sort-field">
+      <span>Ordenar por</span>
+      <select [(ngModel)]="sort" (ngModelChange)="onSortChange()">
+        <option value="recent">Más recientes</option>
+        <option value="oldest">Más antiguos</option>
+        <option value="name-asc">Nombre A-Z</option>
+        <option value="name-desc">Nombre Z-A</option>
+      </select>
+    </label>
+    <span class="results-count">{{ totalItems }} cliente(s)</span>
   </div>
 
-  <!-- FORMULARIO -->
-  <div class="form-card">
-
-    <h2>{{ isEditing ? 'Editar cliente' : 'Nuevo cliente' }}</h2>
-
-    <div class="form-grid">
-
-      <div class="input-group">
-        <label>Nombre</label>
-        <input type="text" [(ngModel)]="client.name" name="name" placeholder="Nombre">
-      </div>
-
-      <div class="input-group">
-        <label>Correo</label>
-        <input type="email" [(ngModel)]="client.email" name="email" placeholder="Correo">
-      </div>
-
-      <div class="input-group">
-        <label>Teléfono</label>
-        <input type="text" [(ngModel)]="client.phone" name="phone" placeholder="Teléfono">
-      </div>
-
-    </div>
-
-    <button class="btn-save" (click)="onSubmit()">
-      {{ isEditing ? 'Actualizar cliente' : 'Guardar cliente' }}
-    </button>
-
-    <div class="alerta" *ngIf="mensaje">
-      {{ mensaje }}
-    </div>
-
+  <div class="loading-state" *ngIf="loading">Cargando clientes...</div>
+  <div class="empty-state" *ngIf="!loading && !clients.length">
+    <h2>{{ searchText ? 'No encontramos clientes' : 'No hay clientes registrados' }}</h2>
+    <p>{{ searchText ? 'Prueba con otro nombre, correo o teléfono.' : 'Agrega tu primer cliente para empezar a gestionar.' }}</p>
+    <button *ngIf="!searchText" class="secondary-button" type="button" (click)="openNew()">Crear cliente</button>
   </div>
 
-  <!-- LISTA -->
-  <div class="cards" *ngIf="clients && clients.length > 0; else vacio">
-
-    <div class="card" *ngFor="let c of clients">
-
-      <div class="card-header">
-        <h3>{{ c.name }}</h3>
-        <span class="correo">{{ c.email }}</span>
+  <div class="client-groups" *ngIf="!loading && clients.length">
+    <section class="client-group" *ngFor="let group of groupedClients">
+      <h2 *ngIf="group.letter">{{ group.letter }}</h2>
+      <div class="client-grid">
+        <article class="client-card" *ngFor="let item of group.clients">
+          <div class="client-card-top">
+            <span class="avatar">{{ item.name.charAt(0).toUpperCase() }}</span>
+            <div class="client-identity">
+              <h3>{{ item.name }}</h3>
+              <span>Cliente #{{ item.id }}</span>
+            </div>
+          </div>
+          <dl class="client-details">
+            <div><dt>Correo</dt><dd>{{ item.email }}</dd></div>
+            <div><dt>Teléfono</dt><dd>{{ item.phone }}</dd></div>
+            <div *ngIf="item.registrationDate"><dt>Registro</dt><dd>{{ item.registrationDate | date:'dd/MM/yyyy' }}</dd></div>
+          </dl>
+          <div class="card-actions">
+            <button type="button" (click)="onEdit(item)">Editar</button>
+            <button type="button" class="danger" (click)="onDelete(item)">Desactivar</button>
+          </div>
+        </article>
       </div>
-
-      <div class="card-body">
-        <p><strong>Tel:</strong> {{ c.phone }}</p>
-      </div>
-
-      <div class="acciones">
-        <button class="btn-icon editar" (click)="onEdit(c)">
-          <i class="fas fa-pencil-alt"></i>
-        </button>
-
-        <button class="btn-icon eliminar" (click)="onDelete(c)">
-          <i class="fas fa-trash-alt"></i>
-        </button>
-      </div>
-
-    </div>
-
+    </section>
   </div>
 
-  <!-- VACÍO -->
-  <ng-template #vacio>
-    <div class="empty-state">
-      <h3>No hay clientes registrados</h3>
-      <p>Agrega tu primer cliente para empezar a gestionar.</p>
-    </div>
-  </ng-template>
+  <footer class="pagination" *ngIf="!loading && totalPages > 0">
+    <button type="button" (click)="previousPage()" [disabled]="page === 0">Anterior</button>
+    <span>Página {{ page + 1 }} de {{ totalPages }}</span>
+    <button type="button" (click)="nextPage()" [disabled]="page + 1 >= totalPages">Siguiente</button>
+  </footer>
+</section>
 
+<div class="modal-backdrop" *ngIf="modalOpen" (click)="closeModal()">
+  <section class="client-modal" role="dialog" aria-modal="true" aria-labelledby="client-modal-title" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <div><span class="eyebrow">Directorio</span><h2 id="client-modal-title">{{ isEditing ? 'Editar cliente' : 'Nuevo cliente' }}</h2></div>
+      <button class="close-button" type="button" aria-label="Cerrar" (click)="closeModal()">×</button>
+    </header>
+    <form (ngSubmit)="onSubmit()">
+      <label>Nombre<input type="text" [(ngModel)]="client.name" name="name" placeholder="Nombre completo" required></label>
+      <label>Correo<input type="email" [(ngModel)]="client.email" name="email" placeholder="correo@ejemplo.com" required></label>
+      <label>Teléfono<input type="tel" [(ngModel)]="client.phone" name="phone" placeholder="Número de teléfono" required></label>
+      <div class="modal-actions"><button class="secondary-button" type="button" (click)="closeModal()">Cancelar</button><button class="primary-button" type="submit">{{ isEditing ? 'Guardar cambios' : 'Crear cliente' }}</button></div>
+    </form>
+  </section>
 </div>

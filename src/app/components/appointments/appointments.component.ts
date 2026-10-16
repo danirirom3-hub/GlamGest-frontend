@@ -102,7 +102,7 @@ export class AppointmentsComponent implements OnInit {
   loadInitialData(): void {
     this.clientsService.getClients().subscribe({
       next: (clientsRes: any) => {
-        this.clients = clientsRes?.data || clientsRes || [];
+        this.clients = clientsRes?.data?.items || clientsRes?.data || clientsRes || [];
         if (this.clients.length > 0) this.selectedClient = this.clients[0].name;
 
         this.employeesService.getEmployees().subscribe({

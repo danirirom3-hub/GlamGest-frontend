@@ -1,237 +1,49 @@
-/* Layout general de la página */
-.page {
-  min-height: 100vh;
-  padding: 40px;
-  background: var(--bg);
-  font-family: 'Poppins', sans-serif;
-  box-sizing: border-box;
-
-  display: flex;
-  justify-content: center;
-}
-
-/* Contenedor principal de clientes */
-.contenedor-clientes {
-  width: 100%;
-  max-width: 1100px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-
-  margin: 0 auto;
-}
-
-/* Header con buscador y botón */
-.header-clientes {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-/* Input de búsqueda */
-.header-clientes input {
-  flex: 1;
-  min-width: 250px;
-  padding: 12px 16px;
-  border-radius: 14px;
-  border: 1px solid rgba(0,0,0,0.08);
-  background: var(--card);
-  color: var(--text);
-  font-size: 14px;
-  transition: 0.2s ease;
-}
-
-/* Focus input */
-.header-clientes input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
-}
-
-/* Botón para crear cliente */
-.btn-nuevo {
-  padding: 12px 20px;
-  border-radius: 14px;
-  border: none;
-  background: var(--primary);
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-
-/* Hover botón */
-.btn-nuevo:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 15px 30px rgba(99,102,241,0.35);
-}
-
-/* Tarjeta del formulario */
-.form-card {
-  background: var(--card);
-  border-radius: 18px;
-  padding: 25px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-  transition: 0.3s ease;
-}
-
-/* Título del formulario */
-.form-card h2 {
-  font-weight: 700;
-  background: linear-gradient(90deg, var(--primary), #7c3aed);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  margin-bottom: 20px;
-}
-
-/* Grid del formulario */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-}
-
-/* Grupo de inputs */
-.input-group {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Inputs del formulario */
-.input-group input {
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.08);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 14px;
-  transition: 0.2s ease;
-}
-
-/* Focus inputs */
-.input-group input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
-}
-
-/* Botón guardar */
-.btn-save {
-  margin-top: 20px;
-  padding: 14px;
-  border-radius: 14px;
-  border: none;
-  background: var(--primary);
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
-  width: 100%;
-  transition: all 0.3s ease;
-}
-
-/* Hover guardar */
-.btn-save:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 15px 30px rgba(99,102,241,0.35);
-}
-
-/* Contenedor de cards */
-.cards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-}
-
-/* Card de cliente */
-.card {
-  background: var(--card);
-  border-radius: 18px;
-  box-shadow: 0 15px 30px rgba(0,0,0,0.08);
-  padding: 20px;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(0,0,0,0.05);
-}
-
-/* Hover card */
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-}
-
-/* Header de card */
-.card-header h3 {
-  font-weight: 700;
-  background: linear-gradient(90deg, var(--primary), #7c3aed);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  margin-bottom: 5px;
-}
-
-/* Correo */
-.card-header .correo {
-  font-size: 13px;
-  color: var(--text);
-  opacity: 0.7;
-}
-
-/* Cuerpo de card */
-.card-body p {
-  font-size: 14px;
-  margin: 4px 0;
-  color: var(--text);
-}
-
-/* Acciones de la card */
-.acciones {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.acciones button {
-  border: none;
-  padding: 8px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-/* Botón editar */
-.acciones button.editar {
-  background: rgba(59, 130, 246, 0.15);
-  color: #1e40af;
-}
-
-.acciones button.editar:hover {
-  transform: scale(1.05);
-  background: rgba(59, 130, 246, 0.25);
-}
-
-/* Botón eliminar */
-.acciones button.eliminar {
-  background: rgba(239, 68, 68, 0.15);
-  color: #b91c1c;
-}
-
-.acciones button.eliminar:hover {
-  transform: scale(1.05);
-  background: rgba(239, 68, 68, 0.25);
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-  .cards {
-    grid-template-columns: 1fr;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-}
+:host { display: block; }
+.clients-page { max-width: 1180px; margin: 0 auto; color: var(--text); }
+.clients-header { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+.eyebrow { color: var(--primary); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+h1 { margin: 6px 0; font-size: clamp(28px, 3vw, 38px); letter-spacing: -.04em; }
+.clients-header p { margin: 0; opacity: .65; }
+.primary-button, .secondary-button, .card-actions button, .pagination button { border: 0; border-radius: 10px; padding: 11px 16px; font: inherit; cursor: pointer; }
+.primary-button { background: var(--primary); color: #fff; font-weight: 600; }
+.secondary-button { background: var(--bg); color: var(--text); border: 1px solid rgba(100,116,139,.2); }
+.clients-toolbar { display: flex; align-items: end; gap: 14px; padding: 16px; margin-bottom: 26px; background: var(--card); border: 1px solid rgba(100,116,139,.14); border-radius: 16px; box-shadow: 0 12px 30px rgba(30,41,59,.05); }
+.search-field { flex: 1; }
+.sort-field { width: 205px; }
+.clients-toolbar label { display: grid; gap: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.clients-toolbar input, .clients-toolbar select { width: 100%; min-height: 42px; box-sizing: border-box; padding: 0 12px; border: 1px solid rgba(100,116,139,.2); border-radius: 10px; background: var(--bg); color: var(--text); font: inherit; text-transform: none; letter-spacing: normal; }
+.results-count { padding: 12px 0; font-size: 12px; opacity: .65; white-space: nowrap; }
+.client-group { margin-bottom: 25px; }
+.client-group > h2 { margin: 0 0 10px; color: var(--primary); font-size: 20px; }
+.client-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+.client-card { position: relative; overflow: hidden; padding: 24px; background: var(--card); border: 1px solid rgba(100,116,139,.12); border-radius: 28px; box-shadow: 0 18px 35px rgba(0,0,0,.05); transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease; }
+.client-card::before { position: absolute; top: 0; right: 24px; left: 24px; height: 3px; border-radius: 0 0 6px 6px; background: linear-gradient(90deg, var(--primary), #7c3aed); content: ''; opacity: .75; }
+.client-card:hover { transform: translateY(-6px); border-color: color-mix(in srgb, var(--primary) 22%, transparent); box-shadow: 0 24px 40px rgba(0,0,0,.09); }
+.client-card-top { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+.avatar { display: grid; flex: 0 0 auto; place-items: center; width: 60px; height: 60px; border-radius: 20px; background: linear-gradient(135deg, var(--primary), #7c3aed); color: #fff; font-size: 22px; font-weight: 700; box-shadow: 0 12px 20px rgba(124,58,237,.25); }
+.client-identity h3 { margin: 0 0 6px; color: var(--text); font-size: 20px; font-weight: 700; }
+.client-identity span { font-size: 11px; opacity: .55; }
+.client-details { display: grid; gap: 11px; margin: 0 0 24px; }
+.client-details div { display: grid; grid-template-columns: 70px 1fr; gap: 8px; }
+dt { font-size: 11px; opacity: .55; } dd { min-width: 0; margin: 0; overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.card-actions { display: flex; gap: 12px; padding-top: 16px; border-top: 1px solid rgba(100,116,139,.12); }
+.card-actions button { flex: 1; min-height: 46px; padding: 8px 10px; border-radius: 16px; background: var(--bg); color: var(--text); font-size: 13px; transition: transform .3s ease, background .3s ease, box-shadow .3s ease; }
+.card-actions button:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(30,41,59,.08); }
+.card-actions .danger { background: rgba(239,68,68,.1); color: #b91c1c; }
+.loading-state, .empty-state { padding: 60px 20px; text-align: center; opacity: .7; }
+.empty-state h2 { margin: 0 0 8px; opacity: 1; }
+.empty-state p { margin: 0 0 20px; }
+.pagination { display: flex; justify-content: center; align-items: center; gap: 14px; margin: 24px 0; font-size: 12px; }
+.pagination button { background: var(--card); color: var(--text); border: 1px solid rgba(100,116,139,.18); }
+.pagination button:disabled { cursor: not-allowed; opacity: .4; }
+.modal-backdrop { position: fixed; z-index: 20; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(15,23,42,.55); }
+.client-modal { width: min(100%, 520px); padding: 24px; background: var(--card); border: 1px solid rgba(100,116,139,.18); border-radius: 22px; box-shadow: 0 25px 70px rgba(15,23,42,.25); }
+.modal-header { display: flex; align-items: start; justify-content: space-between; margin-bottom: 22px; }
+.modal-header h2 { margin: 6px 0 0; font-size: 25px; }
+.close-button { border: 0; background: transparent; color: var(--text); font-size: 28px; line-height: 1; cursor: pointer; }
+.client-modal form { display: grid; gap: 16px; }
+.client-modal label { display: grid; gap: 7px; font-size: 12px; font-weight: 600; }
+.client-modal input { min-height: 44px; box-sizing: border-box; padding: 0 12px; border: 1px solid rgba(100,116,139,.2); border-radius: 10px; background: var(--bg); color: var(--text); font: inherit; }
+.modal-actions { display: flex; justify-content: end; gap: 10px; margin-top: 8px; }
+@media (max-width: 950px) { .client-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .clients-header { display: block; } .clients-header .primary-button { width: 100%; margin-top: 18px; } .clients-toolbar { display: grid; align-items: stretch; grid-template-columns: 1fr; } .sort-field { width: auto; } .results-count { padding: 0; } .client-grid { grid-template-columns: 1fr; } }
