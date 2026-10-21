@@ -12,6 +12,7 @@ export interface AuditLog {
   action: string;
   module: string;
   resourceId: string | null;
+  resourceName?: string | null;
   httpMethod: string;
   endpoint: string;
   statusCode: number;

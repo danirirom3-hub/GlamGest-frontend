@@ -11,6 +11,7 @@ describe('AuditLogsComponent localization', () => {
     'auditLogs.roles.other': 'Other role',
     'auditLogs.noRole': 'No role',
     'auditLogs.descriptions.create': 'A record was created in the {{module}} module.',
+    'auditLogs.descriptions.createWithResource': 'A record was created in the {{module}} module: {{resourceName}}.',
     'auditLogs.descriptions.error': 'The operation in the {{module}} module could not be completed.'
   };
 
@@ -57,6 +58,12 @@ describe('AuditLogsComponent localization', () => {
     const row = log({ action: 'ERROR', statusCode: 500, description: 'No se pudo completar la operación.' });
 
     expect(component.descriptionFor(row)).toBe('The operation in the Clients module could not be completed.');
+  });
+
+  it('includes the affected resource name in localized new audit entries', () => {
+    const row = log({ resourceName: 'Relaxing massage' });
+
+    expect(component.descriptionFor(row)).toBe('A record was created in the Clients module: Relaxing massage.');
   });
 
   it('does not show unknown action or module values untranslated', () => {

@@ -42,6 +42,7 @@ export class AuditLogsComponent implements OnInit {
       { value: 'clients', label: this.translate.instant('auditLogs.modules.clients') },
       { value: 'employees', label: this.translate.instant('auditLogs.modules.employees') },
       { value: 'reports', label: this.translate.instant('auditLogs.modules.reports') },
+      { value: 'roles', label: this.translate.instant('auditLogs.modules.roles') },
       { value: 'sales', label: this.translate.instant('auditLogs.modules.sales') },
       { value: 'services', label: this.translate.instant('auditLogs.modules.services') },
       { value: 'users', label: this.translate.instant('auditLogs.modules.users') },
@@ -130,7 +131,11 @@ export class AuditLogsComponent implements OnInit {
       : ['CREATE', 'UPDATE', 'DELETE'].includes(log.action)
         ? log.action.toLowerCase()
         : 'write';
-    return this.translate.instant(`auditLogs.descriptions.${action}`, { module });
+    const resourceSuffix = log.resourceName ? 'WithResource' : '';
+    return this.translate.instant(`auditLogs.descriptions.${action}${resourceSuffix}`, {
+      module,
+      resourceName: log.resourceName || ''
+    });
   }
 
   errorMessageFor(log: AuditLog): string {

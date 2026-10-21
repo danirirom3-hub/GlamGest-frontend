@@ -586,7 +586,11 @@
       "update": "Se actualizó un registro en el módulo de {{module}}.",
       "delete": "Se eliminó o desactivó un registro en el módulo de {{module}}.",
       "write": "Se realizó una operación en el módulo de {{module}}.",
-      "error": "No se pudo completar la operación en el módulo de {{module}}."
+      "error": "No se pudo completar la operación en el módulo de {{module}}.",
+      "createWithResource": "Se creó un registro en el módulo de {{module}}: {{resourceName}}.",
+      "updateWithResource": "Se actualizó un registro en el módulo de {{module}}: {{resourceName}}.",
+      "deleteWithResource": "Se eliminó o desactivó un registro en el módulo de {{module}}: {{resourceName}}.",
+      "writeWithResource": "Se realizó una operación en el módulo de {{module}}: {{resourceName}}."
     },
     "actions": {
       "empty": "Todas las acciones",
@@ -603,6 +607,7 @@
       "clients": "Clientes",
       "employees": "Empleados",
       "reports": "Reportes",
+      "roles": "Roles",
       "sales": "Ventas",
       "services": "Servicios",
       "users": "Usuarios",

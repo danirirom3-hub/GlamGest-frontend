@@ -586,7 +586,11 @@
       "update": "A record was updated in the {{module}} module.",
       "delete": "A record was deleted or deactivated in the {{module}} module.",
       "write": "An operation was performed in the {{module}} module.",
-      "error": "The operation in the {{module}} module could not be completed."
+      "error": "The operation in the {{module}} module could not be completed.",
+      "createWithResource": "A record was created in the {{module}} module: {{resourceName}}.",
+      "updateWithResource": "A record was updated in the {{module}} module: {{resourceName}}.",
+      "deleteWithResource": "A record was deleted or deactivated in the {{module}} module: {{resourceName}}.",
+      "writeWithResource": "An operation was performed in the {{module}} module: {{resourceName}}."
     },
     "actions": {
       "empty": "All actions",
@@ -603,6 +607,7 @@
       "clients": "Clients",
       "employees": "Employees",
       "reports": "Reports",
+      "roles": "Roles",
       "sales": "Sales",
       "services": "Services",
       "users": "Users",
