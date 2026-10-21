@@ -38,9 +38,17 @@
         <label for="password">{{ 'users.password' | translate }}</label>
         <input id="password" type="password"
           [(ngModel)]="user.password"
+          (ngModelChange)="onPasswordChange($event)"
           name="password"
           [placeholder]="'users.passwordPlaceholder' | translate"
+          aria-describedby="password-requirements"
           required>
+        <ul id="password-requirements" class="password-requirements" [attr.aria-label]="'users.passwordRequirements' | translate">
+          <li *ngFor="let requirement of passwordRequirements" [class.is-valid]="requirement.satisfied">
+            <span class="requirement-indicator" aria-hidden="true">{{ requirement.satisfied ? '✓' : '○' }}</span>
+            <span>{{ requirement.key | translate }}</span>
+          </li>
+        </ul>
       </div>
 
       <div class="campo">

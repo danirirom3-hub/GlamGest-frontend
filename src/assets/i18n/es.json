@@ -177,6 +177,7 @@
     "namePlaceholder": "nombre",
     "emailPlaceholder": "correo@ejemplo.com",
     "passwordPlaceholder": "digite una contraseña segura",
+    "passwordRequirements": "Requisitos de la contraseña",
     "phonePlaceholder": "300 000 0000",
     "privacyAccept": "Acepto la política de tratamiento de datos.",
     "readPolicy": "Leer política",

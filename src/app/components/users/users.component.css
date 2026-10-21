@@ -137,6 +137,37 @@
   outline: none;
 }
 
+.password-requirements {
+  display: grid;
+  gap: 5px;
+  margin: 9px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text);
+  opacity: 0.72;
+  font-size: 12px;
+}
+
+.password-requirements li {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  line-height: 1.4;
+}
+
+.password-requirements li.is-valid {
+  color: #15803d;
+  opacity: 1;
+}
+
+.requirement-indicator {
+  display: inline-block;
+  width: 14px;
+  flex: 0 0 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
 /* botones general */
 button {
   cursor: pointer;

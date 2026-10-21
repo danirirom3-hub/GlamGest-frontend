@@ -9,6 +9,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { ApiErrorMapper } from '../../services/api-error.mapper';
+import { evaluatePasswordPolicy, PasswordPolicyMessageKey } from '../../services/password-policy';
 
 @Component({
   selector: 'app-users',
@@ -41,6 +42,11 @@ export class UsersComponent {
   message: string = '';
   messageType: 'success' | 'error' = 'success';
   isLoading: boolean = false; // Indica si hay una petición en curso.
+  passwordPolicyErrorKey: PasswordPolicyMessageKey | null = null;
+
+  get passwordRequirements() {
+    return evaluatePasswordPolicy(this.user.password);
+  }
 
   constructor(
     private authService: AuthService,
@@ -51,6 +57,7 @@ export class UsersComponent {
   // Registra un nuevo usuario interno.
   registerUser() {
     this.message = '';
+    this.passwordPolicyErrorKey = null;
 
     if (!this.user.name || !this.user.email || !this.user.password || !this.user.phone) {
       this.message = this.translate.instant('users.missingFields');
@@ -64,8 +71,10 @@ export class UsersComponent {
       return;
     }
 
-    if (this.user.password.length < 8) {
-      this.message = this.translate.instant('users.passwordLength');
+    const failedPasswordRequirement = this.passwordRequirements.find(requirement => !requirement.satisfied);
+    if (failedPasswordRequirement) {
+      this.passwordPolicyErrorKey = failedPasswordRequirement.key;
+      this.message = this.translate.instant(failedPasswordRequirement.key);
       this.messageType = 'error';
       return;
     }
@@ -94,6 +103,7 @@ export class UsersComponent {
           this.message = this.translate.instant('users.success');
           this.messageType = 'success';
            this.user = { name: '', email: '', password: '', phone: '', privacyPolicyAccepted: false };
+           this.passwordPolicyErrorKey = null;
         } else {
            this.message = this.errorMapper.localize(res?.message, 'users.registerError');
           this.messageType = 'error';
@@ -111,6 +121,14 @@ export class UsersComponent {
 
   onRecaptchaResolved(token: string | null): void {
     this.recaptchaToken = token;
+  }
+
+  onPasswordChange(password: string): void {
+    this.user.password = password;
+    if (this.passwordPolicyErrorKey) {
+      this.passwordPolicyErrorKey = null;
+      this.message = '';
+    }
   }
 
   private resetRecaptcha(): void {
