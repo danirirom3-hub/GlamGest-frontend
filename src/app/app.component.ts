@@ -9,7 +9,7 @@ import { AuthService } from './services/auth.service';
 import { IdleLockComponent } from './components/idle-lock/idle-lock.component';
 import { IDLE_LOCK_STORAGE_KEY } from './services/idle-lock.service';
 import { TranslateModule } from '@ngx-translate/core';
-import { LanguageService } from './services/language.service';
+import { AppearancePreferencesService } from './services/appearance-preferences.service';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -39,10 +39,10 @@ export class AppComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    // Initialize the saved language before any route renders, including direct links.
-    languageService: LanguageService
+    // Initialize saved language and appearance before any route renders.
+    appearancePreferences: AppearancePreferencesService
   ) {
-    void languageService.currentLanguage;
+    void appearancePreferences.currentLanguage;
   }
 
   ngOnInit(): void {

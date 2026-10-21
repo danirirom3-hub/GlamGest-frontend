@@ -6,73 +6,37 @@ import { BackupsService, BackupInfo } from '../../services/backups.service';
 import { AuthService } from '../../services/auth.service';
 import Swal from 'sweetalert2';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { LanguageService, SupportedLanguage } from '../../services/language.service';
 import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
 import { ApiErrorMapper } from '../../services/api-error.mapper';
+import { AppearanceSettingsComponent } from './appearance-settings.component';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, LocalizedDatePipe],
+  imports: [CommonModule, FormsModule, TranslateModule, LocalizedDatePipe, AppearanceSettingsComponent],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css']
 })
 export class SettingsComponent implements OnInit {
 
-  currentTheme: string = 'default';
   backups: BackupInfo[] = [];
   isLoadingBackups = false;
   isCreatingBackup = false;
   selectedSection: 'visual' | 'backups' = 'visual';
-  language: SupportedLanguage;
 
   constructor(
     private backupsService: BackupsService,
     private authService: AuthService,
     private router: Router,
-    private languageService: LanguageService,
     private translate: TranslateService,
     private errorMapper: ApiErrorMapper
-  ) { this.language = this.languageService.currentLanguage; }
-
-  setLanguage(language: SupportedLanguage): void {
-    this.languageService.setLanguage(language);
-    this.language = language;
-  }
-
-  setTheme(theme: string) {
-    const body = document.body;
-
-    // limpiar temas reales
-    body.classList.remove('dark', 'femenino');
-
-    // aplicar si no es default
-    if (theme !== 'default') {
-      body.classList.add(theme);
-    }
-
-    // guardar
-    localStorage.setItem('theme', theme);
-
-    this.currentTheme = theme;
-  }
+  ) {}
 
   selectSection(section: 'visual' | 'backups'): void {
     this.selectedSection = section;
   }
 
   ngOnInit() {
-    const theme = localStorage.getItem('theme') || 'default';
-
-    const body = document.body;
-
-    body.classList.remove('dark', 'femenino');
-
-    if (theme !== 'default') {
-      body.classList.add(theme);
-    }
-
-    this.currentTheme = theme;
     this.loadBackups();
   }
 
@@ -179,7 +143,4 @@ export class SettingsComponent implements OnInit {
     return this.errorMapper.resolve(error, this.translate.instant('settings.operationError'));
   }
 
-  isActive(theme: string): boolean {
-    return this.currentTheme === theme;
-  }
 }

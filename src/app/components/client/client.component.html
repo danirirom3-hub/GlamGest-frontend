@@ -4,11 +4,22 @@
     <nav class="menu">
       <a routerLink="/client" fragment="profile"><lucide-icon [img]="icons.User"></lucide-icon>{{ 'portal.myProfile' | translate }}</a>
       <a routerLink="/client" fragment="appointments"><lucide-icon [img]="icons.Calendar"></lucide-icon>{{ 'portal.myAppointments' | translate }}</a>
+      <a routerLink="/client/settings" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }" [attr.title]="'nav.settings' | translate" [attr.aria-label]="'nav.settings' | translate"><lucide-icon [img]="icons.Settings"></lucide-icon>{{ 'nav.settings' | translate }}</a>
     </nav>
     <button class="logout-btn" (click)="logout()"><lucide-icon [img]="icons.LogOut"></lucide-icon>{{ 'portal.logout' | translate }}</button>
     <div class="footer"><p>© 2026</p></div>
   </aside>
   <main class="contenido client-content">
+    <div *ngIf="isSettingsPage; else clientPortal" class="client-settings-page">
+      <header class="client-settings-header">
+        <span class="eyebrow">{{ 'settings.eyebrow' | translate }}</span>
+        <h1>{{ 'settings.title' | translate }}</h1>
+        <p>{{ 'settings.description' | translate }}</p>
+      </header>
+      <app-appearance-settings></app-appearance-settings>
+    </div>
+
+    <ng-template #clientPortal>
     <section id="profile" class="client-card">
       <div class="client-heading"><div><h1>{{ 'portal.myProfile' | translate }}</h1><p>{{ 'portal.profileSubtitle' | translate }}</p></div><lucide-icon [img]="icons.User"></lucide-icon></div>
       <div class="profile-grid" *ngIf="profile; else loadingProfile">
@@ -44,5 +55,6 @@
         <div class="actions"><button class="btn-secondary" (click)="editAppointment(appointment)" [disabled]="deletingId !== null">{{ 'portal.edit' | translate }}</button><button class="btn-danger" (click)="cancelAppointment(appointment)" [disabled]="deletingId === appointment.id">{{ (deletingId === appointment.id ? 'portal.canceling' : 'portal.cancel') | translate }}</button></div>
       </article>
     </section>
+    </ng-template>
   </main>
 </div>

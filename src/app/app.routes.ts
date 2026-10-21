@@ -35,6 +35,7 @@ export const routes: Routes = [
 
   { path: 'users', component: UsersComponent },
 
+  { path: 'client/settings', component: ClientComponent, canActivate: [ClientGuard], data: { clientSettings: true } },
   { path: 'client', component: ClientComponent, canActivate: [ClientGuard] },
 
   {

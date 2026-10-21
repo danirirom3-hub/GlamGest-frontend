@@ -1,0 +1,41 @@
+<section class="settings-panel">
+  <div class="panel-heading">
+    <div>
+      <span class="panel-kicker">{{ 'settings.appearance' | translate }}</span>
+      <h2>{{ 'settings.appearance' | translate }}</h2>
+      <p>{{ 'settings.appearanceDescription' | translate }}</p>
+    </div>
+    <span class="panel-mark" aria-hidden="true">Aa</span>
+  </div>
+
+  <div class="themes-grid" role="group" [attr.aria-label]="'settings.appearance' | translate">
+    <button
+      *ngFor="let theme of themes"
+      type="button"
+      class="theme-card"
+      [class.active]="currentTheme === theme.id"
+      [attr.aria-pressed]="currentTheme === theme.id"
+      (click)="setTheme(theme.id)">
+      <span class="preview" [ngClass]="theme.id"></span>
+      <span class="theme-info">
+        <span class="theme-copy">
+          <strong>{{ theme.title | translate }}</strong>
+          <span>{{ theme.description | translate }}</span>
+        </span>
+        <span class="theme-status">{{ currentTheme === theme.id ? ('settings.active' | translate) : ('settings.apply' | translate) }}</span>
+      </span>
+    </button>
+  </div>
+
+  <div class="language-card">
+    <div>
+      <span class="panel-kicker">{{ 'settings.language' | translate }}</span>
+      <h2>{{ 'settings.languageTitle' | translate }}</h2>
+      <p>{{ 'settings.languageDescriptionFull' | translate }}</p>
+    </div>
+    <select [ngModel]="language" (ngModelChange)="setLanguage($event)" [attr.aria-label]="'settings.languageTitle' | translate">
+      <option value="es">{{ 'settings.spanish' | translate }}</option>
+      <option value="en">{{ 'settings.english' | translate }}</option>
+    </select>
+  </div>
+</section>

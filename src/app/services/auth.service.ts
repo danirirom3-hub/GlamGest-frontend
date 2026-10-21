@@ -59,7 +59,6 @@ export class AuthService {
   saveSession(response: any): void {
     const session = response?.data || response;
     if (session?.token) this.saveToken(session.token);
-    if (session?.token) this.sessionSubject.next(true);
     if (session?.role) localStorage.setItem('role', session.role);
     if (session?.userId !== undefined) localStorage.setItem('userId', String(session.userId));
     if (session?.clientId !== undefined && session.clientId !== null) {
@@ -81,6 +80,7 @@ export class AuthService {
         localStorage.setItem('privacyPolicyVersion', String(incomingVersion));
       }
     }
+    if (session?.token) this.sessionSubject.next(true);
   }
 
   // Guarda el token de sesión en el almacenamiento local del navegador.

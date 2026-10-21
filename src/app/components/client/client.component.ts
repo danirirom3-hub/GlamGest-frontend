@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { LucideAngularModule, Calendar, User, LogOut } from 'lucide-angular';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { LucideAngularModule, Calendar, User, LogOut, Settings } from 'lucide-angular';
 import Swal from 'sweetalert2';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
@@ -12,6 +12,7 @@ import { ServicesService } from '../../services/services.service';
 import { EmployeesService } from '../../services/employees.service';
 import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
 import { ApiErrorMapper } from '../../services/api-error.mapper';
+import { AppearanceSettingsComponent } from '../settings/appearance-settings.component';
 
 interface ClientAppointment {
   id: number;
@@ -31,12 +32,13 @@ interface CatalogOption {
 @Component({
   selector: 'app-client',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, LucideAngularModule, TranslateModule, LocalizedDatePipe],
+  imports: [CommonModule, FormsModule, RouterModule, LucideAngularModule, TranslateModule, LocalizedDatePipe, AppearanceSettingsComponent],
   templateUrl: './client.component.html',
   styleUrls: ['../dashboard/dashboard.component.css', './client.component.css']
 })
 export class ClientComponent implements OnInit {
-  icons = { Calendar, User, LogOut };
+  icons = { Calendar, User, LogOut, Settings };
+  isSettingsPage = false;
   profile: any = null;
   appointments: ClientAppointment[] = [];
   services: CatalogOption[] = [];
@@ -56,15 +58,19 @@ export class ClientComponent implements OnInit {
     private appointmentsService: AppointmentsService,
     private servicesService: ServicesService,
     private employeesService: EmployeesService,
+    private route: ActivatedRoute,
     private router: Router,
     private translate: TranslateService,
     private errorMapper: ApiErrorMapper
   ) {}
 
   ngOnInit(): void {
-    this.loadProfile();
-    this.loadAppointments();
-    this.loadCatalog();
+    this.isSettingsPage = this.route.snapshot.data['clientSettings'] === true;
+    if (!this.isSettingsPage) {
+      this.loadProfile();
+      this.loadAppointments();
+      this.loadCatalog();
+    }
   }
 
   loadProfile(): void {

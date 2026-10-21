@@ -107,14 +107,16 @@ export class UsersComponent {
         this.isLoading = false; // Permite volver a interactuar con el formulario.
         if (res?.successful) {
           const session = res?.data || res;
+          const hasClientSession = session?.token && session?.role === 'CLIENT';
+          if (hasClientSession) this.authService.saveSession(res);
+
           this.message = this.translate.instant('users.success');
           this.messageType = 'success';
           this.user = { name: '', email: '', password: '', phone: '', privacyPolicyAccepted: false };
           this.passwordPolicyErrorKey = null;
           this.showPasswordRequirements = false;
 
-          if (session?.token && session?.role === 'CLIENT') {
-            this.authService.saveSession(res);
+          if (hasClientSession) {
             window.setTimeout(() => {
               const destination = this.authService.isPrivacyPolicyPending() ? '/privacy-policy' : '/client';
               void this.router.navigate([destination], { replaceUrl: true });

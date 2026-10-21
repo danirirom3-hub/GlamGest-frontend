@@ -1,6 +1,6 @@
 /// <reference types="jasmine" />
 
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 import { UsersComponent } from './users.component';
 import { AuthService } from '../../services/auth.service';
 import { Router, provideRouter } from '@angular/router';
@@ -90,6 +90,7 @@ describe('UsersComponent', () => {
 
       tick(1200);
       expect(router.navigate).toHaveBeenCalledWith(['/client'], { replaceUrl: true });
+      flush();
     }));
 
     it('debería manejar el escenario donde el servidor responde exitosamente pero con flag successful en false', () => {
