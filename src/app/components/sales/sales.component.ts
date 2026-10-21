@@ -11,6 +11,7 @@ import { EmployeesService } from '../../services/employees.service';
 import { ServicesService } from '../../services/services.service';
 import { AppointmentsService } from '../../services/appointments.service';
 import { LanguageService } from '../../services/language.service';
+import { ApiErrorMapper } from '../../services/api-error.mapper';
 import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
 
 @Component({
@@ -29,7 +30,8 @@ export class SalesComponent implements OnInit {
     private servicesService: ServicesService,
     private appointmentsService: AppointmentsService,
     private translate: TranslateService,
-    private languageService: LanguageService
+    private languageService: LanguageService,
+    private errorMapper: ApiErrorMapper
   ) {}
 
   formatCurrency(value: number): string {
@@ -692,11 +694,7 @@ export class SalesComponent implements OnInit {
 
             error: (err: any) => {
 
-              this.errorMessage =
-
-                err?.error?.message ||
-
-                this.translate.instant('sales.error');
+              this.errorMessage = this.errorMapper.resolve(err, this.translate.instant('sales.error'));
 
               this.isLoading = false;
 

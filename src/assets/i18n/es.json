@@ -103,7 +103,9 @@
     "restoreText": "Se creará una copia de seguridad automática antes de restaurar. Esta acción reemplazará los datos actuales.",
     "restoreDoneTitle": "Restauración completada",
     "restoreDoneText": "La base de datos fue restaurada correctamente. Por seguridad, debes iniciar sesión nuevamente.",
-    "deleteTitle": "¿Eliminar backup?"
+    "deleteTitle": "¿Eliminar backup?",
+    "backupNotFound": "No se encontró el backup solicitado.",
+    "backupChecksumMismatch": "La suma de verificación del backup no coincide con sus metadatos."
   },
   "clients": {
     "eyebrow": "Directorio",
@@ -145,7 +147,8 @@
     "incomplete": "Completa todos los campos para guardar el cliente.",
     "createError": "No se pudo crear el cliente.",
     "updateError": "No se pudo actualizar el cliente.",
-    "deactivateError": "No se pudo desactivar el cliente."
+    "deactivateError": "No se pudo desactivar el cliente.",
+    "notFound": "No se encontró el cliente solicitado."
   },
   "auth": {
     "login": "Iniciar sesión",
@@ -159,6 +162,7 @@
     "captchaRequired": "Completa el captcha antes de iniciar sesión.",
     "invalidCaptcha": "El captcha no es válido o ha expirado. Complétalo nuevamente.",
     "invalidRole": "La respuesta de autenticación no contiene un rol válido.",
+    "emailExists": "Este correo ya tiene una cuenta.",
     "success": "Login exitoso. Redirigiendo...",
     "failed": "No se pudo iniciar sesión.",
     "privacyNote": "Si tu política de tratamiento de datos requiere actualización, te la mostraremos después de iniciar sesión."
@@ -256,7 +260,9 @@
     "categoryCreated": "Categoría creada",
     "categoryUpdated": "Categoría actualizada",
     "categoryDeactivated": "Categoría desactivada",
-    "categoryReactivated": "Categoría reactivada"
+    "categoryReactivated": "Categoría reactivada",
+    "notFound": "No se encontró el servicio solicitado.",
+    "categoryNotFound": "No se encontró la categoría solicitada."
   },
   "employees": {
     "title": "Gestión de Empleados",
@@ -293,7 +299,9 @@
     "deactivated": "Empleado desactivado",
     "activated": "Empleado activado",
     "statusError": "No se pudo cambiar el estado.",
-    "statusChangeError": "Error al cambiar estado."
+    "statusChangeError": "Error al cambiar estado.",
+    "notFound": "No se encontró el empleado solicitado.",
+    "duplicatePhone": "El teléfono ya está registrado para otro empleado."
   },
   "appointments": {
     "title": "Citas",
@@ -323,7 +331,12 @@
     "deleteTitle": "¿Eliminar cita?",
     "deletedTitle": "Eliminada",
     "deletedText": "La cita fue eliminada",
-    "deleteError": "No se pudo eliminar la cita."
+    "deleteError": "No se pudo eliminar la cita.",
+    "scheduleConflict": "El empleado ya tiene una cita en ese horario.",
+    "notFound": "No se encontró la cita solicitada.",
+    "mustBeFuture": "La fecha de la cita debe ser futura.",
+    "cannotDelete": "Las citas no se eliminan; deben cancelarse.",
+    "cannotEdit": "No tienes permiso para modificar esta cita."
   },
   "metrics": {
     "overview": "Visión general",
@@ -472,7 +485,14 @@
     "loadServicesError": "No se pudieron cargar los servicios",
     "loadEmployeesError": "No se pudieron cargar los empleados",
     "loadSalesError": "No se pudo cargar el historial de ventas",
-    "loadAppointmentsError": "No se pudieron cargar las citas"
+    "loadAppointmentsError": "No se pudieron cargar las citas",
+    "notFound": "No se encontró la venta solicitada.",
+    "appointmentUnavailable": "No se puede facturar una cita cancelada o marcada como ausente.",
+    "serviceRequiredText": "El detalle de venta debe incluir un servicio.",
+    "employeeRequiredText": "El detalle de venta debe incluir un empleado.",
+    "cancelledCannotUpdate": "No se puede modificar una venta anulada.",
+    "alreadyCancelled": "La venta ya está anulada.",
+    "detailCannotDelete": "Los detalles de una venta no se pueden eliminar; anula la venta completa."
   },
   "portal": {
     "myProfile": "Mi perfil",
@@ -546,6 +566,28 @@
     "page": "Página",
     "of": "de",
     "loadError": "No se pudo cargar la auditoría.",
+    "errorDetailsUnavailable": "No hay una traducción disponible para el detalle de este error.",
+    "actionLabels": {
+      "create": "Creación",
+      "update": "Actualización",
+      "delete": "Eliminación o desactivación",
+      "error": "Error",
+      "write": "Operación",
+      "other": "Otra acción"
+    },
+    "roles": {
+      "admin": "Administrador",
+      "client": "Cliente",
+      "employee": "Empleado",
+      "other": "Otro rol"
+    },
+    "descriptions": {
+      "create": "Se creó un registro en el módulo de {{module}}.",
+      "update": "Se actualizó un registro en el módulo de {{module}}.",
+      "delete": "Se eliminó o desactivó un registro en el módulo de {{module}}.",
+      "write": "Se realizó una operación en el módulo de {{module}}.",
+      "error": "No se pudo completar la operación en el módulo de {{module}}."
+    },
     "actions": {
       "empty": "Todas las acciones",
       "create": "Creaciones",
@@ -563,7 +605,9 @@
       "reports": "Reportes",
       "sales": "Ventas",
       "services": "Servicios",
-      "users": "Usuarios"
+      "users": "Usuarios",
+      "system": "Sistema",
+      "other": "Otro módulo"
     }
   },
   "idleLock": {
@@ -652,6 +696,7 @@
     "sessionExpiredText": "Tu sesión ya no es válida. Inicia sesión nuevamente.",
     "policyPendingTitle": "Política pendiente",
     "policyPendingText": "Debes aceptar la política de tratamiento de datos para continuar.",
-    "forbiddenTitle": "Permisos insuficientes"
+    "forbiddenTitle": "Permisos insuficientes",
+    "userNotFound": "No se encontró el usuario solicitado."
   }
 }

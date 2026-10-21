@@ -87,7 +87,7 @@ describe('UsersComponent', () => {
       component.registerUser();
 
       expect(component.isLoading).toBeFalse();
-      expect(component.message).toBe('El correo electrónico ya se encuentra registrado.');
+      expect(component.message).toBe('auth.emailExists');
       expect(component.messageType).toBe('error');
       // No debe limpiarse el formulario para que el usuario pueda corregir el dato
       expect(component.user.name).toBe('Angie Sosa');
@@ -119,7 +119,7 @@ describe('UsersComponent', () => {
       component.registerUser();
 
       expect(component.isLoading).toBeFalse();
-      expect(component.message).toBe('Error interno del servidor (500).');
+      expect(component.message).toBe('users.genericError');
       expect(component.messageType).toBe('error');
     });
 

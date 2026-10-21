@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { EmployeesService } from '../../services/employees.service';
 import Swal from 'sweetalert2';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ApiErrorMapper } from '../../services/api-error.mapper';
 
   /* Datos que representan a un empleado. */
 interface Employee {
@@ -38,7 +39,11 @@ export class EmployeesComponent implements OnInit {
   isEditing = false;
   mensaje = '';
 
-  constructor(private employeesService: EmployeesService, private translate: TranslateService) {}
+  constructor(
+    private employeesService: EmployeesService,
+    private translate: TranslateService,
+    private errorMapper: ApiErrorMapper
+  ) {}
 
   ngOnInit(): void {
     this.loadEmployees();
@@ -97,11 +102,11 @@ export class EmployeesComponent implements OnInit {
           this.resetForm();
 
         } else {
-          Swal.fire(this.translate.instant('common.error'), res?.message || this.translate.instant('employees.createError'), 'error');
+          Swal.fire(this.translate.instant('common.error'), this.errorMapper.localize(res?.message, 'employees.createError'), 'error');
         }
       },
       error: (err) => {
-        Swal.fire(this.translate.instant('common.error'), err?.error?.message || this.translate.instant('employees.createError'), 'error');
+        Swal.fire(this.translate.instant('common.error'), this.errorMapper.resolve(err, this.translate.instant('employees.createError')), 'error');
       }
     });
   }
@@ -150,11 +155,11 @@ export class EmployeesComponent implements OnInit {
           this.resetForm();
 
         } else {
-          Swal.fire(this.translate.instant('common.error'), res?.message || this.translate.instant('employees.updateError'), 'error');
+          Swal.fire(this.translate.instant('common.error'), this.errorMapper.localize(res?.message, 'employees.updateError'), 'error');
         }
       },
       error: (err) => {
-        Swal.fire(this.translate.instant('common.error'), err?.error?.message || this.translate.instant('employees.updateError'), 'error');
+        Swal.fire(this.translate.instant('common.error'), this.errorMapper.resolve(err, this.translate.instant('employees.updateError')), 'error');
       }
     });
   }
@@ -191,7 +196,7 @@ export class EmployeesComponent implements OnInit {
           }
         },
         error: (err) => {
-          Swal.fire(this.translate.instant('common.error'), err?.error?.message || this.translate.instant('employees.deleteError'), 'error');
+          Swal.fire(this.translate.instant('common.error'), this.errorMapper.resolve(err, this.translate.instant('employees.deleteError')), 'error');
         }
       });
 
@@ -257,7 +262,7 @@ export class EmployeesComponent implements OnInit {
             });
 
           } else {
-            Swal.fire(this.translate.instant('common.error'), res?.message || this.translate.instant('employees.statusError'), 'error');
+            Swal.fire(this.translate.instant('common.error'), this.errorMapper.localize(res?.message, 'employees.statusError'), 'error');
           }
         },
         error: () => {

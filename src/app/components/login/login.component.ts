@@ -8,6 +8,7 @@ import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ApiErrorMapper } from '../../services/api-error.mapper';
 
 @Component({
   selector: 'app-login',
@@ -37,7 +38,8 @@ export class LoginComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private errorMapper: ApiErrorMapper
   ) {}
 
   // Maneja el login
@@ -113,7 +115,7 @@ export class LoginComponent {
           }, 1500);
 
         } else {
-          this.message = res?.message || this.translate.instant('auth.failed');
+           this.message = this.errorMapper.localize(res?.message, 'auth.failed');
           this.messageType = 'error';
         }
       },
@@ -144,10 +146,7 @@ export class LoginComponent {
   }
 
   private getErrorMessage(error: any, fallback: string): string {
-    if (error?.status === 0) {
-      return this.translate.instant('common.connectionError');
-    }
-    return error?.error?.error || error?.error?.message || error?.message || fallback;
+    return this.errorMapper.resolve(error, fallback);
   }
 
 }

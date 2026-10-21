@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuditLog, AuditLogFilters, AuditLogsService } from '../../services/audit-logs.service';
 import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
+import { ApiErrorMapper } from '../../services/api-error.mapper';
 
 @Component({
   selector: 'app-audit-logs',
@@ -43,11 +44,16 @@ export class AuditLogsComponent implements OnInit {
       { value: 'reports', label: this.translate.instant('auditLogs.modules.reports') },
       { value: 'sales', label: this.translate.instant('auditLogs.modules.sales') },
       { value: 'services', label: this.translate.instant('auditLogs.modules.services') },
-      { value: 'users', label: this.translate.instant('auditLogs.modules.users') }
+      { value: 'users', label: this.translate.instant('auditLogs.modules.users') },
+      { value: 'system', label: this.translate.instant('auditLogs.modules.system') }
     ];
   }
 
-  constructor(private auditLogsService: AuditLogsService, private translate: TranslateService) {}
+  constructor(
+    private auditLogsService: AuditLogsService,
+    private translate: TranslateService,
+    private errorMapper: ApiErrorMapper
+  ) {}
 
   ngOnInit(): void {
     this.loadLogs();
@@ -64,7 +70,7 @@ export class AuditLogsComponent implements OnInit {
       },
       error: error => {
         this.loading = false;
-        void Swal.fire(this.translate.instant('auditLogs.title'), error?.error?.message || this.translate.instant('auditLogs.loadError'), 'error');
+        void Swal.fire(this.translate.instant('auditLogs.title'), this.errorMapper.resolve(error, this.translate.instant('auditLogs.loadError')), 'error');
       }
     });
   }
@@ -95,5 +101,39 @@ export class AuditLogsComponent implements OnInit {
     if (status >= 500) return 'status-error';
     if (status >= 400) return 'status-warning';
     return 'status-success';
+  }
+
+  actionLabel(action: string): string {
+    const key = `auditLogs.actionLabels.${(action || '').toLowerCase()}`;
+    const translated = this.translate.instant(key);
+    return translated === key ? this.translate.instant('auditLogs.actionLabels.other') : translated;
+  }
+
+  moduleLabel(module: string): string {
+    const key = `auditLogs.modules.${(module || '').toLowerCase()}`;
+    const translated = this.translate.instant(key);
+    return translated === key ? this.translate.instant('auditLogs.modules.other') : translated;
+  }
+
+  roleLabel(role: string | null): string {
+    if (!role) return this.translate.instant('auditLogs.noRole');
+    const normalizedRole = role.replace(/^ROLE_/, '').toLowerCase();
+    const key = `auditLogs.roles.${normalizedRole}`;
+    const translated = this.translate.instant(key);
+    return translated === key ? this.translate.instant('auditLogs.roles.other') : translated;
+  }
+
+  descriptionFor(log: AuditLog): string {
+    const module = this.moduleLabel(log.module);
+    const action = log.statusCode >= 400 || log.action === 'ERROR'
+      ? 'error'
+      : ['CREATE', 'UPDATE', 'DELETE'].includes(log.action)
+        ? log.action.toLowerCase()
+        : 'write';
+    return this.translate.instant(`auditLogs.descriptions.${action}`, { module });
+  }
+
+  errorMessageFor(log: AuditLog): string {
+    return this.errorMapper.localizeAuditError(log.errorMessage);
   }
 }

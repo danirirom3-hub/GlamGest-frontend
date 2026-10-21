@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LanguageService, SupportedLanguage } from '../../services/language.service';
 import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
+import { ApiErrorMapper } from '../../services/api-error.mapper';
 
 @Component({
   selector: 'app-settings',
@@ -30,7 +31,8 @@ export class SettingsComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private languageService: LanguageService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private errorMapper: ApiErrorMapper
   ) { this.language = this.languageService.currentLanguage; }
 
   setLanguage(language: SupportedLanguage): void {
@@ -174,7 +176,7 @@ export class SettingsComponent implements OnInit {
   }
 
   private errorMessage(error: any): string {
-    return error?.error?.message || error?.error?.error || error?.message || this.translate.instant('settings.operationError');
+    return this.errorMapper.resolve(error, this.translate.instant('settings.operationError'));
   }
 
   isActive(theme: string): boolean {

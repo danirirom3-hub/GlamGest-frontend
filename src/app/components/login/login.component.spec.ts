@@ -133,7 +133,7 @@ describe('LoginComponent', () => {
 
       component.onLogin();
 
-      expect(component.message).toBe('Credenciales inválidas o cuenta inactiva.');
+      expect(component.message).toBe('auth.invalidCredentials');
       expect(component.messageType).toBe('error');
       expect(routerSpy.navigate).not.toHaveBeenCalled();
     });
@@ -167,7 +167,7 @@ describe('LoginComponent', () => {
 
       component.onLogin();
 
-      expect(component.message).toBe('Error de conexión con el servidor.');
+      expect(component.message).toBe('errors.connection');
       expect(component.messageType).toBe('error');
     });
 

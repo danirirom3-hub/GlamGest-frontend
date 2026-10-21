@@ -11,6 +11,7 @@ import { AppointmentsService } from '../../services/appointments.service';
 import { ServicesService } from '../../services/services.service';
 import { EmployeesService } from '../../services/employees.service';
 import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
+import { ApiErrorMapper } from '../../services/api-error.mapper';
 
 interface ClientAppointment {
   id: number;
@@ -56,7 +57,8 @@ export class ClientComponent implements OnInit {
     private servicesService: ServicesService,
     private employeesService: EmployeesService,
     private router: Router,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private errorMapper: ApiErrorMapper
   ) {}
 
   ngOnInit(): void {
@@ -196,12 +198,6 @@ export class ClientComponent implements OnInit {
   }
 
   private getErrorMessage(error: any, fallback: string): string {
-    if (error?.status === 401) return this.translate.instant('portal.sessionExpired');
-    if (error?.status === 403) return this.translate.instant('portal.forbidden');
-    if (error?.error && typeof error.error === 'object') {
-      const validationErrors = Object.values(error.error).filter(value => typeof value === 'string');
-      if (validationErrors.length > 0) return validationErrors.join(' ');
-    }
-    return error?.error?.error || error?.error?.message || error?.message || fallback;
+    return this.errorMapper.resolve(error, fallback);
   }
 }

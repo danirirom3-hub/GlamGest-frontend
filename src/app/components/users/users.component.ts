@@ -8,6 +8,7 @@ import { finalize } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
+import { ApiErrorMapper } from '../../services/api-error.mapper';
 
 @Component({
   selector: 'app-users',
@@ -41,7 +42,11 @@ export class UsersComponent {
   messageType: 'success' | 'error' = 'success';
   isLoading: boolean = false; // Indica si hay una petición en curso.
 
-  constructor(private authService: AuthService, private translate: TranslateService) {}
+  constructor(
+    private authService: AuthService,
+    private translate: TranslateService,
+    private errorMapper: ApiErrorMapper
+  ) {}
 
   // Registra un nuevo usuario interno.
   registerUser() {
@@ -90,7 +95,7 @@ export class UsersComponent {
           this.messageType = 'success';
            this.user = { name: '', email: '', password: '', phone: '', privacyPolicyAccepted: false };
         } else {
-          this.message = res?.message || this.translate.instant('users.registerError');
+           this.message = this.errorMapper.localize(res?.message, 'users.registerError');
           this.messageType = 'error';
         }
       },
@@ -122,14 +127,7 @@ export class UsersComponent {
   }
 
   private getErrorMessage(error: any, fallback: string): string {
-    if (error?.status === 0) {
-      return this.translate.instant('common.connectionError');
-    }
-    const validationErrors = error?.error?.data;
-    if (validationErrors && typeof validationErrors === 'object') {
-      return Object.values(validationErrors).join(' ');
-    }
-    return error?.error?.error || error?.error?.message || error?.message || fallback;
+    return this.errorMapper.resolve(error, fallback);
   }
 
 }

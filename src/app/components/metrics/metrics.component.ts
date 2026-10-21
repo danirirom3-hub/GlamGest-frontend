@@ -15,6 +15,7 @@ import { OfflineStoreService } from '../../services/offline-store.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
 import { LanguageService } from '../../services/language.service';
+import { ApiErrorMapper } from '../../services/api-error.mapper';
 
 type DatePreset = 'today' | 'week' | 'month' | 'custom';
 
@@ -48,7 +49,8 @@ export class MetricsComponent implements OnInit {
     private metricsService: DashboardMetricsService,
     private offlineStore: OfflineStoreService,
     private translate: TranslateService,
-    private languageService: LanguageService
+    private languageService: LanguageService,
+    private errorMapper: ApiErrorMapper
   ) {}
 
   ngOnInit(): void {
@@ -117,7 +119,7 @@ export class MetricsComponent implements OnInit {
            this.syncedAt = cached.syncedAt;
            this.errorMessage = '';
         } else {
-          this.errorMessage = error?.error?.message || this.translate.instant('metrics.loadError');
+          this.errorMessage = this.errorMapper.resolve(error, this.translate.instant('metrics.loadError'));
         }
       }
     });
@@ -125,7 +127,7 @@ export class MetricsComponent implements OnInit {
 
   formatCurrency(value = 0): string {
     const locale = this.languageService.currentLanguage === 'en' ? 'en-US' : 'es-CO';
-    return new Intl.NumberFormat(locale, { style: 'currency', currency: 'ARS', maximumFractionDigits: 2 }).format(value);
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: 'COP', maximumFractionDigits: 2 }).format(value);
   }
 
   statusName(label: string): string {

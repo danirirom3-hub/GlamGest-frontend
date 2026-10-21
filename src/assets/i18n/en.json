@@ -103,7 +103,9 @@
     "restoreText": "An automatic backup will be created before restoring. This action will replace the current data.",
     "restoreDoneTitle": "Restore completed",
     "restoreDoneText": "The database was restored successfully. For security, you must log in again.",
-    "deleteTitle": "Delete backup?"
+    "deleteTitle": "Delete backup?",
+    "backupNotFound": "The requested backup was not found.",
+    "backupChecksumMismatch": "The backup checksum does not match its metadata."
   },
   "clients": {
     "eyebrow": "Directory",
@@ -145,7 +147,8 @@
     "incomplete": "Complete all fields to save the client.",
     "createError": "Could not create the client.",
     "updateError": "Could not update the client.",
-    "deactivateError": "Could not deactivate the client."
+    "deactivateError": "Could not deactivate the client.",
+    "notFound": "The requested client was not found."
   },
   "auth": {
     "login": "Log in",
@@ -159,6 +162,7 @@
     "captchaRequired": "Complete the captcha before logging in.",
     "invalidCaptcha": "The captcha is invalid or has expired. Complete it again.",
     "invalidRole": "The authentication response does not contain a valid role.",
+    "emailExists": "This email already has an account.",
     "success": "Login successful. Redirecting...",
     "failed": "Could not log in.",
     "privacyNote": "If your data processing policy requires an update, we will show it to you after logging in."
@@ -256,7 +260,9 @@
     "categoryCreated": "Category created",
     "categoryUpdated": "Category updated",
     "categoryDeactivated": "Category deactivated",
-    "categoryReactivated": "Category reactivated"
+    "categoryReactivated": "Category reactivated",
+    "notFound": "The requested service was not found.",
+    "categoryNotFound": "The requested category was not found."
   },
   "employees": {
     "title": "Employee management",
@@ -293,7 +299,9 @@
     "deactivated": "Employee deactivated",
     "activated": "Employee activated",
     "statusError": "Could not change the status.",
-    "statusChangeError": "Error changing status."
+    "statusChangeError": "Error changing status.",
+    "notFound": "The requested employee was not found.",
+    "duplicatePhone": "This phone number is already registered for another employee."
   },
   "appointments": {
     "title": "Appointments",
@@ -323,7 +331,12 @@
     "deleteTitle": "Delete appointment?",
     "deletedTitle": "Deleted",
     "deletedText": "The appointment was deleted",
-    "deleteError": "Could not delete the appointment."
+    "deleteError": "Could not delete the appointment.",
+    "scheduleConflict": "The employee already has an appointment at that time.",
+    "notFound": "The requested appointment was not found.",
+    "mustBeFuture": "The appointment date must be in the future.",
+    "cannotDelete": "Appointments cannot be deleted; they must be cancelled.",
+    "cannotEdit": "You do not have permission to modify this appointment."
   },
   "metrics": {
     "overview": "Overview",
@@ -472,7 +485,14 @@
     "loadServicesError": "Could not load the services",
     "loadEmployeesError": "Could not load the employees",
     "loadSalesError": "Could not load the sales history",
-    "loadAppointmentsError": "Could not load the appointments"
+    "loadAppointmentsError": "Could not load the appointments",
+    "notFound": "The requested sale was not found.",
+    "appointmentUnavailable": "A cancelled or no-show appointment cannot be billed.",
+    "serviceRequiredText": "The sale detail must include a service.",
+    "employeeRequiredText": "The sale detail must include an employee.",
+    "cancelledCannotUpdate": "A cancelled sale cannot be modified.",
+    "alreadyCancelled": "The sale is already cancelled.",
+    "detailCannotDelete": "Sale details cannot be deleted; cancel the entire sale."
   },
   "portal": {
     "myProfile": "My profile",
@@ -546,6 +566,28 @@
     "page": "Page",
     "of": "of",
     "loadError": "Could not load the audit log.",
+    "errorDetailsUnavailable": "No translation is available for this error detail.",
+    "actionLabels": {
+      "create": "Creation",
+      "update": "Update",
+      "delete": "Deletion or deactivation",
+      "error": "Error",
+      "write": "Operation",
+      "other": "Other action"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "client": "Client",
+      "employee": "Employee",
+      "other": "Other role"
+    },
+    "descriptions": {
+      "create": "A record was created in the {{module}} module.",
+      "update": "A record was updated in the {{module}} module.",
+      "delete": "A record was deleted or deactivated in the {{module}} module.",
+      "write": "An operation was performed in the {{module}} module.",
+      "error": "The operation in the {{module}} module could not be completed."
+    },
     "actions": {
       "empty": "All actions",
       "create": "Creations",
@@ -563,7 +605,9 @@
       "reports": "Reports",
       "sales": "Sales",
       "services": "Services",
-      "users": "Users"
+      "users": "Users",
+      "system": "System",
+      "other": "Other module"
     }
   },
   "idleLock": {
@@ -652,6 +696,7 @@
     "sessionExpiredText": "Your session is no longer valid. Log in again.",
     "policyPendingTitle": "Pending policy",
     "policyPendingText": "You must accept the data processing policy to continue.",
-    "forbiddenTitle": "Insufficient permissions"
+    "forbiddenTitle": "Insufficient permissions",
+    "userNotFound": "The requested user was not found."
   }
 }

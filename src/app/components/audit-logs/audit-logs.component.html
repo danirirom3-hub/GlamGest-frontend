@@ -27,10 +27,10 @@
         <tbody>
           <tr *ngFor="let log of logs">
             <td>{{ log.occurredAt | localizedDate:{ day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' } }}</td>
-            <td><strong>{{ log.userEmail || ('auditLogs.systemAnonymous' | translate) }}</strong><small>{{ log.role || ('auditLogs.noRole' | translate) }}</small></td>
-            <td><span class="action">{{ log.action }}</span><small>{{ log.httpMethod }} {{ log.endpoint }}</small></td>
-            <td>{{ log.module }}</td>
-            <td><span>{{ log.description }}</span><small *ngIf="log.errorMessage">{{ log.errorMessage }}</small></td>
+            <td><strong>{{ log.userEmail || ('auditLogs.systemAnonymous' | translate) }}</strong><small>{{ roleLabel(log.role) }}</small></td>
+            <td><span class="action">{{ actionLabel(log.action) }}</span><small>{{ log.httpMethod }} {{ log.endpoint }}</small></td>
+            <td>{{ moduleLabel(log.module) }}</td>
+            <td><span>{{ descriptionFor(log) }}</span><small *ngIf="log.errorMessage">{{ errorMessageFor(log) }}</small></td>
             <td><span class="status" [class]="statusClass(log.statusCode)">{{ log.statusCode }}</span></td>
           </tr>
         </tbody>

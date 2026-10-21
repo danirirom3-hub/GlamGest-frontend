@@ -336,7 +336,7 @@ export class ServicesComponent implements OnInit {
   formatPrice(price: number | null): string {
     if (price === null) return '-';
     const locale = this.languageService.currentLanguage === 'en' ? 'en-US' : 'es-CO';
-    return new Intl.NumberFormat(locale, { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(price);
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(price);
   }
 
   private emptyService(): Service { return { active: true, name: '', price: null, description: '', durationMinutes: null, categoryId: null }; }
