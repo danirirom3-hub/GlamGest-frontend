@@ -54,6 +54,10 @@ export class ClientsComponent implements OnInit {
     return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([letter, clients]) => ({ letter, clients }));
   }
 
+  trackByGroupLetter(_: number, group: ClientGroup): string { return group.letter; }
+
+  trackByClientId(_: number, client: Client): number | string { return client.id ?? client.email; }
+
   ngOnInit(): void { this.loadClients(); }
 
   loadClients(): void {

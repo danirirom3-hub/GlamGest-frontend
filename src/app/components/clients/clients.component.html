@@ -25,18 +25,21 @@
     <span class="results-count">{{ totalItems }} {{ 'clients.results' | translate }}</span>
   </div>
 
-  <div class="loading-state" *ngIf="loading">{{ 'clients.loading' | translate }}</div>
+  <div class="loading-state" *ngIf="loading && !clients.length" role="status" aria-live="polite">{{ 'clients.loading' | translate }}</div>
+  <div class="refreshing-state" *ngIf="loading && clients.length" role="status" aria-live="polite">
+    <span class="loading-spinner" aria-hidden="true"></span>{{ 'clients.loading' | translate }}
+  </div>
   <div class="empty-state" *ngIf="!loading && !clients.length">
     <h2>{{ searchText ? ('clients.notFound' | translate) : ('clients.empty' | translate) }}</h2>
     <p>{{ searchText ? ('clients.notFoundDescription' | translate) : ('clients.emptyDescription' | translate) }}</p>
     <button *ngIf="!searchText" class="secondary-button" type="button" (click)="openNew()">{{ 'clients.create' | translate }}</button>
   </div>
 
-  <div class="client-groups" *ngIf="!loading && clients.length">
-    <section class="client-group" *ngFor="let group of groupedClients">
+  <div class="client-groups" *ngIf="clients.length" [attr.aria-busy]="loading">
+    <section class="client-group" *ngFor="let group of groupedClients; trackBy: trackByGroupLetter">
       <h2 *ngIf="group.letter">{{ group.letter }}</h2>
       <div class="client-grid">
-        <article class="client-card" *ngFor="let item of group.clients">
+        <article class="client-card" *ngFor="let item of group.clients; trackBy: trackByClientId">
           <div class="client-card-top">
             <span class="avatar">{{ item.name.charAt(0).toUpperCase() }}</span>
             <div class="client-identity">
