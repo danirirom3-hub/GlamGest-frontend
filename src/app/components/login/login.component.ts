@@ -74,6 +74,7 @@ export class LoginComponent {
 
         if (token) {
           this.authService.saveSession(res);
+          this.user = { email: '', password: '' };
 
           // Guardar userId en localStorage si el backend lo devuelve
           let userId =

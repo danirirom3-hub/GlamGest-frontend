@@ -188,7 +188,9 @@
     "passwordLength": "The password must have at least 8 characters.",
     "captchaRequired": "Complete the captcha before registering the user.",
     "captchaInvalid": "The captcha is invalid or has expired. Complete it again.",
-    "success": "User registered successfully.",
+    "success": "Account created successfully. Signing you in...",
+    "registeredGoLogin": "Account created. Log in to continue.",
+    "passwordPolicySatisfied": "The password meets all requirements.",
     "registerError": "Could not register the user.",
     "genericError": "Error registering the user."
   },

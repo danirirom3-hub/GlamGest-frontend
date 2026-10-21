@@ -102,6 +102,7 @@ describe('LoginComponent', () => {
 
       expect(component.message).toBe('auth.success');
       expect(component.messageType).toBe('success');
+      expect(component.user).toEqual({ email: '', password: '' });
 
       // Avanzamos los 1500ms del setTimeout
       tick(1500);

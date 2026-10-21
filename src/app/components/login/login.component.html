@@ -14,7 +14,7 @@
     <h2 class="titulo">Glam<span>Gest</span></h2>
     <p class="subtitulo">{{ 'auth.login' | translate }}</p>
 
-    <form (ngSubmit)="onLogin()">
+    <form (ngSubmit)="onLogin()" autocomplete="on">
       
       <div class="input-group">
          <label>{{ 'auth.email' | translate }}</label>
@@ -22,6 +22,7 @@
           type="email" 
           [(ngModel)]="user.email" 
           name="email" 
+          autocomplete="username"
            [placeholder]="'auth.email' | translate">
       </div>
 
@@ -31,6 +32,7 @@
           type="password" 
           [(ngModel)]="user.password" 
           name="password" 
+          autocomplete="current-password"
            [placeholder]="'auth.password' | translate">
       </div>
 

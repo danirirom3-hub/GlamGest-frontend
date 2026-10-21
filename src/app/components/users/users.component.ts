@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, ArrowLeft } from 'lucide-angular';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { RecaptchaComponent, RecaptchaModule } from 'ng-recaptcha';
 import { finalize } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -43,15 +43,21 @@ export class UsersComponent {
   messageType: 'success' | 'error' = 'success';
   isLoading: boolean = false; // Indica si hay una petición en curso.
   passwordPolicyErrorKey: PasswordPolicyMessageKey | null = null;
+  showPasswordRequirements = false;
 
   get passwordRequirements() {
     return evaluatePasswordPolicy(this.user.password);
   }
 
+  get passwordPolicySatisfied(): boolean {
+    return this.passwordRequirements.every(requirement => requirement.satisfied);
+  }
+
   constructor(
     private authService: AuthService,
     private translate: TranslateService,
-    private errorMapper: ApiErrorMapper
+    private errorMapper: ApiErrorMapper,
+    private router: Router
   ) {}
 
   // Registra un nuevo usuario interno.
@@ -100,10 +106,23 @@ export class UsersComponent {
       next: (res: any) => {
         this.isLoading = false; // Permite volver a interactuar con el formulario.
         if (res?.successful) {
+          const session = res?.data || res;
           this.message = this.translate.instant('users.success');
           this.messageType = 'success';
-           this.user = { name: '', email: '', password: '', phone: '', privacyPolicyAccepted: false };
-           this.passwordPolicyErrorKey = null;
+          this.user = { name: '', email: '', password: '', phone: '', privacyPolicyAccepted: false };
+          this.passwordPolicyErrorKey = null;
+          this.showPasswordRequirements = false;
+
+          if (session?.token && session?.role === 'CLIENT') {
+            this.authService.saveSession(res);
+            window.setTimeout(() => {
+              const destination = this.authService.isPrivacyPolicyPending() ? '/privacy-policy' : '/client';
+              void this.router.navigate([destination], { replaceUrl: true });
+            }, 1200);
+          } else {
+            this.message = this.translate.instant('users.registeredGoLogin');
+            window.setTimeout(() => void this.router.navigate(['/login'], { replaceUrl: true }), 1200);
+          }
         } else {
            this.message = this.errorMapper.localize(res?.message, 'users.registerError');
           this.messageType = 'error';
@@ -123,8 +142,17 @@ export class UsersComponent {
     this.recaptchaToken = token;
   }
 
+  onPasswordFocus(): void {
+    this.showPasswordRequirements = !this.passwordPolicySatisfied;
+  }
+
+  onPasswordBlur(): void {
+    this.showPasswordRequirements = this.user.password.length > 0 && !this.passwordPolicySatisfied;
+  }
+
   onPasswordChange(password: string): void {
     this.user.password = password;
+    this.showPasswordRequirements = password.length > 0 && !this.passwordPolicySatisfied;
     if (this.passwordPolicyErrorKey) {
       this.passwordPolicyErrorKey = null;
       this.message = '';

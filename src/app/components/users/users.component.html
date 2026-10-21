@@ -14,13 +14,14 @@
       <p>{{ 'users.title' | translate }}</p>
     </div>
 
-    <form class="form" (ngSubmit)="registerUser()" autocomplete="off">
+    <form class="form" (ngSubmit)="registerUser()" autocomplete="on">
 
       <div class="campo">
         <label for="name">{{ 'users.name' | translate }}</label>
         <input id="name" type="text"
           [(ngModel)]="user.name"
           name="name"
+          autocomplete="name"
           [placeholder]="'users.namePlaceholder' | translate"
           required>
       </div>
@@ -30,6 +31,7 @@
         <input id="email" type="email"
           [(ngModel)]="user.email"
           name="email"
+          autocomplete="email"
           [placeholder]="'users.emailPlaceholder' | translate"
           required>
       </div>
@@ -39,16 +41,24 @@
         <input id="password" type="password"
           [(ngModel)]="user.password"
           (ngModelChange)="onPasswordChange($event)"
+          (focus)="onPasswordFocus()"
+          (blur)="onPasswordBlur()"
           name="password"
+          autocomplete="new-password"
           [placeholder]="'users.passwordPlaceholder' | translate"
-          aria-describedby="password-requirements"
+          aria-describedby="password-feedback"
           required>
-        <ul id="password-requirements" class="password-requirements" [attr.aria-label]="'users.passwordRequirements' | translate">
-          <li *ngFor="let requirement of passwordRequirements" [class.is-valid]="requirement.satisfied">
-            <span class="requirement-indicator" aria-hidden="true">{{ requirement.satisfied ? '✓' : '○' }}</span>
-            <span>{{ requirement.key | translate }}</span>
-          </li>
-        </ul>
+        <div id="password-feedback">
+          <ul *ngIf="showPasswordRequirements" class="password-requirements" [attr.aria-label]="'users.passwordRequirements' | translate">
+            <li *ngFor="let requirement of passwordRequirements" [class.is-valid]="requirement.satisfied">
+              <span class="requirement-indicator" aria-hidden="true">{{ requirement.satisfied ? '✓' : '○' }}</span>
+              <span>{{ requirement.key | translate }}</span>
+            </li>
+          </ul>
+          <p *ngIf="user.password && passwordPolicySatisfied" class="password-policy-satisfied">
+            {{ 'users.passwordPolicySatisfied' | translate }}
+          </p>
+        </div>
       </div>
 
       <div class="campo">
@@ -56,6 +66,7 @@
         <input id="phone" type="tel"
           [(ngModel)]="user.phone"
           name="phone"
+          autocomplete="tel"
           [placeholder]="'users.phonePlaceholder' | translate"
           required>
       </div>

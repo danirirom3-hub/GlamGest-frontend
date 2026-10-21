@@ -1,9 +1,9 @@
 /// <reference types="jasmine" />
 
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { UsersComponent } from './users.component';
 import { AuthService } from '../../services/auth.service';
-import { ActivatedRoute } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { provideTranslateService } from '@ngx-translate/core';
 
@@ -11,23 +11,23 @@ describe('UsersComponent', () => {
   let component: UsersComponent;
   let fixture: ComponentFixture<UsersComponent>;
   let authServiceSpy: jasmine.SpyObj<AuthService>;
+  let router: Router;
 
   beforeEach(async () => {
     // Creamos el espía para el servicio de autenticación con el método 'register'
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['register']);
-
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['register', 'saveSession', 'isPrivacyPolicyPending']);
+    authServiceSpy.isPrivacyPolicyPending.and.returnValue(false);
     await TestBed.configureTestingModule({
       imports: [UsersComponent], // Importación directa por ser Standalone
       providers: [
         provideTranslateService(),
         { provide: AuthService, useValue: authServiceSpy },
-        { 
-          provide: ActivatedRoute, 
-          useValue: { params: of({}), snapshot: { paramMap: { get: () => null } } } 
-        }
+        provideRouter([])
       ]
     }).compileComponents();
 
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
     fixture = TestBed.createComponent(UsersComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -49,13 +49,23 @@ describe('UsersComponent', () => {
       expect(authServiceSpy.register).not.toHaveBeenCalled();
     });
 
-    it('debería enviar el payload con la aceptación de política y limpiar el formulario', () => {
+    it('inicia sesión y abre el perfil tras registrar correctamente', fakeAsync(() => {
       // Seteamos los datos iniciales del formulario
       component.user = { name: 'Daniela Rincon', email: 'daniela@mail.com', password: 'Password1!', phone: '3000000000', privacyPolicyAccepted: true };
       component.recaptchaToken = 'captcha-token';
 
       // Simulamos una respuesta positiva estructurada del backend
-      const mockResponse = { successful: true };
+      const mockResponse = {
+        successful: true,
+        data: {
+          token: 'new-client-token',
+          role: 'CLIENT',
+          userId: 12,
+          clientId: 12,
+          privacyPolicyAccepted: true,
+          privacyPolicyRequired: false
+        }
+      };
       authServiceSpy.register.and.returnValue(of(mockResponse));
 
       component.registerUser();
@@ -70,12 +80,17 @@ describe('UsersComponent', () => {
         privacyPolicyAccepted: true,
         recaptchaToken: 'captcha-token'
       });
+      expect(authServiceSpy.saveSession).toHaveBeenCalledWith(mockResponse);
 
       // Verificaciones de las mutaciones de propiedades del componente
       expect(component.message).toBe('users.success');
       expect(component.messageType).toBe('success');
       expect(component.user.privacyPolicyAccepted).toBeFalse();
-    });
+      expect(component.user.password).toBe('');
+
+      tick(1200);
+      expect(router.navigate).toHaveBeenCalledWith(['/client'], { replaceUrl: true });
+    }));
 
     it('debería manejar el escenario donde el servidor responde exitosamente pero con flag successful en false', () => {
       component.user = { name: 'Angie Sosa', email: 'angie@mail.com', password: 'Password1!', phone: '3000000000', privacyPolicyAccepted: true };

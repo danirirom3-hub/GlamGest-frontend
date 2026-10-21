@@ -168,6 +168,13 @@
   text-align: center;
 }
 
+.password-policy-satisfied {
+  margin: 9px 0 0;
+  color: #15803d;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 /* botones general */
 button {
   cursor: pointer;
