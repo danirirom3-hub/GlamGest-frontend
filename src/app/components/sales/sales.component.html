@@ -124,11 +124,18 @@
                   {{ item.serviceName }}
                 </h4>
 
+                <p class="appointment-reference" *ngIf="item.appointmentId">
+                  {{ 'sales.appointmentNumber' | translate:{ id: item.appointmentId } }}
+                </p>
+
                 <p class="employee-selected">
                   {{
                     getEmployeeName(item.employeeId)
                   }}
                 </p>
+                <small class="employee-changed" *ngIf="employeeWasChanged(item)">
+                  {{ 'sales.actualEmployee' | translate:{ name: getEmployeeName(item.employeeId) } }}
+                </small>
 
               </div>
 
@@ -491,10 +498,7 @@
                 </h4>
 
                 <span class="status pending">
-                  {{
-                    appointment.status ||
-                    'PENDING'
-                  }}
+                  {{ appointmentStatusLabel(appointment) }}
                 </span>
 
               </div>

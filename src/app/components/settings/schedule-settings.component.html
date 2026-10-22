@@ -1,0 +1,135 @@
+<div class="schedule-settings">
+  <header class="schedule-header">
+    <div>
+      <span class="panel-kicker">{{ 'schedule.kicker' | translate }}</span>
+      <h2>{{ 'schedule.title' | translate }}</h2>
+      <p>{{ 'schedule.description' | translate }}</p>
+    </div>
+  </header>
+
+  <p class="schedule-loading" *ngIf="loading">{{ 'common.loading' | translate }}</p>
+  <p class="schedule-error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <section class="schedule-card" *ngIf="!loading">
+    <div class="schedule-card-heading">
+      <div>
+        <h3>{{ 'schedule.weeklyTitle' | translate }}</h3>
+        <p>{{ 'schedule.weeklyDescription' | translate }}</p>
+      </div>
+      <button type="button" class="schedule-primary" (click)="saveBusinessHours()" [disabled]="savingHours || businessHours.length !== 7">
+        {{ savingHours ? ('common.loading' | translate) : ('common.save' | translate) }}
+      </button>
+    </div>
+
+    <div class="weekly-hours">
+      <div class="weekly-hours-head">
+        <span>{{ 'schedule.day' | translate }}</span>
+        <span>{{ 'schedule.closed' | translate }}</span>
+        <span>{{ 'schedule.opensAt' | translate }}</span>
+        <span>{{ 'schedule.closesAt' | translate }}</span>
+      </div>
+      <div class="weekly-hours-row" *ngFor="let day of businessHours">
+        <strong>{{ dayLabel(day.dayOfWeek) }}</strong>
+        <label class="closed-toggle">
+          <input type="checkbox" [(ngModel)]="day.closed" [name]="'closed-' + day.dayOfWeek">
+          <span>{{ day.closed ? ('schedule.closed' | translate) : ('schedule.open' | translate) }}</span>
+        </label>
+        <input type="time" step="900" [(ngModel)]="day.opensAt" [name]="'opens-' + day.dayOfWeek" [disabled]="day.closed">
+        <input type="time" step="900" [(ngModel)]="day.closesAt" [name]="'closes-' + day.dayOfWeek" [disabled]="day.closed">
+      </div>
+    </div>
+  </section>
+
+  <section class="schedule-card" *ngIf="!loading">
+    <div class="schedule-card-heading">
+      <div>
+        <h3>{{ 'schedule.exceptionsTitle' | translate }}</h3>
+        <p>{{ 'schedule.exceptionsDescription' | translate }}</p>
+      </div>
+    </div>
+
+    <form class="schedule-form exception-form" (ngSubmit)="saveException()">
+      <label>
+        {{ 'schedule.date' | translate }}
+        <input type="date" name="exceptionDate" [(ngModel)]="exceptionForm.date" required>
+      </label>
+      <label class="closed-toggle exception-closed">
+        <input type="checkbox" name="exceptionClosed" [(ngModel)]="exceptionForm.closed">
+        <span>{{ 'schedule.closeAllDay' | translate }}</span>
+      </label>
+      <label>
+        {{ 'schedule.opensAt' | translate }}
+        <input type="time" step="900" name="exceptionOpensAt" [(ngModel)]="exceptionForm.opensAt" [disabled]="exceptionForm.closed" required>
+      </label>
+      <label>
+        {{ 'schedule.closesAt' | translate }}
+        <input type="time" step="900" name="exceptionClosesAt" [(ngModel)]="exceptionForm.closesAt" [disabled]="exceptionForm.closed" required>
+      </label>
+      <label class="wide-field">
+        {{ 'schedule.reason' | translate }}
+        <input type="text" name="exceptionReason" [(ngModel)]="exceptionForm.reason" [placeholder]="'schedule.reasonPlaceholder' | translate" maxlength="200">
+      </label>
+      <button type="submit" class="schedule-primary" [disabled]="savingException || !exceptionForm.date">
+        {{ savingException ? ('common.loading' | translate) : ('schedule.saveException' | translate) }}
+      </button>
+    </form>
+
+    <p class="schedule-empty" *ngIf="exceptions.length === 0">{{ 'schedule.noExceptions' | translate }}</p>
+    <div class="schedule-record-list" *ngIf="exceptions.length">
+      <article class="schedule-record" *ngFor="let exception of exceptions">
+        <div>
+          <strong>{{ exception.date | localizedDate }}</strong>
+          <span>{{ exception.closed ? ('schedule.closed' | translate) : (exception.opensAt + ' – ' + exception.closesAt) }}</span>
+          <small *ngIf="exception.reason">{{ exception.reason }}</small>
+        </div>
+        <button type="button" class="schedule-delete" (click)="deleteException(exception)">{{ 'common.delete' | translate }}</button>
+      </article>
+    </div>
+  </section>
+
+  <section class="schedule-card" *ngIf="!loading">
+    <div class="schedule-card-heading">
+      <div>
+        <h3>{{ 'schedule.employeeBlocksTitle' | translate }}</h3>
+        <p>{{ 'schedule.employeeBlocksDescription' | translate }}</p>
+      </div>
+    </div>
+
+    <form class="schedule-form employee-block-form" (ngSubmit)="saveEmployeeBlock()">
+      <label>
+        {{ 'schedule.employee' | translate }}
+        <select name="employeeId" [(ngModel)]="employeeBlockForm.employeeId" required>
+          <option value="">{{ 'schedule.selectEmployee' | translate }}</option>
+          <option *ngFor="let employee of employees" [value]="employee.id">{{ employee.name }}</option>
+        </select>
+      </label>
+      <label>
+        {{ 'schedule.startsAt' | translate }}
+        <input type="datetime-local" name="blockStartsAt" [(ngModel)]="employeeBlockForm.startsAt" required>
+      </label>
+      <label>
+        {{ 'schedule.endsAt' | translate }}
+        <input type="datetime-local" name="blockEndsAt" [(ngModel)]="employeeBlockForm.endsAt" required>
+      </label>
+      <label class="wide-field">
+        {{ 'schedule.reason' | translate }}
+        <input type="text" name="blockReason" [(ngModel)]="employeeBlockForm.reason" [placeholder]="'schedule.employeeReasonPlaceholder' | translate" maxlength="200">
+      </label>
+      <button type="submit" class="schedule-primary" [disabled]="savingEmployeeBlock || !employeeBlockForm.employeeId || !employeeBlockForm.startsAt || !employeeBlockForm.endsAt">
+        {{ savingEmployeeBlock ? ('common.loading' | translate) : ('schedule.blockEmployee' | translate) }}
+      </button>
+    </form>
+
+    <p class="schedule-empty" *ngIf="employeeBlocks.length === 0">{{ 'schedule.noEmployeeBlocks' | translate }}</p>
+    <div class="schedule-record-list" *ngIf="employeeBlocks.length">
+      <article class="schedule-record" *ngFor="let block of employeeBlocks">
+        <div>
+          <strong>{{ block.employeeName }}</strong>
+          <span>{{ formatDateTime(block.startsAt) }} – {{ formatDateTime(block.endsAt) }}</span>
+          <small *ngIf="block.reason">{{ block.reason }}</small>
+        </div>
+        <button type="button" class="schedule-delete" (click)="deleteEmployeeBlock(block)">{{ 'common.delete' | translate }}</button>
+      </article>
+    </div>
+  </section>
+</div>

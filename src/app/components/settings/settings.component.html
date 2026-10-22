@@ -22,10 +22,25 @@
         <span>
            <strong>{{ 'settings.visual' | translate }}</strong>
            <small>{{ 'settings.visualDescription' | translate }}</small>
+         </span>
+      </button>
+
+      <button
+        *ngIf="isAdmin"
+        type="button"
+        class="settings-nav-item"
+        [class.active]="selectedSection === 'schedule'"
+        [attr.aria-pressed]="selectedSection === 'schedule'"
+        (click)="selectSection('schedule')">
+        <span class="nav-icon" aria-hidden="true">15′</span>
+        <span>
+          <strong>{{ 'schedule.title' | translate }}</strong>
+          <small>{{ 'schedule.description' | translate }}</small>
         </span>
       </button>
 
       <button
+        *ngIf="isAdmin"
         type="button"
         class="settings-nav-item"
         [class.active]="selectedSection === 'backups'"
@@ -42,8 +57,9 @@
 
     <main class="settings-content">
       <app-appearance-settings *ngIf="selectedSection === 'visual'"></app-appearance-settings>
+      <app-schedule-settings *ngIf="selectedSection === 'schedule' && isAdmin"></app-schedule-settings>
 
-      <section class="settings-panel" *ngIf="selectedSection === 'backups'">
+      <section class="settings-panel" *ngIf="selectedSection === 'backups' && isAdmin">
         <div class="panel-heading backup-heading">
           <div>
            <span class="panel-kicker">{{ 'settings.data' | translate }}</span>

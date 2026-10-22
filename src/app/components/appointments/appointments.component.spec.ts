@@ -1,69 +1,76 @@
 /// <reference types="jasmine" />
 
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { AppointmentsComponent } from './appointments.component';
-import { CashService } from '../../services/cash.service';
-import { AppointmentsService } from '../../services/appointments.service';
-import { ClientsService } from '../../services/clients.service';
-import { EmployeesService } from '../../services/employees.service';
-import { ServicesService } from '../../services/services.service';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import Swal from 'sweetalert2';
 import { provideTranslateService } from '@ngx-translate/core';
+import { AppointmentsComponent } from './appointments.component';
+import { AppointmentsService } from '../../services/appointments.service';
+import { ClientsService } from '../../services/clients.service';
+import { EmployeesService } from '../../services/employees.service';
+import { ServicesService } from '../../services/services.service';
+import { ScheduleService } from '../../services/schedule.service';
 
 describe('AppointmentsComponent', () => {
   let component: AppointmentsComponent;
   let fixture: ComponentFixture<AppointmentsComponent>;
-
-  // Spys de los servicios correctamente tipados
-  let cashServiceSpy: jasmine.SpyObj<CashService>;
   let routerSpy: jasmine.SpyObj<Router>;
   let appointmentsServiceSpy: jasmine.SpyObj<AppointmentsService>;
   let clientsServiceSpy: jasmine.SpyObj<ClientsService>;
   let employeesServiceSpy: jasmine.SpyObj<EmployeesService>;
   let servicesServiceSpy: jasmine.SpyObj<ServicesService>;
+  let scheduleServiceSpy: jasmine.SpyObj<ScheduleService>;
 
-  // Datos mock base para las pruebas
   const mockClients = [{ id: 1, name: 'Daniela Rincon' }];
   const mockEmployees = [{ id: 1, name: 'Angie Sosa' }];
-  const mockServices = [{ id: 1, name: 'Corte de Cabello' }];
-  const mockAppointments = [
-    {
-      id: 10,
-      clientId: 1,
-      employeeId: 1,
-      serviceId: 1,
-      appointmentDatetime: '2026-05-20T10:00:00',
-      notes: 'Nota de prueba',
-      status: 'Pending'
-    }
-  ];
+  const mockServices = [{ id: 1, name: 'Corte de Cabello', durationMinutes: 30, price: 25000 }];
+  const mockAppointments = [{
+    id: 10,
+    clientId: 1,
+    employeeId: 1,
+    serviceId: 1,
+    durationMinutes: 30,
+    billed: false,
+    performedByEmployeeId: null,
+    appointmentDatetime: '2026-05-20T10:00:00-05:00',
+    notes: 'Nota de prueba',
+    status: 'PENDING'
+  }];
 
   beforeEach(async () => {
-    cashServiceSpy = jasmine.createSpyObj('CashService', ['addItemFromAppointment']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    appointmentsServiceSpy = jasmine.createSpyObj('AppointmentsService', ['getAppointments', 'createAppointment', 'deleteAppointment']);
+    appointmentsServiceSpy = jasmine.createSpyObj('AppointmentsService', [
+      'getAppointments', 'createAppointment', 'createAppointmentsBatch', 'updateAppointment',
+      'updateAppointmentStatus', 'deleteAppointment'
+    ]);
     clientsServiceSpy = jasmine.createSpyObj('ClientsService', ['getClients']);
     employeesServiceSpy = jasmine.createSpyObj('EmployeesService', ['getEmployees']);
     servicesServiceSpy = jasmine.createSpyObj('ServicesService', ['getServices']);
+    scheduleServiceSpy = jasmine.createSpyObj('ScheduleService', [
+      'getBusinessHours', 'getExceptions', 'getEmployeeBlocks', 'getAvailability'
+    ]);
 
-    // Configuración de respuestas por defecto para observables
-    clientsServiceSpy.getClients.and.returnValue(of(mockClients.map(c => ({ ...c }))) as any);
-    employeesServiceSpy.getEmployees.and.returnValue(of(mockEmployees.map(e => ({ ...e }))));
-    servicesServiceSpy.getServices.and.returnValue(of(mockServices.map(s => ({ ...s }))) as any);
-    appointmentsServiceSpy.getAppointments.and.returnValue(of(mockAppointments.map(a => ({ ...a }))));
+    clientsServiceSpy.getClients.and.returnValue(of(mockClients) as any);
+    employeesServiceSpy.getEmployees.and.returnValue(of(mockEmployees) as any);
+    servicesServiceSpy.getServices.and.returnValue(of(mockServices) as any);
+    appointmentsServiceSpy.getAppointments.and.returnValue(of(mockAppointments) as any);
+    scheduleServiceSpy.getBusinessHours.and.returnValue(of({ data: Array.from({ length: 7 }, (_, index) => ({
+      dayOfWeek: index + 1, closed: index === 6, opensAt: index === 6 ? null : '09:00', closesAt: index === 6 ? null : '19:00'
+    })) }) as any);
+    scheduleServiceSpy.getExceptions.and.returnValue(of({ data: [] }) as any);
+    scheduleServiceSpy.getEmployeeBlocks.and.returnValue(of({ data: [] }) as any);
 
     await TestBed.configureTestingModule({
       imports: [AppointmentsComponent],
       providers: [
         provideTranslateService(),
-        { provide: CashService, useValue: cashServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: AppointmentsService, useValue: appointmentsServiceSpy },
         { provide: ClientsService, useValue: clientsServiceSpy },
         { provide: EmployeesService, useValue: employeesServiceSpy },
-        { provide: ServicesService, useValue: servicesServiceSpy }
+        { provide: ServicesService, useValue: servicesServiceSpy },
+        { provide: ScheduleService, useValue: scheduleServiceSpy }
       ]
     }).compileComponents();
 
@@ -71,142 +78,109 @@ describe('AppointmentsComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('debería crear el componente', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('debería cargar los datos iniciales y mapear las citas correctamente en ngOnInit', () => {
-    fixture.detectChanges(); // Ejecuta ngOnInit y suscribe los métodos
+  it('loads appointments, catalogs and schedule data', () => {
+    fixture.detectChanges();
 
     expect(clientsServiceSpy.getClients).toHaveBeenCalled();
     expect(employeesServiceSpy.getEmployees).toHaveBeenCalled();
     expect(servicesServiceSpy.getServices).toHaveBeenCalled();
     expect(appointmentsServiceSpy.getAppointments).toHaveBeenCalled();
-
-    expect(component.clients.length).toBe(1);
-    expect(component.appointments.length).toBe(1);
+    expect(scheduleServiceSpy.getBusinessHours).toHaveBeenCalled();
+    expect(component.appointments[0].status).toBe('PENDING');
     expect(component.appointments[0].client).toBe('Daniela Rincon');
-    expect(component.appointments[0].status).toBe('pending');
   });
 
-  it('debería manejar errores al cargar citas', () => {
+  it('blocks creation if required booking fields are missing', () => {
     spyOn(Swal, 'fire');
-    appointmentsServiceSpy.getAppointments.and.returnValue(throwError(() => new Error('Error de red')));
-    
     fixture.detectChanges();
+    component.selectedClientId = null;
 
+    component.scheduleAppointment();
+
+    expect(Swal.fire).toHaveBeenCalledWith('common.error', 'appointments.incomplete', 'warning');
+    expect(appointmentsServiceSpy.createAppointmentsBatch).not.toHaveBeenCalled();
+  });
+
+  it('sends selected services in order as one sequential booking request', () => {
+    spyOn(Swal, 'fire');
+    fixture.detectChanges();
+    appointmentsServiceSpy.createAppointmentsBatch.and.returnValue(of({ successful: true, data: [] }) as any);
+    component.selectedClientId = 1;
+    component.selectedEmployee = { id: 1, name: 'Angie Sosa' };
+    component.selectedServices = [
+      { id: 1, name: 'Corte', durationMinutes: 30, price: 25000 },
+      { id: 2, name: 'Peinado', durationMinutes: 45, price: 30000 }
+    ];
+    component.selectedDate = '2026-05-22';
+    component.selectedTime = '14:30';
+
+    component.scheduleAppointment();
+
+    expect(appointmentsServiceSpy.createAppointmentsBatch).toHaveBeenCalledWith({
+      appointmentDatetime: '2026-05-22T14:30',
+      clientId: 1,
+      employeeId: 1,
+      serviceIds: [1, 2],
+      notes: ''
+    });
+    expect(component.selectedServices).toEqual([]);
+  });
+
+  it('sends a selected appointment to the real sales route with its ID', () => {
+    const appointment = { ...mockAppointments[0], client: 'Daniela', employee: 'Angie', service: 'Corte', date: '2026-05-20', time: '10:00' } as any;
+
+    component.sendToCash(appointment);
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/dashboard/sales'], { queryParams: { appointmentId: 10 } });
+  });
+
+  it('does not send cancelled appointments to cash', () => {
+    const appointment = { ...mockAppointments[0], status: 'CANCELLED' } as any;
+
+    component.sendToCash(appointment);
+
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
+  });
+
+  it('filters appointments by client name case-insensitively', () => {
+    fixture.detectChanges();
+    component.filterClient = 'dan';
+
+    expect(component.filteredAppointments().length).toBe(1);
+    expect(component.filteredAppointments()[0].client).toBe('Daniela Rincon');
+  });
+
+  it('toggles multiple services while preserving their selection order', () => {
+    const first = { id: 1, name: 'Corte', durationMinutes: 30, price: 25000 };
+    const second = { id: 2, name: 'Peinado', durationMinutes: 45, price: 30000 };
+
+    component.selectService(first);
+    component.selectService(second);
+    expect(component.selectedServices.map(service => service.id)).toEqual([1, 2]);
+    expect(component.selectedDurationMinutes).toBe(75);
+
+    component.selectService(first);
+    expect(component.selectedServices.map(service => service.id)).toEqual([2]);
+  });
+
+  it('creates 15-minute time rows and sizes appointment blocks by their duration', () => {
+    component.gridDate = '2026-05-20'; // Wednesday
+    component.businessHours = [{ dayOfWeek: 3, closed: false, opensAt: '09:00', closesAt: '10:00' }];
+
+    expect(component.timeSlots).toEqual(['09:00', '09:15', '09:30', '09:45']);
+    expect(component.gridHeight({ ...mockAppointments[0], client: '', employee: '', service: '', date: '', time: '', status: 'PENDING' })).toBe(82);
+  });
+
+  it('deletes the appointment when the delete confirmation succeeds', fakeAsync(() => {
+    spyOn(Swal, 'fire').and.returnValue(Promise.resolve({ isConfirmed: true } as any));
+    appointmentsServiceSpy.deleteAppointment.and.returnValue(of({}) as any);
+    fixture.detectChanges();
+    const appointment = component.appointments[0];
+
+    component.deleteAppointment(appointment);
+    tick();
+
+    expect(appointmentsServiceSpy.deleteAppointment).toHaveBeenCalledWith(appointment.id);
     expect(component.appointments.length).toBe(0);
-    expect(Swal.fire).toHaveBeenCalledWith('common.error', 'appointments.loadError', 'error');
-  });
-
-  describe('scheduleAppointment', () => {
-    it('debería mostrar advertencia si los campos están incompletos', () => {
-      spyOn(Swal, 'fire');
-      fixture.detectChanges();
-      
-      component.selectedClient = ''; // Campo vacío para detonar el error
-      component.scheduleAppointment();
-
-      expect(Swal.fire).toHaveBeenCalledWith('common.error', 'appointments.incomplete', 'warning');
-    });
-
-    it('debería crear una cita exitosamente y reiniciar el formulario', () => {
-      spyOn(Swal, 'fire');
-      fixture.detectChanges();
-
-      // Rellenar formulario simulado
-      component.selectedClient = 'Daniela Rincon';
-      component.selectedEmployee = { id: 1, name: 'Angie Sosa' };
-      component.selectedService = { id: 1, name: 'Corte de Cabello' };
-      component.selectedDate = '2026-05-22';
-      component.selectedTime = '14:30';
-      component.details = 'Sin detalles';
-
-      const mockResponse = {
-        successful: true,
-        data: { id: 11 }
-      };
-      appointmentsServiceSpy.createAppointment.and.returnValue(of(mockResponse));
-
-      component.scheduleAppointment();
-
-      expect(appointmentsServiceSpy.createAppointment).toHaveBeenCalled();
-      expect(component.appointments.some(a => a.id === 11)).toBeTrue();
-      expect(Swal.fire).toHaveBeenCalled();
-      expect(component.selectedDate).toBe(''); // Verifica que se limpió el formulario
-    });
-  });
-
-  describe('sendToCash', () => {
-    it('debería enviar la cita a caja y redirigir si el usuario confirma', fakeAsync(() => {
-      spyOn(Swal, 'fire').and.returnValue(Promise.resolve({ isConfirmed: true } as any));
-      fixture.detectChanges();
-
-      const appointmentSample = component.appointments[0];
-      component.sendToCash(appointmentSample);
-      
-      tick(); // Procesa la promesa de SweetAlert
-
-      expect(cashServiceSpy.addItemFromAppointment).toHaveBeenCalledWith(appointmentSample);
-      expect(appointmentSample.status).toBe('sent_to_cash');
-      expect(routerSpy.navigate).toHaveBeenCalledWith(['/ventas']);
-    }));
-
-    it('no debería hacer nada si el usuario cancela en SweetAlert', fakeAsync(() => {
-      spyOn(Swal, 'fire').and.returnValue(Promise.resolve({ isConfirmed: false } as any));
-      fixture.detectChanges();
-
-      const appointmentSample = component.appointments[0];
-      component.sendToCash(appointmentSample);
-      
-      tick();
-
-      expect(cashServiceSpy.addItemFromAppointment).not.toHaveBeenCalled();
-      expect(routerSpy.navigate).not.toHaveBeenCalled();
-    }));
-  });
-
-  describe('deleteAppointment', () => {
-    it('debería eliminar la cita si se confirma la acción', fakeAsync(() => {
-      spyOn(Swal, 'fire').and.returnValue(Promise.resolve({ isConfirmed: true } as any));
-      appointmentsServiceSpy.deleteAppointment.and.returnValue(of({}));
-      fixture.detectChanges();
-
-      const appToDelete = component.appointments[0];
-      component.deleteAppointment(appToDelete);
-      
-      tick();
-
-      expect(appointmentsServiceSpy.deleteAppointment).toHaveBeenCalledWith(appToDelete.id);
-      expect(component.appointments.length).toBe(0);
-    }));
-  });
-
-  describe('Filtros', () => {
-    it('debería filtrar las citas por cliente de forma insensible a mayúsculas', () => {
-      fixture.detectChanges();
-      
-      component.appointments = [
-        { id: 1, client: 'Daniela', employee: 'Angie', service: 'Uñas', date: '2026-05-20', time: '10:00', status: 'pending' },
-        { id: 2, client: 'Carlos', employee: 'Angie', service: 'Corte', date: '2026-05-21', time: '11:00', status: 'pending' }
-      ];
-
-      component.filterClient = 'dan';
-      let filtradas = component.filteredAppointments();
-      expect(filtradas.length).toBe(1);
-      expect(filtradas[0].client).toBe('Daniela');
-    });
-  });
-
-  describe('selectService', () => {
-    it('debería seleccionar un servicio o desmarcarlo si ya estaba seleccionado', () => {
-      const servicio = { id: 5, name: 'Manicura' };
-      
-      component.selectService(servicio);
-      expect(component.selectedService).toEqual(servicio);
-
-      component.selectService(servicio);
-      expect(component.selectedService).toBeNull();
-    });
-  });
+  }));
 });

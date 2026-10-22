@@ -297,6 +297,58 @@ button:disabled {
   opacity: 0.8;
 }
 
+.selected-service-summary {
+  display: grid;
+  gap: 5px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg));
+  color: var(--text);
+  font-size: 12px;
+}
+
+.selected-service-summary strong { color: var(--primary); }
+.selected-service-summary span:last-child { opacity: .75; }
+.actual-employee { margin: 5px 0 0; color: #b45309; font-size: 12px; font-weight: 600; }
+
+.schedule-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.schedule-toolbar input { width: auto; min-width: 160px; }
+.schedule-toolbar strong { min-width: 210px; text-align: center; text-transform: capitalize; }
+.schedule-closed { padding: 28px; }
+.schedule-grid-scroll { overflow-x: auto; border: 1px solid rgba(100,116,139,.18); border-radius: 12px; }
+.schedule-grid { display: grid; grid-template-rows: 48px auto; min-width: max-content; background: var(--card); }
+.schedule-grid-corner, .schedule-employee-heading { position: sticky; top: 0; z-index: 4; background: var(--card); border-bottom: 1px solid rgba(100,116,139,.2); }
+.schedule-grid-corner { left: 0; z-index: 5; }
+.schedule-employee-heading { display: grid; place-items: center; padding: 8px; border-left: 1px solid rgba(100,116,139,.16); color: var(--text); font-size: 13px; font-weight: 700; }
+.schedule-time-axis { position: sticky; left: 0; z-index: 3; display: flex; flex-direction: column; background: var(--card); border-right: 1px solid rgba(100,116,139,.18); }
+.schedule-time-axis span { display: block; box-sizing: border-box; padding: 3px 7px 0; border-bottom: 1px solid rgba(100,116,139,.12); color: var(--text); opacity: .66; font-size: 11px; text-align: right; }
+.schedule-employee-lane { position: relative; min-width: 170px; border-left: 1px solid rgba(100,116,139,.16); background: var(--card); }
+.schedule-slot { position: absolute; left: 0; right: 0; z-index: 0; width: 100%; margin: 0; padding: 0; border: 0; border-bottom: 1px solid rgba(100,116,139,.12); border-radius: 0; background: transparent; cursor: pointer; }
+.schedule-slot:nth-child(4n + 1) { border-bottom-color: rgba(100,116,139,.28); }
+.schedule-slot:hover:not(:disabled) { background: color-mix(in srgb, var(--primary) 8%, transparent); }
+.schedule-slot.unavailable { background: repeating-linear-gradient(135deg, rgba(148,163,184,.10), rgba(148,163,184,.10) 5px, rgba(148,163,184,.22) 5px, rgba(148,163,184,.22) 10px); cursor: not-allowed; }
+.schedule-appointment { position: absolute; left: 4px; right: 4px; z-index: 2; display: flex; flex-direction: column; gap: 3px; overflow: hidden; padding: 6px 8px; border-left: 4px solid #d8a300; border-radius: 7px; background: #fef3c7; color: #422006; box-shadow: 0 2px 6px rgba(15,23,42,.16); cursor: pointer; font-size: 11px; }
+.schedule-appointment strong, .schedule-appointment span, .schedule-appointment small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.schedule-appointment strong { font-size: 11px; }
+.schedule-appointment small { opacity: .76; font-size: 10px; }
+.schedule-appointment.status-confirmed { border-left-color: #2563eb; background: #dbeafe; color: #172554; }
+.schedule-appointment.status-completed { border-left-color: #16a34a; background: #dcfce7; color: #14532d; }
+.schedule-appointment.status-cancelled { border-left-color: #64748b; background: #e2e8f0; color: #334155; opacity: .72; }
+.schedule-appointment.status-no_show { border-left-color: #dc2626; background: #fee2e2; color: #7f1d1d; }
+.schedule-appointment.different-employee { box-shadow: inset 0 0 0 2px #7c3aed, 0 2px 6px rgba(15,23,42,.16); }
+.different-employee-label { color: #6d28d9; font-weight: 700; }
+.status.billed { background: #16a34a; color: #fff; }
+.billed-label { color: #15803d; font-weight: 700; }
+.btn-secondary { padding: 8px 12px; border: 1px solid rgba(100,116,139,.2); border-radius: 9px; background: var(--bg); color: var(--text); cursor: pointer; }
+
 /* Mensaje de alerta */
 .alerta {
   margin-top: 10px;
@@ -344,6 +396,10 @@ button:disabled {
   .grid {
     grid-template-columns: 1fr;
   }
+
+  .schedule-toolbar { justify-content: space-between; gap: 6px; }
+  .schedule-toolbar strong { min-width: 0; flex: 1; font-size: 13px; }
+  .schedule-toolbar input { min-width: 130px; padding: 8px; }
 
   .actions {
     flex-direction: row;

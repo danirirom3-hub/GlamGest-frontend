@@ -27,6 +27,25 @@ export interface SaleResponse {
   successful: boolean;
 }
 
+export interface CashierAppointment {
+  appointmentId: number;
+  appointmentDatetime: string;
+  status: string;
+  serviceId: number;
+  serviceName: string;
+  scheduledEmployeeId: number;
+  scheduledEmployeeName: string;
+  durationMinutes: number;
+  defaultPrice: number;
+}
+
+export interface CashierGroup {
+  clientId: number;
+  clientName: string;
+  businessDate: string;
+  appointments: CashierAppointment[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -61,6 +80,14 @@ export class SalesService {
   getSaleById(id: number): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.get(`${this.apiUrl}/${id}`, headers ? { headers } : {});
+  }
+
+  getCashierGroup(appointmentId: number): Observable<SaleResponse & { data: CashierGroup }> {
+    const headers = this.getAuthHeaders();
+    return this.http.get<SaleResponse & { data: CashierGroup }>(
+      `${this.apiUrl}/cashier-group`,
+      { ...(headers ? { headers } : {}), params: { appointmentId } }
+    );
   }
 
   // Actualiza los datos permitidos de una venta.

@@ -1,18 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import Swal from 'sweetalert2';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { ClientsService } from '../../services/clients.service';
-import { SalesService } from '../../services/sales.service';
+import { CashierAppointment, SalesService } from '../../services/sales.service';
 import { EmployeesService } from '../../services/employees.service';
 import { ServicesService } from '../../services/services.service';
 import { AppointmentsService } from '../../services/appointments.service';
 import { LanguageService } from '../../services/language.service';
 import { ApiErrorMapper } from '../../services/api-error.mapper';
 import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-sales',
@@ -29,6 +31,9 @@ export class SalesComponent implements OnInit {
     private employeesService: EmployeesService,
     private servicesService: ServicesService,
     private appointmentsService: AppointmentsService,
+    private authService: AuthService,
+    private route: ActivatedRoute,
+    private router: Router,
     private translate: TranslateService,
     private languageService: LanguageService,
     private errorMapper: ApiErrorMapper
@@ -50,6 +55,7 @@ export class SalesComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   isLoading = false;
+  isLoadingCashierGroup = false;
 
   view: 'create' | 'history' = 'create';
 
@@ -70,6 +76,7 @@ export class SalesComponent implements OnInit {
   items: any[] = [];
 
   selectedAppointment: any = null;
+  cashierGroupAppointmentId: number | null = null;
 
   clientData = {
     name: '',
@@ -84,7 +91,12 @@ export class SalesComponent implements OnInit {
     this.loadEmployees();
     this.loadSales();
     this.loadAppointments();
-
+    this.route.queryParamMap.subscribe(params => {
+      const appointmentId = Number(params.get('appointmentId'));
+      if (appointmentId > 0 && appointmentId !== this.cashierGroupAppointmentId) {
+        this.loadCashierGroup(appointmentId);
+      }
+    });
   }
 
   loadClients(): void {
@@ -93,7 +105,11 @@ export class SalesComponent implements OnInit {
 
       next: (res: any) => {
 
-        this.clients = res?.data || res || [];
+        this.clients = (res?.data?.items || res?.data || res || []).map((client: any) => ({
+          ...client,
+          id: client.id ?? client.client_id
+        }));
+        if (this.selectedClientId) this.onClientSelect();
 
       },
 
@@ -115,7 +131,10 @@ export class SalesComponent implements OnInit {
 
       next: (res: any) => {
 
-        this.services = res?.data || res || [];
+        this.services = (res?.data || res || []).map((service: any) => ({
+          ...service,
+          id: service.id ?? service.service_id
+        }));
 
       },
 
@@ -137,7 +156,10 @@ export class SalesComponent implements OnInit {
 
       next: (res: any) => {
 
-        this.employees = res?.data || res || [];
+        this.employees = (res?.data || res || []).map((employee: any) => ({
+          ...employee,
+          id: employee.id ?? employee.employee_id
+        }));
 
       },
 
@@ -199,9 +221,7 @@ export class SalesComponent implements OnInit {
 
         const data = res?.data || res || [];
 
-        this.appointments = data.filter(
-          (a: any) => a.status !== 'FACTURADA'
-        );
+        this.appointments = data.filter((appointment: any) => this.isCashEligible(appointment));
 
       },
 
@@ -215,6 +235,48 @@ export class SalesComponent implements OnInit {
 
     });
 
+  }
+
+  isCashEligible(appointment: any): boolean {
+    const status = String(appointment?.status || '').toUpperCase();
+    return !appointment?.billed && status !== 'CANCELLED' && status !== 'NO_SHOW';
+  }
+
+  loadCashierGroup(appointmentId: number): void {
+    this.isLoadingCashierGroup = true;
+    this.salesService.getCashierGroup(appointmentId).subscribe({
+      next: response => {
+        const group = response?.data;
+        this.isLoadingCashierGroup = false;
+        if (!group) {
+          this.showError('sales.loadAppointmentsError');
+          return;
+        }
+        this.cashierGroupAppointmentId = appointmentId;
+        this.selectedClientId = String(group.clientId);
+        this.onClientSelect();
+        this.items = group.appointments.map((appointment: CashierAppointment) => ({
+          appointmentId: appointment.appointmentId,
+          appointmentDatetime: appointment.appointmentDatetime,
+          serviceId: appointment.serviceId,
+          serviceName: appointment.serviceName,
+          scheduledEmployeeId: appointment.scheduledEmployeeId,
+          scheduledEmployeeName: appointment.scheduledEmployeeName,
+          employeeId: String(appointment.scheduledEmployeeId),
+          quantity: 1,
+          unitPrice: appointment.defaultPrice,
+          subtotal: appointment.defaultPrice,
+          source: 'appointment'
+        }));
+        this.view = 'create';
+        this.showAppointmentsModal = false;
+      },
+      error: error => {
+        this.isLoadingCashierGroup = false;
+        void Swal.fire(this.translate.instant('common.error'),
+          this.errorMapper.resolve(error, this.translate.instant('sales.loadAppointmentsError')), 'error');
+      }
+    });
   }
 
   toggleSaleDetails(sale: any): void {
@@ -396,75 +458,24 @@ export class SalesComponent implements OnInit {
 
   }
 
+  appointmentStatusLabel(appointment: any): string {
+    const status = String(appointment?.status || 'PENDING').toUpperCase();
+    const key = `metrics.status.${status}`;
+    const translated = this.translate.instant(key);
+    return translated === key ? status : translated;
+  }
+
+  employeeWasChanged(item: any): boolean {
+    return item?.scheduledEmployeeId != null
+      && Number(item.employeeId) !== Number(item.scheduledEmployeeId);
+  }
+
   selectAppointment(
     appointment: any
   ): void {
-
-    this.selectedAppointment =
-      appointment;
-
-    this.selectedClientId =
-
-      appointment.clientId ||
-
-      appointment.client?.id ||
-
-      appointment.client?.client_id ||
-
-      '';
-
-    this.onClientSelect();
-
-    this.items = [];
-
-    const serviceId =
-      appointment.serviceId ||
-      appointment.service?.id;
-
-    const employeeId =
-      appointment.employeeId ||
-      appointment.employee?.id;
-
-    const service = this.services.find(
-      s =>
-        (s.service_id ?? s.id) == serviceId
-    );
-
-    const price =
-      service?.price || 0;
-
-    this.items.push({
-
-      appointmentId:
-        appointment.id,
-
-      serviceId,
-
-      serviceName:
-        this.getAppointmentServiceName(
-          appointment
-        ),
-
-      employeeId,
-
-      quantity: 1,
-
-      unitPrice: price,
-
-      subtotal: price
-
-    });
-
-    Swal.fire({
-      icon: 'success',
-      title: this.translate.instant('sales.selectedTitle'),
-      text: this.translate.instant('sales.selectedText'),
-      timer: 1800,
-      showConfirmButton: false
-    });
-
+    this.selectedAppointment = appointment;
     this.closeAppointmentsModal();
-
+    this.loadCashierGroup(Number(appointment.id));
   }
 
   addService(service: any): void {
@@ -476,6 +487,12 @@ export class SalesComponent implements OnInit {
       serviceName: service.name,
 
       employeeId: '',
+
+      appointmentId: null,
+
+      scheduledEmployeeId: null,
+
+      scheduledEmployeeName: null,
 
       quantity: 1,
 
@@ -639,6 +656,12 @@ export class SalesComponent implements OnInit {
 
       }));
 
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      this.showError('errors.sessionExpired');
+      return;
+    }
+
     const payload = {
 
       clientId:
@@ -647,7 +670,7 @@ export class SalesComponent implements OnInit {
           matchedClient.id
         ),
 
-      userId: 2,
+      userId,
 
       paymentType:
         this.paymentMethod.toLowerCase(),
@@ -689,6 +712,14 @@ export class SalesComponent implements OnInit {
               this.resetForm();
 
               this.loadSales();
+              this.loadAppointments();
+              this.cashierGroupAppointmentId = null;
+              void this.router.navigate([], {
+                relativeTo: this.route,
+                queryParams: { appointmentId: null },
+                queryParamsHandling: 'merge',
+                replaceUrl: true
+              });
 
             },
 
@@ -723,6 +754,8 @@ export class SalesComponent implements OnInit {
     this.selectedAppointment = null;
 
     this.selectedClientId = '';
+
+    this.cashierGroupAppointmentId = null;
 
   }
 

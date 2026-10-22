@@ -26,6 +26,11 @@ export class AppointmentsService {
     return this.http.post(this.apiUrl, data, { headers });
   }
 
+  createAppointmentsBatch(data: { clientId?: number; appointmentDatetime: string; employeeId: number; serviceIds: number[]; notes?: string }): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.post(`${this.apiUrl}/batch`, data, { headers });
+  }
+
   getAppointments(): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.get(this.apiUrl, { headers });
@@ -44,6 +49,11 @@ export class AppointmentsService {
   updateAppointment(id: number, data: any): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.put(`${this.apiUrl}/${id}`, data, { headers });
+  }
+
+  updateAppointmentStatus(id: number, status: string): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.patch(`${this.apiUrl}/${id}/status`, { status }, { headers });
   }
 
   deleteAppointment(id: number): Observable<any> {

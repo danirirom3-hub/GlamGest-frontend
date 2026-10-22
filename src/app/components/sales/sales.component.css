@@ -234,6 +234,9 @@ select:focus {
   font-size: 13px;
 }
 
+.appointment-reference { margin: 5px 0 0; color: var(--text); opacity: .68; font-size: 11px; }
+.employee-changed { display: block; margin-top: 4px; color: #7c3aed; font-size: 11px; font-weight: 600; }
+
 .detail-grid {
   display: grid;
   grid-template-columns: 1fr 130px 190px;

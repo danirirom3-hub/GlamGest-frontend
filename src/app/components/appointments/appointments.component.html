@@ -7,28 +7,30 @@
     </div>
 
     <div class="tabs">
-      <button [class.active]="view === 'create'" (click)="view = 'create'">{{ 'appointments.newTab' | translate }}</button>
-      <button [class.active]="view === 'list'" (click)="view = 'list'">{{ 'appointments.agenda' | translate }}</button>
-      <button [class.active]="view === 'calendar'" (click)="view = 'calendar'">{{ 'appointments.calendar' | translate }}</button>
+      <button [class.active]="view === 'calendar'" (click)="setView('calendar')">{{ 'appointments.agenda' | translate }}</button>
+      <button [class.active]="view === 'create'" (click)="setView('create')">{{ 'appointments.newTab' | translate }}</button>
+      <button [class.active]="view === 'list'" (click)="setView('list')">{{ 'appointments.list' | translate }}</button>
     </div>
 
     <div *ngIf="view === 'create'" class="card">
 
       <div class="grid">
-        <select [(ngModel)]="selectedClient">
-          <option *ngFor="let c of clients" [value]="c.name">
+        <select [(ngModel)]="selectedClientId" name="clientId">
+          <option [ngValue]="null">{{ 'sales.selectClient' | translate }}</option>
+          <option *ngFor="let c of clients" [ngValue]="c.id ?? c.client_id">
             {{ c.name }}
           </option>
         </select>
 
-        <select [(ngModel)]="selectedEmployee">
+        <select [(ngModel)]="selectedEmployee" name="employee">
+          <option [ngValue]="null">{{ 'portal.selectEmployee' | translate }}</option>
           <option *ngFor="let e of employees" [ngValue]="e">
             {{ e.name }}
           </option>
         </select>
 
-        <input type="date" [(ngModel)]="selectedDate">
-        <input type="time" [(ngModel)]="selectedTime">
+        <input type="date" [(ngModel)]="selectedDate" name="appointmentDate">
+        <input type="time" step="900" [(ngModel)]="selectedTime" name="appointmentTime">
       </div>
 
       <div class="details-field">
@@ -40,14 +42,22 @@
       <div class="servicios-grid">
         <div class="servicio-item"
              *ngFor="let s of services"
-             [class.activo]="selectedService === s"
+             [class.activo]="isServiceSelected(s.id)"
+             [attr.aria-pressed]="isServiceSelected(s.id)"
              (click)="selectService(s)">
-          {{ s.name }}
+          <span>{{ s.name }}</span>
+          <small>{{ s.durationMinutes }} {{ 'services.minutes' | translate }}</small>
         </div>
 
         <div class="empty" *ngIf="!services || services.length === 0">
           {{ 'appointments.noServices' | translate }}
         </div>
+      </div>
+
+      <div class="selected-service-summary" *ngIf="selectedServices.length">
+        <strong>{{ 'appointments.selectedServices' | translate }}</strong>
+        <span>{{ 'appointments.totalDuration' | translate:{ minutes: selectedDurationMinutes } }}</span>
+        <span *ngFor="let service of selectedServices; let last = last">{{ service.name }}<ng-container *ngIf="!last"> · </ng-container></span>
       </div>
 
       <div class="empty" *ngIf="!employees || employees.length === 0">
@@ -91,28 +101,75 @@
           <div class="meta">
             <span>{{ c.employee }}</span>
 
-            <span class="status"
-                  [ngClass]="{
-                    'pending': c.status !== 'sent_to_cash',
-                    'sent_to_cash': c.status === 'sent_to_cash'
-                  }">
-              {{ c.status === 'sent_to_cash' ? ('appointments.cash' | translate) : ('appointments.pending' | translate) }}
+            <span class="status" [ngClass]="'status-' + c.status.toLowerCase()">
+              {{ statusLabel(c.status) }}
             </span>
+            <span class="status billed" *ngIf="c.billed">{{ 'appointments.invoiced' | translate }}</span>
+          </div>
+          <p class="actual-employee" *ngIf="hasDifferentActualEmployee(c)">{{ 'appointments.performedBy' | translate:{ employee: getEmployeeName(c.performedByEmployeeId!) } }}</p>
+        </div>
+
+        <button class="btn-secondary small" type="button" (click)="openAppointmentActions(c)">
+          {{ 'appointments.actions' | translate }}
+        </button>
+        </div>
+    </div>
+
+    <div *ngIf="view === 'calendar'" class="card schedule-card">
+      <div class="schedule-toolbar">
+        <button type="button" class="btn-secondary" (click)="moveGridDate(-1)" [attr.aria-label]="'common.previous' | translate">‹</button>
+        <input type="date" [ngModel]="gridDate" (ngModelChange)="changeGridDate($event)">
+        <strong>{{ gridDateLabel }}</strong>
+        <button type="button" class="btn-secondary" (click)="moveGridDate(1)" [attr.aria-label]="'common.next' | translate">›</button>
+      </div>
+
+      <p class="empty" *ngIf="isScheduleLoading">{{ 'common.loading' | translate }}</p>
+      <p class="empty schedule-closed" *ngIf="!isScheduleLoading && isGridClosed">{{ 'schedule.closedOnDate' | translate }}</p>
+      <p class="empty" *ngIf="!isScheduleLoading && !isGridClosed && employees.length === 0">{{ 'appointments.noEmployees' | translate }}</p>
+
+      <div class="schedule-grid-scroll" *ngIf="!isScheduleLoading && !isGridClosed && employees.length">
+        <div class="schedule-grid" [style.grid-template-columns]="gridColumns">
+          <div class="schedule-grid-corner"></div>
+          <div class="schedule-employee-heading" *ngFor="let employee of employees">{{ employee.name }}</div>
+
+          <div class="schedule-time-axis" [style.height.px]="gridBodyHeight">
+            <span *ngFor="let time of timeSlots" [style.height.px]="slotHeight">{{ time }}</span>
+          </div>
+
+          <div class="schedule-employee-lane" *ngFor="let employee of employees"
+               [style.height.px]="gridBodyHeight"
+               (dragover)="allowAppointmentDrop($event)"
+               (drop)="dropAppointment($event, employee)">
+            <button *ngFor="let time of timeSlots; let slotIndex = index"
+                    type="button"
+                    class="schedule-slot"
+                    [class.unavailable]="isEmployeeBlocked(employee.id, time)"
+                    [style.top.px]="slotIndex * slotHeight"
+                    [style.height.px]="slotHeight"
+                    [disabled]="isEmployeeBlocked(employee.id, time)"
+                    [attr.aria-label]="'appointments.createAt' | translate:{ employee: employee.name, time: time }"
+                    (click)="createAppointmentAt(employee, time)"></button>
+
+            <article *ngFor="let appointment of gridAppointmentsForEmployee(employee.id)"
+                     class="schedule-appointment"
+                     [ngClass]="['status-' + appointment.status.toLowerCase(), hasDifferentActualEmployee(appointment) ? 'different-employee' : '']"
+                     [style.top.px]="gridTop(appointment)"
+                     [style.height.px]="gridHeight(appointment)"
+                     [draggable]="canReschedule(appointment)"
+                     [title]="('appointments.dragHint' | translate)"
+                     (dragstart)="startAppointmentDrag($event, appointment)"
+                     (click)="openAppointmentActions(appointment)">
+              <strong>{{ appointment.client }}</strong>
+              <span>{{ appointment.service }}</span>
+              <small>#{{ appointment.id }} · {{ appointment.time }} · {{ statusLabel(appointment.status) }}</small>
+              <small *ngIf="appointment.billed" class="billed-label">{{ 'appointments.invoiced' | translate }}</small>
+              <small *ngIf="hasDifferentActualEmployee(appointment)" class="different-employee-label">
+                {{ 'appointments.performedBy' | translate:{ employee: getEmployeeName(appointment.performedByEmployeeId!) } }}
+              </small>
+            </article>
           </div>
         </div>
-
-       
-
-          <button class="btn-danger small" (click)="deleteAppointment(c)">
-            {{ 'appointments.delete' | translate }}
-          </button>
-        </div>
-
       </div>
     </div>
-
-    <div *ngIf="view === 'calendar'" class="calendar-wrapper">
-      <full-calendar [options]="calendarOptions"></full-calendar>
-    </div>
-
   </div>
+</div>

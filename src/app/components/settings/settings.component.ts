@@ -9,11 +9,12 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
 import { ApiErrorMapper } from '../../services/api-error.mapper';
 import { AppearanceSettingsComponent } from './appearance-settings.component';
+import { ScheduleSettingsComponent } from './schedule-settings.component';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, LocalizedDatePipe, AppearanceSettingsComponent],
+  imports: [CommonModule, FormsModule, TranslateModule, LocalizedDatePipe, AppearanceSettingsComponent, ScheduleSettingsComponent],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css']
 })
@@ -22,7 +23,7 @@ export class SettingsComponent implements OnInit {
   backups: BackupInfo[] = [];
   isLoadingBackups = false;
   isCreatingBackup = false;
-  selectedSection: 'visual' | 'backups' = 'visual';
+  selectedSection: 'visual' | 'backups' | 'schedule' = 'visual';
 
   constructor(
     private backupsService: BackupsService,
@@ -32,12 +33,16 @@ export class SettingsComponent implements OnInit {
     private errorMapper: ApiErrorMapper
   ) {}
 
-  selectSection(section: 'visual' | 'backups'): void {
+  get isAdmin(): boolean {
+    return this.authService.getRole() === 'ADMIN';
+  }
+
+  selectSection(section: 'visual' | 'backups' | 'schedule'): void {
     this.selectedSection = section;
   }
 
   ngOnInit() {
-    this.loadBackups();
+    if (this.isAdmin) this.loadBackups();
   }
 
   loadBackups(): void {

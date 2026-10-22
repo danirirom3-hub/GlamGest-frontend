@@ -33,15 +33,40 @@
       <div class="client-heading"><div><h1>{{ 'portal.myAppointments' | translate }}</h1><p>{{ 'portal.agendaSubtitle' | translate }}</p></div><lucide-icon [img]="icons.Calendar"></lucide-icon></div>
       <div class="catalog-error" *ngIf="catalogError">{{ catalogError }}</div>
       <div class="appointment-form" *ngIf="!isLoadingCatalog; else loadingCatalog">
-        <input type="datetime-local" [(ngModel)]="form.appointmentDatetime">
-        <select [(ngModel)]="form.serviceId">
-          <option value="">{{ 'portal.selectService' | translate }}</option>
-          <option *ngFor="let service of services" [value]="service.id">{{ service.name }}</option>
-        </select>
-        <select [(ngModel)]="form.employeeId">
-          <option value="">{{ 'portal.selectEmployee' | translate }}</option>
-          <option *ngFor="let employee of employees" [value]="employee.id">{{ employee.name }}</option>
-        </select>
+        <label class="appointment-field">
+          <span>{{ 'portal.appointmentDate' | translate }}</span>
+          <input type="date" [ngModel]="form.appointmentDate" (ngModelChange)="onAppointmentDateChange($event)">
+        </label>
+        <div class="client-services-picker">
+          <span class="picker-label">{{ 'portal.selectServices' | translate }}</span>
+          <div class="client-services-list">
+            <button type="button" class="client-service-option" *ngFor="let service of services"
+              [class.selected]="isServiceSelected(service.id)"
+              [disabled]="editingId !== null && !isServiceSelected(service.id)"
+              [attr.aria-pressed]="isServiceSelected(service.id)"
+              (click)="toggleService(service.id)">
+              <span>{{ service.name }}</span>
+              <small>{{ service.durationMinutes }} {{ 'services.minutes' | translate }}</small>
+            </button>
+          </div>
+        </div>
+        <p class="availability-message" *ngIf="isLoadingAvailability">{{ 'portal.checkingAvailability' | translate }}</p>
+        <p class="availability-message unavailable" *ngIf="!isLoadingAvailability && availability?.closed">{{ 'portal.businessClosed' | translate }}</p>
+        <p class="availability-message unavailable" *ngIf="!isLoadingAvailability && availability && !availability.closed && availableEmployees.length === 0">{{ 'portal.noAvailableSlots' | translate }}</p>
+        <label class="appointment-field" *ngIf="availableEmployees.length">
+          <span>{{ 'portal.selectEmployee' | translate }}</span>
+          <select [ngModel]="form.employeeId" (ngModelChange)="onEmployeeChange($event)">
+            <option value="">{{ 'portal.selectEmployee' | translate }}</option>
+            <option *ngFor="let employee of availableEmployees" [value]="employee.employeeId">{{ employee.employeeName }}</option>
+          </select>
+        </label>
+        <label class="appointment-field" *ngIf="availableTimes.length">
+          <span>{{ 'portal.appointmentTime' | translate }}</span>
+          <select [(ngModel)]="form.appointmentTime">
+            <option value="">{{ 'portal.selectTime' | translate }}</option>
+            <option *ngFor="let time of availableTimes" [value]="time">{{ time }}</option>
+          </select>
+        </label>
         <input [(ngModel)]="form.notes" [placeholder]="'portal.notesPlaceholder' | translate">
         <button class="btn-primary" (click)="saveAppointment()" [disabled]="isLoading">{{ (editingId === null ? 'portal.schedule' : 'portal.saveChanges') | translate }}</button>
         <button *ngIf="editingId !== null" class="btn-secondary" (click)="resetForm()">{{ 'portal.cancelEdit' | translate }}</button>
