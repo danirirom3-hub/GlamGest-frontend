@@ -65,7 +65,8 @@ export class AppointmentsComponent implements OnInit {
     private errorMapper: ApiErrorMapper
   ) {}
 
-  view: 'create' | 'list' | 'calendar' = 'create';
+  view: 'create' | 'list' | 'calendar' = 'calendar';
+  bookingMode = false;
   selectedServices: Service[] = [];
   selectedEmployee: Employee | null = null;
   selectedClientId: number | null = null;
@@ -81,6 +82,10 @@ export class AppointmentsComponent implements OnInit {
   employeeBlocks: EmployeeUnavailability[] = [];
   readonly slotHeight = 44;
   draggedAppointment: Appointment | null = null;
+  isCheckingSlotAvailability = false;
+  slotAvailabilityValid: boolean | null = null;
+  slotAvailabilityCheckFailed = false;
+  private slotAvailabilityRequestId = 0;
 
   appointments: Appointment[] = [];
 
@@ -99,7 +104,22 @@ export class AppointmentsComponent implements OnInit {
 
   setView(view: 'create' | 'list' | 'calendar'): void {
     this.view = view;
+    this.bookingMode = view === 'create';
     if (view === 'calendar') this.loadGridSchedule();
+  }
+
+  startBooking(): void {
+    this.resetForm();
+    this.bookingMode = true;
+    this.view = 'calendar';
+    this.loadGridSchedule();
+  }
+
+  returnToSchedule(): void {
+    this.resetForm();
+    this.bookingMode = false;
+    this.view = 'calendar';
+    this.loadGridSchedule();
   }
 
   loadInitialData(): void {
@@ -173,11 +193,19 @@ export class AppointmentsComponent implements OnInit {
       return;
     }
 
+    if (this.slotAvailabilityValid !== true) {
+      Swal.fire(this.translate.instant('common.error'), this.translate.instant(this.slotAvailabilityCheckFailed
+        ? 'appointments.availabilityCheckError'
+        : 'appointments.slotUnavailable'), 'warning');
+      return;
+    }
+
     const appointmentDatetime = `${this.selectedDate}T${this.selectedTime}`;
     const employee = this.employees.find(e => e.id === this.selectedEmployee!.id);
     if (!employee) return;
 
     this.isLoading = true;
+    const scheduledDate = this.selectedDate;
 
     this.appointmentsService.createAppointmentsBatch({
       appointmentDatetime,
@@ -189,7 +217,11 @@ export class AppointmentsComponent implements OnInit {
       next: (res: any) => {
         this.isLoading = false;
         if (res?.successful) {
+          this.gridDate = scheduledDate;
           this.loadAppointments();
+          this.loadGridSchedule();
+          this.view = 'calendar';
+          this.bookingMode = false;
 
           Swal.fire({
             icon: 'success',
@@ -387,13 +419,15 @@ export class AppointmentsComponent implements OnInit {
 
   gridAppointmentsForEmployee(employeeId: number): Appointment[] {
     return this.appointments.filter(appointment => appointment.date === this.gridDate
-      && appointment.employeeId === employeeId
+      && Number(appointment.employeeId) === Number(employeeId)
       && this.gridTop(appointment) !== null);
   }
 
   gridTop(appointment: Appointment): number | null {
-    const slotIndex = this.timeSlots.indexOf(appointment.time);
-    return slotIndex < 0 ? null : slotIndex * this.slotHeight + 3;
+    if (this.timeSlots.length === 0) return null;
+    const offsetMinutes = this.minutesOfDay(appointment.time) - this.minutesOfDay(this.timeSlots[0]);
+    if (offsetMinutes < 0 || offsetMinutes >= this.timeSlots.length * 15) return null;
+    return offsetMinutes / 15 * this.slotHeight + 3;
   }
 
   gridHeight(appointment: Appointment): number {
@@ -420,6 +454,8 @@ export class AppointmentsComponent implements OnInit {
     this.selectedTime = time;
     this.selectedServices = [];
     this.details = '';
+    this.slotAvailabilityValid = null;
+    this.slotAvailabilityCheckFailed = false;
     this.setView('create');
   }
 
@@ -483,6 +519,51 @@ export class AppointmentsComponent implements OnInit {
     const index = this.selectedServices.findIndex(item => item.id === service.id);
     if (index >= 0) this.selectedServices = this.selectedServices.filter(item => item.id !== service.id);
     else this.selectedServices = [...this.selectedServices, service];
+    this.validateSelectedSlotAvailability();
+  }
+
+  onClientChange(clientId: number | null): void {
+    this.selectedClientId = clientId;
+    this.validateSelectedSlotAvailability();
+  }
+
+  get selectedDateLabel(): string {
+    if (!this.selectedDate) return '';
+    const [year, month, day] = this.selectedDate.split('-').map(Number);
+    return new Intl.DateTimeFormat(this.translate.currentLang === 'en' ? 'en-US' : 'es-CO', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    }).format(new Date(year, month - 1, day, 12));
+  }
+
+  private validateSelectedSlotAvailability(): void {
+    const requestId = ++this.slotAvailabilityRequestId;
+    if (!this.selectedDate || !this.selectedTime || !this.selectedEmployee || this.selectedServices.length === 0) {
+      this.slotAvailabilityValid = null;
+      this.slotAvailabilityCheckFailed = false;
+      this.isCheckingSlotAvailability = false;
+      return;
+    }
+
+    this.isCheckingSlotAvailability = true;
+    this.slotAvailabilityValid = null;
+    this.slotAvailabilityCheckFailed = false;
+    this.scheduleService.getAvailability(this.selectedDate, this.selectedServices.map(service => service.id),
+      null, this.selectedClientId).subscribe({
+      next: response => {
+        if (requestId !== this.slotAvailabilityRequestId) return;
+        const employeeSlots = response?.data?.employees?.find(employee =>
+          Number(employee.employeeId) === Number(this.selectedEmployee?.id));
+        this.slotAvailabilityValid = Boolean(employeeSlots?.startsAt.some(start =>
+          start.slice(0, 5) === this.selectedTime));
+        this.isCheckingSlotAvailability = false;
+      },
+      error: () => {
+        if (requestId !== this.slotAvailabilityRequestId) return;
+        this.slotAvailabilityValid = false;
+        this.slotAvailabilityCheckFailed = true;
+        this.isCheckingSlotAvailability = false;
+      }
+    });
   }
 
   isServiceSelected(serviceId: number): boolean {
@@ -490,12 +571,16 @@ export class AppointmentsComponent implements OnInit {
   }
 
   resetForm(): void {
+    this.slotAvailabilityRequestId += 1;
     if (this.clients.length > 0) this.selectedClientId = this.getClientId(this.clients[0]);
     if (this.employees.length > 0) this.selectedEmployee = this.employees[0];
     this.selectedDate = '';
     this.selectedTime = '';
     this.selectedServices = [];
     this.details = '';
+    this.slotAvailabilityValid = null;
+    this.slotAvailabilityCheckFailed = false;
+    this.isCheckingSlotAvailability = false;
   }
 
   filteredAppointments(): Appointment[] {

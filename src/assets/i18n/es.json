@@ -402,7 +402,12 @@
     "createAt": "Agendar cita para {{employee}} a las {{time}}",
     "dragHint": "Arrastra para cambiar la hora o el empleado",
     "rescheduled": "Cita reprogramada",
-    "rescheduleError": "No se pudo mover la cita. Verifica el horario y vuelve a intentarlo."
+    "rescheduleError": "No se pudo mover la cita. Verifica el horario y vuelve a intentarlo.",
+    "selectedSlot": "Horario seleccionado",
+    "changeSlot": "Elegir otro horario",
+    "slotUnavailable": "Ese horario no alcanza para la duración seleccionada o dejó de estar disponible. Elige otra casilla.",
+    "checkingAvailability": "Verificando disponibilidad para los servicios seleccionados...",
+    "availabilityCheckError": "No se pudo verificar la disponibilidad. Vuelve a elegir el horario e inténtalo de nuevo."
   },
   "metrics": {
     "overview": "Visión general",
@@ -541,6 +546,8 @@
     "servicesRequiredText": "Debe agregar al menos un servicio",
     "employeeRequiredTitle": "Empleado requerido",
     "employeeRequiredText": "Debe asignar un empleado",
+    "invalidLineTitle": "Revisa el detalle de venta",
+    "invalidLineText": "La cantidad debe ser un entero mayor que cero y el precio no puede ser negativo.",
     "confirmTitle": "¿Registrar venta?",
     "confirmText": "La venta será guardada en el sistema",
     "successMessage": "Venta creada correctamente",
@@ -560,7 +567,17 @@
     "alreadyCancelled": "La venta ya está anulada.",
     "detailCannotDelete": "Los detalles de una venta no se pueden eliminar; anula la venta completa.",
     "appointmentNumber": "Cita #{{id}}",
-    "actualEmployee": "Empleado que atendió: {{name}}"
+    "actualEmployee": "Empleado que atendió: {{name}}",
+    "active": "Activa",
+    "voided": "Anulada",
+    "voidSale": "Anular venta",
+    "voiding": "Anulando...",
+    "voidTitle": "¿Anular esta venta?",
+    "voidText": "La venta #{{id}} quedará anulada y se conservará en el historial.",
+    "voidConfirm": "Sí, anular venta",
+    "voidedTitle": "Venta anulada",
+    "voidedText": "La venta fue anulada; sus citas vuelven a estar disponibles para facturación.",
+    "voidError": "No se pudo anular la venta."
   },
   "portal": {
     "myProfile": "Mi perfil",

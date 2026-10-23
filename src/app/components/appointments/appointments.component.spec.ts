@@ -113,6 +113,7 @@ describe('AppointmentsComponent', () => {
     ];
     component.selectedDate = '2026-05-22';
     component.selectedTime = '14:30';
+    component.slotAvailabilityValid = true;
 
     component.scheduleAppointment();
 
@@ -169,6 +170,47 @@ describe('AppointmentsComponent', () => {
 
     expect(component.timeSlots).toEqual(['09:00', '09:15', '09:30', '09:45']);
     expect(component.gridHeight({ ...mockAppointments[0], client: '', employee: '', service: '', date: '', time: '', status: 'PENDING' })).toBe(82);
+  });
+
+  it('opens service selection only after a grid slot has been selected', () => {
+    fixture.detectChanges();
+    const employee = { id: 1, name: 'Angie Sosa' };
+    component.gridDate = '2026-05-20';
+
+    component.createAppointmentAt(employee, '10:15');
+
+    expect(component.view).toBe('create');
+    expect(component.bookingMode).toBeTrue();
+    expect(component.selectedEmployee).toEqual(employee);
+    expect(component.selectedDate).toBe('2026-05-20');
+    expect(component.selectedTime).toBe('10:15');
+  });
+
+  it('keeps existing appointments at their actual minute within the 15-minute grid', () => {
+    component.gridDate = '2026-05-20';
+    component.businessHours = [{ dayOfWeek: 3, closed: false, opensAt: '09:00', closesAt: '10:30' }];
+    const appointment = {
+      ...mockAppointments[0], client: 'Daniela', employee: 'Angie', service: 'Corte',
+      date: '2026-05-20', time: '10:05', status: 'PENDING'
+    } as any;
+
+    expect(component.gridTop(appointment)).toBeCloseTo((65 / 15) * component.slotHeight + 3, 2);
+  });
+
+  it('rechecks the selected employee, client, time and combined services before saving', () => {
+    fixture.detectChanges();
+    scheduleServiceSpy.getAvailability.and.returnValue(of({ data: {
+      employees: [{ employeeId: 1, employeeName: 'Angie Sosa', startsAt: ['10:15:00'] }]
+    } }) as any);
+    component.selectedClientId = 1;
+    component.selectedEmployee = { id: 1, name: 'Angie Sosa' };
+    component.selectedDate = '2026-05-20';
+    component.selectedTime = '10:15';
+
+    component.selectService(mockServices[0]);
+
+    expect(scheduleServiceSpy.getAvailability).toHaveBeenCalledWith('2026-05-20', [1], null, 1);
+    expect(component.slotAvailabilityValid).toBeTrue();
   });
 
   it('deletes the appointment when the delete confirmation succeeds', fakeAsync(() => {

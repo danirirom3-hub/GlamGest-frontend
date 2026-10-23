@@ -56,6 +56,7 @@ export class SalesComponent implements OnInit {
   successMessage = '';
   isLoading = false;
   isLoadingCashierGroup = false;
+  voidingSaleId: number | null = null;
 
   view: 'create' | 'history' = 'create';
 
@@ -187,6 +188,10 @@ export class SalesComponent implements OnInit {
 
           ...sale,
 
+          saleDatetime: sale.saleDatetime || sale.date || sale.createdAt,
+
+          status: String(sale.status || 'ACTIVE').toUpperCase(),
+
           showDetails: false,
 
           saleDetails:
@@ -283,6 +288,47 @@ export class SalesComponent implements OnInit {
 
     sale.showDetails = !sale.showDetails;
 
+  }
+
+  canVoidSale(sale: any): boolean {
+    return String(sale?.status || 'ACTIVE').toUpperCase() === 'ACTIVE';
+  }
+
+  voidSale(sale: any): void {
+    const saleId = Number(sale?.id);
+    if (!saleId || !this.canVoidSale(sale) || this.voidingSaleId !== null) return;
+
+    Swal.fire({
+      title: this.translate.instant('sales.voidTitle'),
+      text: this.translate.instant('sales.voidText', { id: saleId }),
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: this.translate.instant('sales.voidConfirm'),
+      cancelButtonText: this.translate.instant('common.cancel'),
+      confirmButtonColor: '#dc2626'
+    }).then(result => {
+      if (!result.isConfirmed) return;
+      this.voidingSaleId = saleId;
+      this.salesService.deleteSale(saleId).subscribe({
+        next: () => {
+          sale.status = 'VOIDED';
+          sale.voidedAt = new Date().toISOString();
+          sale.showDetails = false;
+          void Swal.fire({
+            icon: 'success',
+            title: this.translate.instant('sales.voidedTitle'),
+            text: this.translate.instant('sales.voidedText'),
+            timer: 1600,
+            showConfirmButton: false
+          });
+        },
+        error: error => {
+          void Swal.fire(this.translate.instant('common.error'),
+            this.errorMapper.resolve(error, this.translate.instant('sales.voidError')), 'error');
+        },
+        complete: () => this.voidingSaleId = null
+      });
+    });
   }
 
   onClientSelect(): void {
@@ -617,6 +663,22 @@ export class SalesComponent implements OnInit {
 
       return;
 
+    }
+
+    const hasInvalidLine = this.items.some(item => {
+      const quantity = Number(item.quantity);
+      const unitPrice = Number(item.unitPrice);
+      return !Number.isInteger(quantity) || quantity < 1
+        || !Number.isInteger(unitPrice) || unitPrice < 0;
+    });
+
+    if (hasInvalidLine) {
+      Swal.fire({
+        icon: 'warning',
+        title: this.translate.instant('sales.invalidLineTitle'),
+        text: this.translate.instant('sales.invalidLineText')
+      });
+      return;
     }
 
     const missingEmployee =

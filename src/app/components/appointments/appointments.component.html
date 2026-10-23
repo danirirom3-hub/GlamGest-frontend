@@ -7,31 +7,41 @@
     </div>
 
     <div class="tabs">
-      <button [class.active]="view === 'calendar'" (click)="setView('calendar')">{{ 'appointments.agenda' | translate }}</button>
-      <button [class.active]="view === 'create'" (click)="setView('create')">{{ 'appointments.newTab' | translate }}</button>
+      <button [class.active]="view === 'calendar' && !bookingMode" (click)="setView('calendar')">{{ 'appointments.agenda' | translate }}</button>
+      <button [class.active]="bookingMode || view === 'create'" (click)="startBooking()">{{ 'appointments.newTab' | translate }}</button>
       <button [class.active]="view === 'list'" (click)="setView('list')">{{ 'appointments.list' | translate }}</button>
     </div>
 
     <div *ngIf="view === 'create'" class="card">
 
       <div class="grid">
-        <select [(ngModel)]="selectedClientId" name="clientId">
-          <option [ngValue]="null">{{ 'sales.selectClient' | translate }}</option>
-          <option *ngFor="let c of clients" [ngValue]="c.id ?? c.client_id">
-            {{ c.name }}
-          </option>
-        </select>
-
-        <select [(ngModel)]="selectedEmployee" name="employee">
-          <option [ngValue]="null">{{ 'portal.selectEmployee' | translate }}</option>
-          <option *ngFor="let e of employees" [ngValue]="e">
-            {{ e.name }}
-          </option>
-        </select>
-
-        <input type="date" [(ngModel)]="selectedDate" name="appointmentDate">
-        <input type="time" step="900" [(ngModel)]="selectedTime" name="appointmentTime">
+        <div class="form-group">
+          <label>{{ 'sales.client' | translate }}</label>
+          <select [ngModel]="selectedClientId" (ngModelChange)="onClientChange($event)" name="clientId">
+            <option [ngValue]="null">{{ 'sales.selectClient' | translate }}</option>
+            <option *ngFor="let c of clients" [ngValue]="c.id ?? c.client_id">
+              {{ c.name }}
+            </option>
+          </select>
+        </div>
       </div>
+
+      <div class="booking-slot-summary">
+        <div>
+          <strong>{{ 'appointments.selectedSlot' | translate }}</strong>
+          <span>{{ selectedDateLabel }} · {{ selectedTime }} · {{ selectedEmployee?.name }}</span>
+        </div>
+        <button type="button" class="btn-secondary" (click)="returnToSchedule()">
+          {{ 'appointments.changeSlot' | translate }}
+        </button>
+      </div>
+
+      <p class="slot-availability-warning" *ngIf="slotAvailabilityValid === false && !isCheckingSlotAvailability">
+        {{ (slotAvailabilityCheckFailed ? 'appointments.availabilityCheckError' : 'appointments.slotUnavailable') | translate }}
+      </p>
+      <p class="slot-availability-note" *ngIf="isCheckingSlotAvailability">
+        {{ 'appointments.checkingAvailability' | translate }}
+      </p>
 
       <div class="details-field">
         <textarea [(ngModel)]="details"
@@ -64,7 +74,8 @@
         {{ 'appointments.noEmployees' | translate }}
       </div>
 
-      <button class="btn-primary" (click)="scheduleAppointment()" [disabled]="isLoading">
+      <button class="btn-primary" (click)="scheduleAppointment()"
+              [disabled]="isLoading || isCheckingSlotAvailability || (selectedServices.length > 0 && slotAvailabilityValid !== true)">
         <span *ngIf="!isLoading">{{ 'appointments.schedule' | translate }}</span>
         <span *ngIf="isLoading">{{ 'appointments.loading' | translate }}</span>
       </button>

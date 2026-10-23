@@ -312,6 +312,24 @@ button:disabled {
 .selected-service-summary span:last-child { opacity: .75; }
 .actual-employee { margin: 5px 0 0; color: #b45309; font-size: 12px; font-weight: 600; }
 
+.booking-slot-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 12px 0 18px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg));
+  color: var(--text);
+}
+
+.booking-slot-summary > div { display: grid; gap: 5px; }
+.booking-slot-summary strong { color: var(--primary); }
+.booking-slot-summary span { font-size: 13px; }
+.slot-availability-warning { color: #b91c1c; font-size: 13px; font-weight: 600; }
+.slot-availability-note { color: var(--text); opacity: .7; font-size: 13px; }
+
 .schedule-toolbar {
   display: flex;
   align-items: center;
@@ -400,6 +418,7 @@ button:disabled {
   .schedule-toolbar { justify-content: space-between; gap: 6px; }
   .schedule-toolbar strong { min-width: 0; flex: 1; font-size: 13px; }
   .schedule-toolbar input { min-width: 130px; padding: 8px; }
+  .booking-slot-summary { align-items: flex-start; flex-direction: column; }
 
   .actions {
     flex-direction: row;

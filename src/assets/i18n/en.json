@@ -402,7 +402,12 @@
     "createAt": "Schedule an appointment for {{employee}} at {{time}}",
     "dragHint": "Drag to change the time or employee",
     "rescheduled": "Appointment rescheduled",
-    "rescheduleError": "Could not move the appointment. Check availability and try again."
+    "rescheduleError": "Could not move the appointment. Check availability and try again.",
+    "selectedSlot": "Selected time slot",
+    "changeSlot": "Choose another time",
+    "slotUnavailable": "This time slot is too short for the selected services or is no longer available. Choose another slot.",
+    "checkingAvailability": "Checking availability for the selected services...",
+    "availabilityCheckError": "Could not verify availability. Choose the time again and try once more."
   },
   "metrics": {
     "overview": "Overview",
@@ -541,6 +546,8 @@
     "servicesRequiredText": "You must add at least one service",
     "employeeRequiredTitle": "Employee required",
     "employeeRequiredText": "You must assign an employee",
+    "invalidLineTitle": "Check the sale details",
+    "invalidLineText": "Quantity must be a positive whole number and the price cannot be negative.",
     "confirmTitle": "Register sale?",
     "confirmText": "The sale will be saved in the system",
     "successMessage": "Sale created successfully",
@@ -560,7 +567,17 @@
     "alreadyCancelled": "The sale is already cancelled.",
     "detailCannotDelete": "Sale details cannot be deleted; cancel the entire sale.",
     "appointmentNumber": "Appointment #{{id}}",
-    "actualEmployee": "Performed by: {{name}}"
+    "actualEmployee": "Performed by: {{name}}",
+    "active": "Active",
+    "voided": "Voided",
+    "voidSale": "Void sale",
+    "voiding": "Voiding...",
+    "voidTitle": "Void this sale?",
+    "voidText": "Sale #{{id}} will be voided and kept in the history.",
+    "voidConfirm": "Yes, void sale",
+    "voidedTitle": "Sale voided",
+    "voidedText": "The sale was voided; its appointments are available for billing again.",
+    "voidError": "Could not void the sale."
   },
   "portal": {
     "myProfile": "My profile",
