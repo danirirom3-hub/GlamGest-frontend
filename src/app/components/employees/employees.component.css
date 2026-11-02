@@ -49,39 +49,6 @@ h2{
   font-size: 14px;
 }
 
-/* FILTER */
-
-.filter-bar{
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  padding: 14px 18px;
-  border-radius: 18px;
-
-  background: var(--card);
-  border: 1px solid rgba(0,0,0,0.06);
-
-  box-shadow:
-    0 12px 24px rgba(0,0,0,0.04);
-
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 500;
-
-  transition: 0.3s ease;
-}
-
-.filter-bar:hover{
-  transform: translateY(-2px);
-}
-
-.filter-bar input{
-  width: 16px;
-  height: 16px;
-  accent-color: var(--primary);
-}
-
 /* FORM */
 
 .form-card{
