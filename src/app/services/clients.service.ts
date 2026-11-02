@@ -10,6 +10,7 @@ export interface Client {
   email: string;
   phone: string;
   registrationDate?: string;
+  systemClient?: boolean;
 }
 
 export interface ClientPage {
@@ -54,6 +55,11 @@ export class ClientsService {
   getMyProfile(): Observable<ClientApiResponse<Client>> {
     const headers = this.getAuthHeaders();
     return this.http.get<ClientApiResponse<Client>>(`${this.apiUrl}/me`, { headers });
+  }
+
+  getSystemClient(): Observable<ClientApiResponse<Client>> {
+    const headers = this.getAuthHeaders();
+    return this.http.get<ClientApiResponse<Client>>(`${this.apiUrl}/system`, { headers });
   }
 
   getClients(search = '', sort = 'recent', page = 0, size = 25): Observable<ClientApiResponse<ClientPage>> {

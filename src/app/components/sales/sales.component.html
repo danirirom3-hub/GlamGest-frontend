@@ -37,23 +37,16 @@
 
           <label>{{ 'sales.client' | translate }}</label>
 
-          <select
-            [(ngModel)]="selectedClientId"
-            (change)="onClientSelect()"
-          >
-
-            <option value="">
-              {{ 'sales.selectClient' | translate }}
-            </option>
-
-            <option
-              *ngFor="let c of clients"
-              [value]="c.client_id || c.id"
-            >
-              {{ c.name }}
-            </option>
-
-          </select>
+          <button type="button" class="client-selector" (click)="openClientModal()">
+            <span class="client-selector-copy">
+              <small>{{ 'sales.selectedClient' | translate }}</small>
+              <strong>{{ clientData.name || ('sales.selectClient' | translate) }}</strong>
+              <em *ngIf="isSystemClientSelected()">
+                {{ 'sales.walkInHint' | translate }}
+              </em>
+            </span>
+            <span class="client-selector-action">{{ 'sales.changeClient' | translate }}</span>
+          </button>
 
         </div>
 
@@ -402,6 +395,59 @@
 
       </div>
 
+    </div>
+
+    <div class="modal-backdrop" *ngIf="showClientModal" (click)="closeClientModal()">
+      <div class="modal client-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h3>{{ 'sales.selectClientTitle' | translate }}</h3>
+            <p>{{ 'sales.selectClientSubtitle' | translate }}</p>
+          </div>
+          <button class="btn-close" (click)="closeClientModal()">✕</button>
+        </div>
+
+        <button type="button" class="walk-in-option" (click)="selectSystemClient()">
+          <span class="walk-in-icon">▣</span>
+          <span>
+            <strong>{{ systemClient?.name || ('sales.generalClient' | translate) }}</strong>
+            <small>{{ 'sales.walkInHint' | translate }}</small>
+          </span>
+          <span class="walk-in-use">{{ 'sales.useOption' | translate }}</span>
+        </button>
+
+        <div class="registered-divider">
+          <span>{{ 'sales.registeredClients' | translate }}</span>
+        </div>
+
+        <input
+          class="client-modal-search"
+          type="search"
+          [placeholder]="'sales.searchClientDetails' | translate"
+          [(ngModel)]="clientSearch"
+          (ngModelChange)="onClientSearchChange($event)"
+          [ngModelOptions]="{ standalone: true }"
+          name="clientSearch"
+          autocomplete="off"
+        >
+
+        <div class="client-results">
+          <button
+            type="button"
+            class="client-result"
+            *ngFor="let c of clients"
+            [hidden]="c.systemClient"
+            (click)="selectClient(c)"
+          >
+            <span class="client-result-name">{{ c.name }}</span>
+            <span class="client-result-detail">{{ c.phone || ('sales.noPhone' | translate) }}</span>
+            <span class="client-result-detail">{{ c.email || ('sales.noEmail' | translate) }}</span>
+          </button>
+          <p class="suggestions-empty" *ngIf="clients.length === 0">
+            {{ 'sales.noClientsFound' | translate }}
+          </p>
+        </div>
+      </div>
     </div>
 
     <div

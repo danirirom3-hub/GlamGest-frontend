@@ -63,12 +63,14 @@ export class SalesComponent implements OnInit {
   view: 'create' | 'history' = 'create';
 
   showModal = false;
+  showClientModal = false;
   showAppointmentsModal = false;
 
   appointmentSearch = '';
   clientSearch = '';
   showClientSuggestions = false;
   clientSearchTimer: ReturnType<typeof setTimeout> | null = null;
+  clientSearchRequestId = 0;
   serviceSearch = '';
   selectedCategoryId: number | null = null;
   categories: any[] = [];
@@ -112,10 +114,12 @@ export class SalesComponent implements OnInit {
   }
 
   loadClients(search = ''): void {
+    const requestId = ++this.clientSearchRequestId;
 
     this.clientsService.getClients(search, 'name-asc', 0, 10).subscribe({
 
       next: (res: any) => {
+        if (requestId !== this.clientSearchRequestId) return;
 
         this.clients = (res?.data?.items || res?.data || res || []).map((client: any) => ({
           ...client,
@@ -269,13 +273,9 @@ export class SalesComponent implements OnInit {
   }
 
   loadSystemClient(): void {
-    this.clientsService.getClients('Consumidor final', 'name-asc', 0, 5).subscribe({
+    this.clientsService.getSystemClient().subscribe({
       next: (res: any) => {
-        const clients = res?.data?.items || res?.data || res || [];
-        this.systemClient = clients.find((client: any) => client.systemClient) || clients[0] || null;
-        if (this.systemClient && !this.clients.some(client => Number(client.id) === Number(this.systemClient.id))) {
-          this.clients = [this.systemClient, ...this.clients];
-        }
+        this.systemClient = res?.data || res || null;
         if (this.systemClient && !this.selectedClientId) {
           this.selectedClientId = this.systemClient.id ?? this.systemClient.client_id;
           this.onClientSelect();
@@ -284,8 +284,8 @@ export class SalesComponent implements OnInit {
     });
   }
 
-  searchClients(): void {
-    this.showClientSuggestions = true;
+  onClientSearchChange(value: string): void {
+    this.clientSearch = value;
     if (this.clientSearchTimer) clearTimeout(this.clientSearchTimer);
     this.clientSearchTimer = setTimeout(() => this.loadClients(this.clientSearch.trim()), 250);
   }
@@ -294,11 +294,43 @@ export class SalesComponent implements OnInit {
     this.selectedClientId = client.id ?? client.client_id;
     this.clientSearch = client.name || '';
     this.showClientSuggestions = false;
+    this.showClientModal = false;
     this.onClientSelect();
   }
 
   selectSystemClient(): void {
-    if (this.systemClient) this.selectClient(this.systemClient);
+    if (this.systemClient) {
+      this.selectClient(this.systemClient);
+      return;
+    }
+
+    this.clientsService.getSystemClient().subscribe({
+      next: (res: any) => {
+        this.systemClient = res?.data || res || null;
+        if (this.systemClient) this.selectClient(this.systemClient);
+      },
+      error: error => void Swal.fire(
+        this.translate.instant('common.error'),
+        this.errorMapper.resolve(error, this.translate.instant('sales.loadClientsError')),
+        'error'
+      )
+    });
+  }
+
+  isSystemClientSelected(): boolean {
+    return Boolean(this.systemClient)
+      && Number(this.selectedClientId) === Number(this.systemClient.id ?? this.systemClient.client_id);
+  }
+
+  openClientModal(): void {
+    this.clientSearch = '';
+    this.clientSearchRequestId++;
+    this.showClientModal = true;
+    this.loadClients();
+  }
+
+  closeClientModal(): void {
+    this.showClientModal = false;
   }
 
   isCashEligible(appointment: any): boolean {
@@ -688,13 +720,14 @@ export class SalesComponent implements OnInit {
     this.successMessage = '';
 
     const matchedClient =
-      this.clients.find(
+      (this.systemClient && this.isSystemClientSelected()
+        ? this.systemClient
+        : this.clients.find(
+            c =>
+              (c.client_id ?? c.id) ==
+              this.selectedClientId
 
-        c =>
-          (c.client_id ?? c.id) ==
-          this.selectedClientId
-
-      );
+          ));
 
     if (!matchedClient) {
 
