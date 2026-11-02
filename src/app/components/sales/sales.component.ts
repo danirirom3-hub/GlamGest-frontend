@@ -15,6 +15,7 @@ import { LanguageService } from '../../services/language.service';
 import { ApiErrorMapper } from '../../services/api-error.mapper';
 import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
 import { AuthService } from '../../services/auth.service';
+import { CategoriesService } from '../../services/categories.service';
 
 @Component({
   selector: 'app-sales',
@@ -32,6 +33,7 @@ export class SalesComponent implements OnInit {
     private servicesService: ServicesService,
     private appointmentsService: AppointmentsService,
     private authService: AuthService,
+    private categoriesService: CategoriesService,
     private route: ActivatedRoute,
     private router: Router,
     private translate: TranslateService,
@@ -64,6 +66,13 @@ export class SalesComponent implements OnInit {
   showAppointmentsModal = false;
 
   appointmentSearch = '';
+  clientSearch = '';
+  showClientSuggestions = false;
+  clientSearchTimer: ReturnType<typeof setTimeout> | null = null;
+  serviceSearch = '';
+  selectedCategoryId: number | null = null;
+  categories: any[] = [];
+  systemClient: any = null;
 
   selectedClientId: any = '';
 
@@ -88,7 +97,9 @@ export class SalesComponent implements OnInit {
   ngOnInit(): void {
 
     this.loadClients();
+    this.loadSystemClient();
     this.loadServices();
+    this.loadCategories();
     this.loadEmployees();
     this.loadSales();
     this.loadAppointments();
@@ -100,9 +111,9 @@ export class SalesComponent implements OnInit {
     });
   }
 
-  loadClients(): void {
+  loadClients(search = ''): void {
 
-    this.clientsService.getClients().subscribe({
+    this.clientsService.getClients(search, 'name-asc', 0, 10).subscribe({
 
       next: (res: any) => {
 
@@ -226,7 +237,8 @@ export class SalesComponent implements OnInit {
 
         const data = res?.data || res || [];
 
-        this.appointments = data.filter((appointment: any) => this.isCashEligible(appointment));
+        this.appointments = data.filter((appointment: any) =>
+          this.isCashEligible(appointment) && this.isToday(appointment.appointmentDatetime));
 
       },
 
@@ -242,9 +254,63 @@ export class SalesComponent implements OnInit {
 
   }
 
+  loadCategories(): void {
+    this.categoriesService.getCategories().subscribe({
+      next: (res: any) => this.categories = res?.data || res || []
+    });
+  }
+
+  filteredServices(): any[] {
+    const query = this.serviceSearch.trim().toLowerCase();
+    return this.services.filter(service =>
+      (this.selectedCategoryId === null || Number(service.categoryId) === this.selectedCategoryId)
+      && (!query || String(service.name || '').toLowerCase().includes(query))
+    );
+  }
+
+  loadSystemClient(): void {
+    this.clientsService.getClients('Consumidor final', 'name-asc', 0, 5).subscribe({
+      next: (res: any) => {
+        const clients = res?.data?.items || res?.data || res || [];
+        this.systemClient = clients.find((client: any) => client.systemClient) || clients[0] || null;
+        if (this.systemClient && !this.clients.some(client => Number(client.id) === Number(this.systemClient.id))) {
+          this.clients = [this.systemClient, ...this.clients];
+        }
+        if (this.systemClient && !this.selectedClientId) {
+          this.selectedClientId = this.systemClient.id ?? this.systemClient.client_id;
+          this.onClientSelect();
+        }
+      }
+    });
+  }
+
+  searchClients(): void {
+    this.showClientSuggestions = true;
+    if (this.clientSearchTimer) clearTimeout(this.clientSearchTimer);
+    this.clientSearchTimer = setTimeout(() => this.loadClients(this.clientSearch.trim()), 250);
+  }
+
+  selectClient(client: any): void {
+    this.selectedClientId = client.id ?? client.client_id;
+    this.clientSearch = client.name || '';
+    this.showClientSuggestions = false;
+    this.onClientSelect();
+  }
+
+  selectSystemClient(): void {
+    if (this.systemClient) this.selectClient(this.systemClient);
+  }
+
   isCashEligible(appointment: any): boolean {
     const status = String(appointment?.status || '').toUpperCase();
     return !appointment?.billed && status !== 'CANCELLED' && status !== 'NO_SHOW';
+  }
+
+  isToday(value: string): boolean {
+    const format = (date: Date) => new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit'
+    }).format(date);
+    return format(new Date(value)) === format(new Date());
   }
 
   loadCashierGroup(appointmentId: number): void {
@@ -350,6 +416,7 @@ export class SalesComponent implements OnInit {
         email: client.email || ''
 
       };
+      this.clientSearch = client.name || '';
 
     }
 
@@ -815,7 +882,8 @@ export class SalesComponent implements OnInit {
 
     this.selectedAppointment = null;
 
-    this.selectedClientId = '';
+    this.selectedClientId = this.systemClient?.id ?? this.systemClient?.client_id ?? '';
+    this.clientSearch = this.systemClient?.name || '';
 
     this.cashierGroupAppointmentId = null;
 

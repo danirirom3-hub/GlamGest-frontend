@@ -426,11 +426,25 @@
 
         </div>
 
+        <div class="service-filters">
+          <input
+            type="search"
+            [placeholder]="'sales.searchService' | translate"
+            [(ngModel)]="serviceSearch"
+          >
+          <select [(ngModel)]="selectedCategoryId">
+            <option [ngValue]="null">{{ 'sales.allCategories' | translate }}</option>
+            <option *ngFor="let category of categories" [ngValue]="category.id">
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+
         <div class="services-list">
 
           <div
             class="service-card"
-            *ngFor="let service of services"
+            *ngFor="let service of filteredServices()"
           >
 
             <div>
