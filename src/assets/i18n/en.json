@@ -476,6 +476,10 @@
     }
   },
   "reports": {
+    "periodLabel": "Report period",
+    "today": "Today",
+    "last7Days": "Last 7 days",
+    "thisMonth": "This month",
     "admin": "Administration",
     "title": "Reports",
     "description": "Download key business information by period.",

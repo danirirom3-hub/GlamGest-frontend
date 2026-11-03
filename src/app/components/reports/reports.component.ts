@@ -62,6 +62,23 @@ export class ReportsComponent implements OnInit {
     }
   }
 
+  setPreset(preset: 'today' | 'week' | 'month'): void {
+    const today = new Date();
+    const end = this.toDateInput(today);
+    const start = new Date(today);
+    if (preset === 'today') {
+      this.from = end;
+    } else if (preset === 'week') {
+      start.setDate(today.getDate() - 6);
+      this.from = this.toDateInput(start);
+    } else {
+      start.setDate(1);
+      this.from = this.toDateInput(start);
+    }
+    this.to = end;
+    this.applyPeriod();
+  }
+
   download(definition: ReportDefinition): void {
     this.errorMessage = this.validatePeriod();
     if (this.errorMessage || this.loading) return;

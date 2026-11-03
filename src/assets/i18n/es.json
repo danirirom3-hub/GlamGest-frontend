@@ -476,6 +476,10 @@
     }
   },
   "reports": {
+    "periodLabel": "Período del reporte",
+    "today": "Hoy",
+    "last7Days": "Últimos 7 días",
+    "thisMonth": "Este mes",
     "admin": "Administración",
     "title": "Reportes",
     "description": "Descarga información clave de tu negocio por período.",
