@@ -8,21 +8,29 @@
 
     <div class="tabs">
       <button [class.active]="view === 'calendar' && !bookingMode" (click)="setView('calendar')">{{ 'appointments.agenda' | translate }}</button>
-      <button [class.active]="bookingMode || view === 'create'" (click)="startBooking()">{{ 'appointments.newTab' | translate }}</button>
-      <button [class.active]="view === 'list'" (click)="setView('list')">{{ 'appointments.list' | translate }}</button>
+      <button [class.active]="view === 'list'" (click)="setView('list')">{{ 'appointments.todayList' | translate }}</button>
     </div>
 
     <div *ngIf="view === 'create'" class="card">
 
+      <div class="booking-header">
+        <div>
+          <span class="booking-eyebrow">{{ 'appointments.newBooking' | translate }}</span>
+          <h3>{{ 'appointments.schedule' | translate }}</h3>
+        </div>
+        <button type="button" class="booking-close" (click)="returnToSchedule()" [attr.aria-label]="'common.close' | translate">✕</button>
+      </div>
+
       <div class="grid">
         <div class="form-group">
           <label>{{ 'sales.client' | translate }}</label>
-          <select [ngModel]="selectedClientId" (ngModelChange)="onClientChange($event)" name="clientId">
-            <option [ngValue]="null">{{ 'sales.selectClient' | translate }}</option>
-            <option *ngFor="let c of clients" [ngValue]="c.id ?? c.client_id">
-              {{ c.name }}
-            </option>
-          </select>
+          <button type="button" class="appointment-selector" (click)="openClientModal()">
+            <span>
+              <small>{{ 'appointments.selectedClient' | translate }}</small>
+              <strong>{{ getClientName(selectedClientId) }}</strong>
+            </span>
+            <em>{{ 'appointments.changeClient' | translate }}</em>
+          </button>
         </div>
       </div>
 
@@ -49,19 +57,14 @@
         </textarea>
       </div>
 
-      <div class="servicios-grid">
-        <div class="servicio-item"
-             *ngFor="let s of services"
-             [class.activo]="isServiceSelected(s.id)"
-             [attr.aria-pressed]="isServiceSelected(s.id)"
-             (click)="selectService(s)">
-          <span>{{ s.name }}</span>
-          <small>{{ s.durationMinutes }} {{ 'services.minutes' | translate }}</small>
-        </div>
-
-        <div class="empty" *ngIf="!services || services.length === 0">
-          {{ 'appointments.noServices' | translate }}
-        </div>
+      <div class="appointment-services-picker">
+        <button type="button" class="appointment-selector" (click)="openServiceModal()">
+          <span>
+            <small>{{ 'appointments.servicesLabel' | translate }}</small>
+            <strong>{{ selectedServices.length ? ('appointments.selectedServicesCount' | translate:{ count: selectedServices.length }) : ('appointments.chooseServices' | translate) }}</strong>
+          </span>
+          <em>{{ 'appointments.choose' | translate }}</em>
+        </button>
       </div>
 
       <div class="selected-service-summary" *ngIf="selectedServices.length">
@@ -85,12 +88,66 @@
       </div>
     </div>
 
+    <div class="modal-backdrop" *ngIf="showClientModal" (click)="closeClientModal()">
+      <div class="appointment-modal client-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h3>{{ 'appointments.selectClientTitle' | translate }}</h3>
+            <p>{{ 'appointments.selectClientSubtitle' | translate }}</p>
+          </div>
+          <button type="button" class="btn-close" (click)="closeClientModal()">✕</button>
+        </div>
+        <input
+          class="modal-search"
+          type="search"
+          [placeholder]="'appointments.searchClient' | translate"
+          [(ngModel)]="clientSearch"
+          (ngModelChange)="onClientSearchChange($event)"
+          [ngModelOptions]="{ standalone: true }"
+          autocomplete="off"
+        >
+        <div class="modal-results">
+          <button type="button" class="modal-result" *ngFor="let client of clients" (click)="selectClient(client)">
+            <strong>{{ client.name }}</strong>
+            <small>{{ client.phone || client.email }}</small>
+          </button>
+          <p class="empty" *ngIf="clients.length === 0">{{ 'appointments.noClientsFound' | translate }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" *ngIf="showServiceModal" (click)="closeServiceModal()">
+      <div class="appointment-modal service-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h3>{{ 'appointments.selectServicesTitle' | translate }}</h3>
+            <p>{{ 'appointments.selectServicesSubtitle' | translate }}</p>
+          </div>
+          <button type="button" class="btn-close" (click)="closeServiceModal()">✕</button>
+        </div>
+        <div class="modal-filters">
+          <input type="search" [placeholder]="'appointments.searchService' | translate" [(ngModel)]="serviceSearch" [ngModelOptions]="{ standalone: true }">
+          <select [(ngModel)]="selectedCategoryId" [ngModelOptions]="{ standalone: true }">
+            <option [ngValue]="null">{{ 'sales.allCategories' | translate }}</option>
+            <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
+          </select>
+        </div>
+        <div class="modal-results service-results">
+          <button type="button" class="modal-result service-result" *ngFor="let service of filteredServices()" [class.selected]="isServiceSelected(service.id)" (click)="selectService(service)">
+            <span><strong>{{ service.name }}</strong><small>{{ service.durationMinutes }} {{ 'services.minutes' | translate }}</small></span>
+            <span>{{ isServiceSelected(service.id) ? '✓' : '+' }}</span>
+          </button>
+          <p class="empty" *ngIf="filteredServices().length === 0">{{ 'appointments.noServices' | translate }}</p>
+        </div>
+        <button type="button" class="btn-primary modal-done" (click)="closeServiceModal()">{{ 'appointments.done' | translate }}</button>
+      </div>
+    </div>
+
     <div *ngIf="view === 'list'" class="card">
 
       <div class="grid">
         <input [placeholder]="'appointments.filterClient' | translate" [(ngModel)]="filterClient">
         <input [placeholder]="'appointments.filterEmployee' | translate" [(ngModel)]="filterEmployee">
-        <input type="date" [(ngModel)]="filterDate">
       </div>
 
       <div class="empty" *ngIf="filteredAppointments().length === 0">

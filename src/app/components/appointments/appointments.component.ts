@@ -9,6 +9,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ClientsService } from '../../services/clients.service';
 import { EmployeesService } from '../../services/employees.service';
 import { ServicesService } from '../../services/services.service';
+import { CategoriesService } from '../../services/categories.service';
 import { ScheduleService, BusinessHours, BusinessScheduleException, EmployeeUnavailability } from '../../services/schedule.service';
 import { ApiErrorMapper } from '../../services/api-error.mapper';
 
@@ -38,6 +39,8 @@ interface Service {
   name: string;
   durationMinutes: number;
   price: number;
+  categoryId?: number | null;
+  categoryName?: string | null;
 }
 
 interface Employee {
@@ -60,6 +63,7 @@ export class AppointmentsComponent implements OnInit {
     private clientsService: ClientsService,
     private employeesService: EmployeesService,
     private servicesService: ServicesService,
+    private categoriesService: CategoriesService,
     private scheduleService: ScheduleService,
     private translate: TranslateService,
     private errorMapper: ApiErrorMapper
@@ -67,6 +71,13 @@ export class AppointmentsComponent implements OnInit {
 
   view: 'create' | 'list' | 'calendar' = 'calendar';
   bookingMode = false;
+  showClientModal = false;
+  showServiceModal = false;
+  clientSearch = '';
+  clientSearchTimer: ReturnType<typeof setTimeout> | null = null;
+  serviceSearch = '';
+  selectedCategoryId: number | null = null;
+  categories: any[] = [];
   selectedServices: Service[] = [];
   selectedEmployee: Employee | null = null;
   selectedClientId: number | null = null;
@@ -91,14 +102,16 @@ export class AppointmentsComponent implements OnInit {
 
   filterClient = '';
   filterEmployee = '';
-  filterDate = '';
+  todayBusinessDate = '';
 
   services: Service[] = [];
   employees: Employee[] = [];
   clients: any[] = [];
 
   ngOnInit(): void {
+    this.todayBusinessDate = this.businessDateToday();
     this.loadInitialData();
+    this.loadCategories();
     this.loadGridSchedule();
   }
 
@@ -109,10 +122,7 @@ export class AppointmentsComponent implements OnInit {
   }
 
   startBooking(): void {
-    this.resetForm();
-    this.bookingMode = true;
-    this.view = 'calendar';
-    this.loadGridSchedule();
+    this.setView('calendar');
   }
 
   returnToSchedule(): void {
@@ -142,7 +152,9 @@ export class AppointmentsComponent implements OnInit {
                   id: service.id ?? service.service_id,
                   name: service.name,
                   durationMinutes: service.durationMinutes ?? service.duration_minutes ?? 15,
-                  price: service.price ?? 0
+                  price: service.price ?? 0,
+                  categoryId: service.categoryId ?? service.category_id ?? null,
+                  categoryName: service.categoryName ?? service.category_name ?? null
                 }));
                 this.loadAppointments();
               }
@@ -239,6 +251,57 @@ export class AppointmentsComponent implements OnInit {
         Swal.fire(this.translate.instant('common.error'), this.translate.instant('appointments.createError'), 'error');
       }
     });
+  }
+
+  loadCategories(): void {
+    this.categoriesService.getCategories().subscribe({
+      next: (res: any) => this.categories = res?.data || res || []
+    });
+  }
+
+  openClientModal(): void {
+    this.clientSearch = '';
+    this.showClientModal = true;
+    this.loadClientsForSearch();
+  }
+
+  closeClientModal(): void {
+    this.showClientModal = false;
+  }
+
+  onClientSearchChange(value: string): void {
+    this.clientSearch = value;
+    if (this.clientSearchTimer) clearTimeout(this.clientSearchTimer);
+    this.clientSearchTimer = setTimeout(() => this.loadClientsForSearch(), 250);
+  }
+
+  private loadClientsForSearch(): void {
+    this.clientsService.getClients(this.clientSearch.trim(), 'name-asc', 0, 25).subscribe({
+      next: (res: any) => this.clients = res?.data?.items || res?.data || res || []
+    });
+  }
+
+  selectClient(client: any): void {
+    this.onClientChange(this.getClientId(client));
+    this.showClientModal = false;
+  }
+
+  openServiceModal(): void {
+    this.serviceSearch = '';
+    this.selectedCategoryId = null;
+    this.showServiceModal = true;
+  }
+
+  closeServiceModal(): void {
+    this.showServiceModal = false;
+  }
+
+  filteredServices(): Service[] {
+    const query = this.serviceSearch.trim().toLowerCase();
+    return this.services.filter(service =>
+      (this.selectedCategoryId === null || Number(service.categoryId) === this.selectedCategoryId)
+      && (!query || service.name.toLowerCase().includes(query))
+    );
   }
 
   sendToCash(app: Appointment): void {
@@ -587,12 +650,20 @@ export class AppointmentsComponent implements OnInit {
     return this.appointments.filter(a => {
       const matchClient = !this.filterClient || a.client.toLowerCase().includes(this.filterClient.toLowerCase());
       const matchEmployee = !this.filterEmployee || a.employee.toLowerCase().includes(this.filterEmployee.toLowerCase());
-      const matchDate = !this.filterDate || a.date === this.filterDate;
+      const matchDate = a.date === this.todayBusinessDate;
       return matchClient && matchEmployee && matchDate;
     });
   }
 
-  getClientName(clientId: number): string {
+  private businessDateToday(): string {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit'
+    }).formatToParts(new Date());
+    const value = (type: string) => parts.find(part => part.type === type)?.value || '';
+    return `${value('year')}-${value('month')}-${value('day')}`;
+  }
+
+  getClientName(clientId: number | null): string {
     return this.clients.find(c => this.getClientId(c) === clientId)?.name || this.translate.instant('common.unknown');
   }
 
