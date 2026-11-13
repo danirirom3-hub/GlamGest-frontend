@@ -83,6 +83,10 @@ export class ClientComponent implements OnInit {
 
   ngOnInit(): void {
     this.isSettingsPage = this.route.snapshot.data['clientSettings'] === true;
+    const requestedSection = this.route.snapshot.queryParamMap.get('section');
+    if (requestedSection && this.sections.includes(requestedSection as typeof this.sections[number])) {
+      this.activeSection = requestedSection as typeof this.sections[number];
+    }
     if (!this.isSettingsPage) {
       this.loadProfile();
       this.loadAppointments();
@@ -159,6 +163,10 @@ export class ClientComponent implements OnInit {
   }
 
   setSection(section: typeof this.sections[number]): void {
+    if (this.isSettingsPage) {
+      void this.router.navigate(['/client'], { queryParams: { section } });
+      return;
+    }
     this.activeSection = section;
     if (section === 'booking' && !this.form.appointmentDate) this.resetForm();
   }
