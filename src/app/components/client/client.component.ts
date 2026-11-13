@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { LucideAngularModule, Calendar, User, LogOut, Settings } from 'lucide-angular';
+import { LucideAngularModule, Calendar, User, LogOut, Settings, LayoutGrid, History, Clock } from 'lucide-angular';
 import Swal from 'sweetalert2';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
@@ -14,6 +14,7 @@ import { LocalizedDatePipe } from '../../pipes/localized-date.pipe';
 import { ApiErrorMapper } from '../../services/api-error.mapper';
 import { AppearanceSettingsComponent } from '../settings/appearance-settings.component';
 import { ScheduleAvailability, ScheduleService } from '../../services/schedule.service';
+import { CategoriesService, Category } from '../../services/categories.service';
 
 interface ClientAppointment {
   id: number;
@@ -23,13 +24,17 @@ interface ClientAppointment {
   employeeId?: number;
   notes?: string;
   status?: string;
+  billed?: boolean;
 }
 
 interface CatalogOption {
   id: number;
   name: string;
+  description?: string;
   durationMinutes?: number;
   price?: number;
+  categoryId?: number | null;
+  categoryName?: string;
 }
 
 @Component({
@@ -40,11 +45,15 @@ interface CatalogOption {
   styleUrls: ['../dashboard/dashboard.component.css', './client.component.css']
 })
 export class ClientComponent implements OnInit {
-  icons = { Calendar, User, LogOut, Settings };
+  icons = { Calendar, User, LogOut, Settings, LayoutGrid, History, Clock };
+  readonly sections = ['catalog', 'booking', 'upcoming', 'history', 'profile'] as const;
+  activeSection: typeof this.sections[number] = 'catalog';
   isSettingsPage = false;
   profile: any = null;
   appointments: ClientAppointment[] = [];
   services: CatalogOption[] = [];
+  categories: Category[] = [];
+  selectedCatalogCategoryId: number | null = null;
   employees: CatalogOption[] = [];
   availability: ScheduleAvailability | null = null;
   isLoadingAvailability = false;
@@ -64,6 +73,7 @@ export class ClientComponent implements OnInit {
     private appointmentsService: AppointmentsService,
     private servicesService: ServicesService,
     private employeesService: EmployeesService,
+    private categoriesService: CategoriesService,
     private scheduleService: ScheduleService,
     private route: ActivatedRoute,
     private router: Router,
@@ -77,6 +87,7 @@ export class ClientComponent implements OnInit {
       this.loadProfile();
       this.loadAppointments();
       this.loadCatalog();
+      this.loadCategories();
     }
   }
 
@@ -115,8 +126,11 @@ export class ClientComponent implements OnInit {
       next: response => this.services = (response?.data || response || []).map((service: any) => ({
         id: service.id ?? service.service_id,
         name: service.name,
+        description: service.description ?? '',
         durationMinutes: service.durationMinutes ?? service.duration_minutes ?? 15,
-        price: service.price ?? 0
+        price: service.price ?? 0,
+        categoryId: service.categoryId ?? service.category_id ?? null,
+        categoryName: service.categoryName ?? service.category_name ?? ''
       })),
       error: error => {
         this.catalogError = this.getErrorMessage(error, this.translate.instant('portal.loadServicesError'));
@@ -135,6 +149,68 @@ export class ClientComponent implements OnInit {
       },
       complete
     });
+  }
+
+  loadCategories(): void {
+    this.categoriesService.getCategories().subscribe({
+      next: response => this.categories = (response?.data || []).filter(category => category.active !== false),
+      error: () => this.categories = []
+    });
+  }
+
+  setSection(section: typeof this.sections[number]): void {
+    this.activeSection = section;
+    if (section === 'booking' && !this.form.appointmentDate) this.resetForm();
+  }
+
+  reserveService(service: CatalogOption): void {
+    this.form = { ...this.form, serviceIds: [service.id], employeeId: '', appointmentTime: '' };
+    this.activeSection = 'booking';
+    this.refreshAvailability();
+  }
+
+  get upcomingAppointments(): ClientAppointment[] {
+    return this.appointments
+      .filter(appointment => !this.isHistoryAppointment(appointment))
+      .sort((a, b) => new Date(a.appointmentDatetime).getTime() - new Date(b.appointmentDatetime).getTime());
+  }
+
+  get filteredCatalogServices(): CatalogOption[] {
+    return this.services.filter(service =>
+      this.selectedCatalogCategoryId === null || service.categoryId === this.selectedCatalogCategoryId
+    );
+  }
+
+  get historyAppointments(): ClientAppointment[] {
+    return this.appointments
+      .filter(appointment => this.isHistoryAppointment(appointment))
+      .sort((a, b) => new Date(b.appointmentDatetime).getTime() - new Date(a.appointmentDatetime).getTime());
+  }
+
+  isHistoryAppointment(appointment: ClientAppointment): boolean {
+    const status = String(appointment.status || '').toUpperCase();
+    return Boolean(appointment.billed)
+      || ['COMPLETED', 'CANCELLED', 'NO_SHOW'].includes(status)
+      || new Date(appointment.appointmentDatetime).getTime() < Date.now();
+  }
+
+  categoryName(service: CatalogOption): string {
+    return service.categoryName
+      || this.categories.find(category => category.id === service.categoryId)?.name
+      || this.translate.instant('portal.generalCategory');
+  }
+
+  formatPrice(value?: number): string {
+    return new Intl.NumberFormat(this.translate.currentLang === 'en' ? 'en-US' : 'es-CO', {
+      style: 'currency', currency: 'COP', maximumFractionDigits: 0
+    }).format(Number(value) || 0);
+  }
+
+  statusLabel(status?: string): string {
+    const normalized = String(status || 'PENDING').toUpperCase();
+    const key = `portal.status.${normalized}`;
+    const translated = this.translate.instant(key);
+    return translated === key ? normalized : translated;
   }
 
   saveAppointment(): void {
@@ -266,6 +342,35 @@ export class ClientComponent implements OnInit {
   get availableTimes(): string[] {
     return this.availability?.employees.find(employee => employee.employeeId === Number(this.form.employeeId))
       ?.startsAt.map(time => time.slice(0, 5)) || [];
+  }
+
+  get availabilityEmployees(): Array<{ employeeId: number; employeeName: string; startsAt: string[] }> {
+    return this.availability?.employees || [];
+  }
+
+  get availabilityTimeSlots(): string[] {
+    if (!this.availability?.opensAt || !this.availability.closesAt) return [];
+    const slots: string[] = [];
+    const [openHour, openMinute] = this.availability.opensAt.slice(0, 5).split(':').map(Number);
+    const [closeHour, closeMinute] = this.availability.closesAt.slice(0, 5).split(':').map(Number);
+    const first = openHour * 60 + openMinute;
+    const last = closeHour * 60 + closeMinute - this.availability.durationMinutes;
+    for (let minutes = first; minutes <= last; minutes += 15) {
+      slots.push(`${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`);
+    }
+    return slots;
+  }
+
+  isSlotAvailable(employeeId: number, time: string): boolean {
+    return Boolean(this.availability?.employees
+      .find(employee => employee.employeeId === employeeId)
+      ?.startsAt.some(start => start.slice(0, 5) === time));
+  }
+
+  selectAvailableSlot(employeeId: number, time: string): void {
+    if (!this.isSlotAvailable(employeeId, time)) return;
+    this.form.employeeId = String(employeeId);
+    this.form.appointmentTime = time;
   }
 
   private refreshAvailability(): void {

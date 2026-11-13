@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { finalize } from 'rxjs';
 
 import Swal from 'sweetalert2';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -407,7 +408,9 @@ export class SalesComponent implements OnInit {
     }).then(result => {
       if (!result.isConfirmed) return;
       this.voidingSaleId = saleId;
-      this.salesService.deleteSale(saleId).subscribe({
+      this.salesService.deleteSale(saleId).pipe(
+        finalize(() => this.voidingSaleId = null)
+      ).subscribe({
         next: () => {
           sale.status = 'VOIDED';
           sale.voidedAt = new Date().toISOString();
@@ -423,8 +426,7 @@ export class SalesComponent implements OnInit {
         error: error => {
           void Swal.fire(this.translate.instant('common.error'),
             this.errorMapper.resolve(error, this.translate.instant('sales.voidError')), 'error');
-        },
-        complete: () => this.voidingSaleId = null
+        }
       });
     });
   }

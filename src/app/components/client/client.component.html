@@ -2,8 +2,11 @@
   <aside class="sidebar">
     <div class="brand"><h2>Glam<span>Gest</span></h2></div>
     <nav class="menu">
-      <a routerLink="/client" fragment="profile"><lucide-icon [img]="icons.User"></lucide-icon>{{ 'portal.myProfile' | translate }}</a>
-      <a routerLink="/client" fragment="appointments"><lucide-icon [img]="icons.Calendar"></lucide-icon>{{ 'portal.myAppointments' | translate }}</a>
+      <a href="#" [class.activo]="activeSection === 'catalog'" (click)="$event.preventDefault(); setSection('catalog')"><lucide-icon [img]="icons.LayoutGrid"></lucide-icon>{{ 'portal.catalog' | translate }}</a>
+      <a href="#" [class.activo]="activeSection === 'booking'" (click)="$event.preventDefault(); setSection('booking')"><lucide-icon [img]="icons.Calendar"></lucide-icon>{{ 'portal.bookAppointment' | translate }}</a>
+      <a href="#" [class.activo]="activeSection === 'upcoming'" (click)="$event.preventDefault(); setSection('upcoming')"><lucide-icon [img]="icons.Clock"></lucide-icon>{{ 'portal.upcoming' | translate }}</a>
+      <a href="#" [class.activo]="activeSection === 'history'" (click)="$event.preventDefault(); setSection('history')"><lucide-icon [img]="icons.History"></lucide-icon>{{ 'portal.history' | translate }}</a>
+      <a href="#" [class.activo]="activeSection === 'profile'" (click)="$event.preventDefault(); setSection('profile')"><lucide-icon [img]="icons.User"></lucide-icon>{{ 'portal.myProfile' | translate }}</a>
       <a routerLink="/client/settings" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }" [attr.title]="'nav.settings' | translate" [attr.aria-label]="'nav.settings' | translate"><lucide-icon [img]="icons.Settings"></lucide-icon>{{ 'nav.settings' | translate }}</a>
     </nav>
     <button class="logout-btn" (click)="logout()"><lucide-icon [img]="icons.LogOut"></lucide-icon>{{ 'portal.logout' | translate }}</button>
@@ -20,19 +23,32 @@
     </div>
 
     <ng-template #clientPortal>
-    <section id="profile" class="client-card">
-      <div class="client-heading"><div><h1>{{ 'portal.myProfile' | translate }}</h1><p>{{ 'portal.profileSubtitle' | translate }}</p></div><lucide-icon [img]="icons.User"></lucide-icon></div>
-      <div class="profile-grid" *ngIf="profile; else loadingProfile">
-        <div><span>{{ 'portal.name' | translate }}</span><strong>{{ profile.name }}</strong></div>
-        <div><span>{{ 'portal.email' | translate }}</span><strong>{{ profile.email }}</strong></div>
-        <div><span>{{ 'portal.phone' | translate }}</span><strong>{{ profile.phone || ('portal.notRegistered' | translate) }}</strong></div>
-      </div>
-      <ng-template #loadingProfile><p class="empty">{{ 'portal.loadingProfile' | translate }}</p></ng-template>
+    <section class="client-card portal-hero" *ngIf="activeSection === 'catalog'">
+      <div><span class="eyebrow">{{ 'portal.catalogEyebrow' | translate }}</span><h1>{{ 'portal.catalogTitle' | translate }}</h1><p>{{ 'portal.catalogSubtitle' | translate }}</p></div>
+      <lucide-icon [img]="icons.LayoutGrid"></lucide-icon>
     </section>
-    <section id="appointments" class="client-card">
-      <div class="client-heading"><div><h1>{{ 'portal.myAppointments' | translate }}</h1><p>{{ 'portal.agendaSubtitle' | translate }}</p></div><lucide-icon [img]="icons.Calendar"></lucide-icon></div>
+    <section class="client-card" *ngIf="activeSection === 'catalog'">
       <div class="catalog-error" *ngIf="catalogError">{{ catalogError }}</div>
-      <div class="appointment-form" *ngIf="!isLoadingCatalog; else loadingCatalog">
+      <div class="client-catalog" *ngIf="!isLoadingCatalog; else loadingCatalog">
+        <div class="catalog-categories" *ngIf="categories.length">
+          <button type="button" [class.selected]="selectedCatalogCategoryId === null" (click)="selectedCatalogCategoryId = null">{{ 'services.all' | translate }}</button>
+          <button type="button" *ngFor="let category of categories" [class.selected]="selectedCatalogCategoryId === category.id" (click)="selectedCatalogCategoryId = category.id!">{{ category.name }}</button>
+        </div>
+        <article class="client-service-card" *ngFor="let service of filteredCatalogServices">
+          <div class="service-card-top"><span class="category-pill">{{ categoryName(service) }}</span><strong>{{ formatPrice(service.price) }}</strong></div>
+          <h2>{{ service.name }}</h2>
+          <p class="service-description">{{ service.description || ('portal.noDescription' | translate) }}</p>
+          <div class="service-meta"><span>{{ service.durationMinutes }} {{ 'services.minutes' | translate }}</span><button class="btn-primary" type="button" (click)="reserveService(service)">{{ 'portal.reserve' | translate }}</button></div>
+        </article>
+        <p class="empty" *ngIf="filteredCatalogServices.length === 0">{{ 'portal.noServices' | translate }}</p>
+      </div>
+      <ng-template #loadingCatalog><p class="empty">{{ 'portal.loadingCatalog' | translate }}</p></ng-template>
+    </section>
+
+    <section class="client-card" *ngIf="activeSection === 'booking'">
+      <div class="client-heading"><div><span class="eyebrow">{{ 'portal.bookingEyebrow' | translate }}</span><h1>{{ 'portal.bookingTitle' | translate }}</h1><p>{{ 'portal.bookingSubtitle' | translate }}</p></div><lucide-icon [img]="icons.Calendar"></lucide-icon></div>
+      <div class="booking-steps"><span class="active">1. {{ 'portal.stepService' | translate }}</span><span [class.active]="form.serviceIds.length">2. {{ 'portal.stepProfessional' | translate }}</span><span [class.active]="form.appointmentDate">3. {{ 'portal.stepDateTime' | translate }}</span></div>
+      <div class="appointment-form" *ngIf="!isLoadingCatalog; else bookingLoading">
         <label class="appointment-field">
           <span>{{ 'portal.appointmentDate' | translate }}</span>
           <input type="date" [ngModel]="form.appointmentDate" (ngModelChange)="onAppointmentDateChange($event)">
@@ -53,32 +69,58 @@
         <p class="availability-message" *ngIf="isLoadingAvailability">{{ 'portal.checkingAvailability' | translate }}</p>
         <p class="availability-message unavailable" *ngIf="!isLoadingAvailability && availability?.closed">{{ 'portal.businessClosed' | translate }}</p>
         <p class="availability-message unavailable" *ngIf="!isLoadingAvailability && availability && !availability.closed && availableEmployees.length === 0">{{ 'portal.noAvailableSlots' | translate }}</p>
-        <label class="appointment-field" *ngIf="availableEmployees.length">
-          <span>{{ 'portal.selectEmployee' | translate }}</span>
-          <select [ngModel]="form.employeeId" (ngModelChange)="onEmployeeChange($event)">
-            <option value="">{{ 'portal.selectEmployee' | translate }}</option>
-            <option *ngFor="let employee of availableEmployees" [value]="employee.employeeId">{{ employee.employeeName }}</option>
-          </select>
-        </label>
-        <label class="appointment-field" *ngIf="availableTimes.length">
-          <span>{{ 'portal.appointmentTime' | translate }}</span>
-          <select [(ngModel)]="form.appointmentTime">
-            <option value="">{{ 'portal.selectTime' | translate }}</option>
-            <option *ngFor="let time of availableTimes" [value]="time">{{ time }}</option>
-          </select>
-        </label>
+        <div class="client-availability-grid" *ngIf="!isLoadingAvailability && availability && !availability.closed && availabilityEmployees.length">
+          <div class="availability-grid-scroll">
+            <div class="availability-grid" [style.grid-template-columns]="'130px repeat(' + availabilityTimeSlots.length + ', minmax(74px, 1fr))'">
+              <div class="availability-corner">{{ 'portal.professional' | translate }}</div>
+              <div class="availability-time" *ngFor="let time of availabilityTimeSlots">{{ time }}</div>
+              <ng-container *ngFor="let employee of availabilityEmployees">
+                <div class="availability-employee">{{ employee.employeeName }}</div>
+                <button type="button" *ngFor="let time of availabilityTimeSlots"
+                  class="availability-slot"
+                  [class.available]="isSlotAvailable(employee.employeeId, time)"
+                  [class.selected]="form.employeeId === '' + employee.employeeId && form.appointmentTime === time"
+                  [disabled]="!isSlotAvailable(employee.employeeId, time)"
+                  [attr.aria-label]="employee.employeeName + ' ' + time"
+                  (click)="selectAvailableSlot(employee.employeeId, time)">
+                  {{ isSlotAvailable(employee.employeeId, time) ? ('portal.available' | translate) : ('portal.occupied' | translate) }}
+                </button>
+              </ng-container>
+            </div>
+          </div>
+          <div class="availability-legend"><span><i class="legend-dot free"></i>{{ 'portal.available' | translate }}</span><span><i class="legend-dot busy"></i>{{ 'portal.occupied' | translate }}</span></div>
+          <p class="selected-slot" *ngIf="form.employeeId && form.appointmentTime">{{ 'portal.selectedSlot' | translate:{ employee: getEmployeeName(+form.employeeId), time: form.appointmentTime } }}</p>
+        </div>
+        <p class="availability-message unavailable" *ngIf="!isLoadingAvailability && availability && !availability.closed && availabilityEmployees.length === 0">{{ 'portal.noAvailableSlots' | translate }}</p>
         <input [(ngModel)]="form.notes" [placeholder]="'portal.notesPlaceholder' | translate">
         <button class="btn-primary" (click)="saveAppointment()" [disabled]="isLoading">{{ (editingId === null ? 'portal.schedule' : 'portal.saveChanges') | translate }}</button>
         <button *ngIf="editingId !== null" class="btn-secondary" (click)="resetForm()">{{ 'portal.cancelEdit' | translate }}</button>
       </div>
-      <ng-template #loadingCatalog><p class="empty">{{ 'portal.loadingCatalog' | translate }}</p></ng-template>
+      <ng-template #bookingLoading><p class="empty">{{ 'portal.loadingCatalog' | translate }}</p></ng-template>
+    </section>
+
+    <section class="client-card" *ngIf="activeSection === 'upcoming' || activeSection === 'history'">
+      <div class="client-heading"><div><span class="eyebrow">{{ activeSection === 'upcoming' ? ('portal.upcomingEyebrow' | translate) : ('portal.historyEyebrow' | translate) }}</span><h1>{{ activeSection === 'upcoming' ? ('portal.upcoming' | translate) : ('portal.history' | translate) }}</h1><p>{{ activeSection === 'upcoming' ? ('portal.upcomingSubtitle' | translate) : ('portal.historySubtitle' | translate) }}</p></div><lucide-icon [img]="activeSection === 'upcoming' ? icons.Clock : icons.History"></lucide-icon></div>
       <p class="request-error" *ngIf="appointmentsError">{{ appointmentsError }}</p>
       <p class="empty" *ngIf="!isLoadingAppointments && !appointmentsError && appointments.length === 0">{{ 'portal.noAppointments' | translate }}</p>
       <p class="empty" *ngIf="isLoadingAppointments">{{ 'portal.loadingAppointments' | translate }}</p>
-      <article class="cita-card" *ngFor="let appointment of appointments">
-        <div><strong>{{ appointment.appointmentDatetime | localizedDate:{ day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' } }}</strong><p>{{ getServiceName(appointment.serviceId) }} · {{ getEmployeeName(appointment.employeeId) }}</p><p>{{ appointment.notes || ('portal.notesNone' | translate) }}</p></div>
-        <div class="actions"><button class="btn-secondary" (click)="editAppointment(appointment)" [disabled]="deletingId !== null">{{ 'portal.edit' | translate }}</button><button class="btn-danger" (click)="cancelAppointment(appointment)" [disabled]="deletingId === appointment.id">{{ (deletingId === appointment.id ? 'portal.canceling' : 'portal.cancel') | translate }}</button></div>
+      <div class="appointment-list" *ngIf="!isLoadingAppointments">
+      <article class="cita-card" *ngFor="let appointment of (activeSection === 'upcoming' ? upcomingAppointments : historyAppointments)">
+        <div><strong>{{ appointment.appointmentDatetime | localizedDate:{ day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' } }}</strong><p>{{ getServiceName(appointment.serviceId) }} · {{ getEmployeeName(appointment.employeeId) }}</p><p>{{ appointment.notes || ('portal.notesNone' | translate) }}</p><span class="appointment-status" [class.status-completed]="appointment.billed || appointment.status === 'COMPLETED'">{{ appointment.billed ? ('portal.status.BILLED' | translate) : statusLabel(appointment.status) }}</span></div>
+        <div class="actions" *ngIf="activeSection === 'upcoming'"><button class="btn-secondary" (click)="editAppointment(appointment)" [disabled]="deletingId !== null">{{ 'portal.edit' | translate }}</button><button class="btn-danger" (click)="cancelAppointment(appointment)" [disabled]="deletingId === appointment.id">{{ (deletingId === appointment.id ? 'portal.canceling' : 'portal.cancel') | translate }}</button></div>
       </article>
+      <p class="empty" *ngIf="!appointmentsError && (activeSection === 'upcoming' ? upcomingAppointments : historyAppointments).length === 0">{{ activeSection === 'upcoming' ? ('portal.noUpcoming' | translate) : ('portal.noHistory' | translate) }}</p>
+      </div>
+    </section>
+
+    <section id="profile" class="client-card" *ngIf="activeSection === 'profile'">
+      <div class="client-heading"><div><h1>{{ 'portal.myProfile' | translate }}</h1><p>{{ 'portal.profileSubtitle' | translate }}</p></div><lucide-icon [img]="icons.User"></lucide-icon></div>
+      <div class="profile-grid" *ngIf="profile; else loadingProfile">
+        <div><span>{{ 'portal.name' | translate }}</span><strong>{{ profile.name }}</strong></div>
+        <div><span>{{ 'portal.email' | translate }}</span><strong>{{ profile.email }}</strong></div>
+        <div><span>{{ 'portal.phone' | translate }}</span><strong>{{ profile.phone || ('portal.notRegistered' | translate) }}</strong></div>
+      </div>
+      <ng-template #loadingProfile><p class="empty">{{ 'portal.loadingProfile' | translate }}</p></ng-template>
     </section>
     </ng-template>
   </main>

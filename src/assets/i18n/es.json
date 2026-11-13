@@ -613,6 +613,33 @@
     "voidError": "No se pudo anular la venta."
   },
   "portal": {
+    "catalog": "Catálogo",
+    "catalogEyebrow": "Servicios de belleza",
+    "catalogTitle": "Elige tu próximo cuidado",
+    "catalogSubtitle": "Explora nuestros servicios y reserva tu cita en pocos pasos.",
+    "bookAppointment": "Reservar cita",
+    "upcoming": "Próximas citas",
+    "history": "Historial",
+    "bookingEyebrow": "Agenda en línea",
+    "bookingTitle": "Reserva tu cita",
+    "bookingSubtitle": "Selecciona el servicio, profesional, fecha y horario que prefieras.",
+    "upcomingEyebrow": "Tu agenda",
+    "historyEyebrow": "Tus servicios",
+    "upcomingSubtitle": "Consulta y administra tus próximas citas.",
+    "historySubtitle": "Revisa los servicios que ya recibiste.",
+    "reserve": "Reservar",
+    "noServices": "No hay servicios disponibles.",
+    "noDescription": "Servicio personalizado para ti.",
+    "generalCategory": "Servicios",
+    "noUpcoming": "No tienes próximas citas.",
+    "noHistory": "Aún no tienes servicios en tu historial.",
+    "stepService": "Servicio",
+    "stepProfessional": "Profesional",
+    "stepDateTime": "Fecha y hora",
+    "professional": "Profesional",
+    "available": "Libre",
+    "occupied": "Ocupado",
+    "selectedSlot": "Horario seleccionado: {{employee}} a las {{time}}",
     "myProfile": "Mi perfil",
     "myAppointments": "Mis citas",
     "logout": "Cerrar sesión",
@@ -659,6 +686,14 @@
     "businessClosed": "El negocio está cerrado en esta fecha.",
     "noAvailableSlots": "No hay horarios disponibles para esos servicios en esta fecha.",
     "editSingleService": "Edita un servicio a la vez. Para agendar varios, crea una nueva reserva."
+    ,"status": {
+      "PENDING": "Pendiente",
+      "CONFIRMED": "Confirmada",
+      "COMPLETED": "Atendida",
+      "CANCELLED": "Cancelada",
+      "NO_SHOW": "No asistió",
+      "BILLED": "Servicio recibido"
+    }
   },
   "auditLogs": {
     "admin": "Administración",

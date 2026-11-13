@@ -613,6 +613,33 @@
     "voidError": "Could not void the sale."
   },
   "portal": {
+    "catalog": "Catalog",
+    "catalogEyebrow": "Beauty services",
+    "catalogTitle": "Choose your next treatment",
+    "catalogSubtitle": "Explore our services and book your appointment in a few steps.",
+    "bookAppointment": "Book appointment",
+    "upcoming": "Upcoming appointments",
+    "history": "History",
+    "bookingEyebrow": "Online booking",
+    "bookingTitle": "Book your appointment",
+    "bookingSubtitle": "Choose your service, professional, date and preferred time.",
+    "upcomingEyebrow": "Your schedule",
+    "historyEyebrow": "Your services",
+    "upcomingSubtitle": "Review and manage your upcoming appointments.",
+    "historySubtitle": "Review the services you have already received.",
+    "reserve": "Book now",
+    "noServices": "No services are available.",
+    "noDescription": "A personalized service for you.",
+    "generalCategory": "Services",
+    "noUpcoming": "You have no upcoming appointments.",
+    "noHistory": "You do not have services in your history yet.",
+    "stepService": "Service",
+    "stepProfessional": "Professional",
+    "stepDateTime": "Date and time",
+    "professional": "Professional",
+    "available": "Available",
+    "occupied": "Busy",
+    "selectedSlot": "Selected time: {{employee}} at {{time}}",
     "myProfile": "My profile",
     "myAppointments": "My appointments",
     "logout": "Log out",
@@ -659,6 +686,14 @@
     "businessClosed": "The business is closed on this date.",
     "noAvailableSlots": "No times are available for these services on this date.",
     "editSingleService": "Edit one service at a time. To schedule several services, create a new booking."
+    ,"status": {
+      "PENDING": "Pending",
+      "CONFIRMED": "Confirmed",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled",
+      "NO_SHOW": "No show",
+      "BILLED": "Service received"
+    }
   },
   "auditLogs": {
     "admin": "Administration",

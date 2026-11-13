@@ -1,5 +1,44 @@
 .client-content { display: flex; flex-direction: column; gap: 24px; }
 .client-card { background: var(--card); border-radius: 20px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,.08); }
+.portal-hero { display: flex; justify-content: space-between; align-items: center; color: var(--primary); }
+.portal-hero h1 { margin: 5px 0; color: var(--text); font-size: clamp(28px, 4vw, 42px); }
+.portal-hero p { margin: 0; color: var(--text); opacity: .7; }
+.eyebrow { color: var(--primary); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.client-catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(245px, 1fr)); gap: 16px; }
+.catalog-categories { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
+.catalog-categories button { border: 1px solid rgba(100,116,139,.18); border-radius: 999px; padding: 8px 12px; background: var(--bg); color: var(--text); cursor: pointer; }
+.catalog-categories button.selected { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 12%, var(--card)); color: var(--primary); }
+.client-service-card { display: flex; flex-direction: column; min-height: 215px; padding: 18px; border: 1px solid rgba(100,116,139,.15); border-radius: 16px; background: var(--bg); color: var(--text); }
+.service-card-top, .service-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.client-service-card h2 { margin: 18px 0 8px; font-size: 20px; }
+.client-service-card strong { color: var(--primary); }
+.category-pill { display: inline-flex; width: fit-content; padding: 5px 9px; border-radius: 999px; background: color-mix(in srgb, var(--primary) 12%, var(--card)); color: var(--primary); font-size: 11px; font-weight: 700; }
+.service-description { flex: 1; margin: 0 0 16px; color: var(--text); opacity: .7; font-size: 13px; line-height: 1.45; }
+.service-meta { font-size: 12px; opacity: .8; }
+.service-meta .btn-primary { opacity: 1; }
+.booking-steps { display: flex; gap: 8px; margin: 4px 0 20px; flex-wrap: wrap; }
+.booking-steps span { padding: 7px 10px; border-radius: 999px; background: var(--bg); color: var(--text); opacity: .55; font-size: 11px; }
+.booking-steps span.active { opacity: 1; color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+.client-availability-grid { grid-column: 1 / -1; display: grid; gap: 10px; }
+.availability-grid-scroll { overflow-x: auto; border: 1px solid rgba(100,116,139,.18); border-radius: 14px; }
+.availability-grid { display: grid; min-width: max-content; background: var(--card); }
+.availability-corner, .availability-time, .availability-employee { padding: 12px 10px; border-bottom: 1px solid rgba(100,116,139,.15); background: var(--card); color: var(--text); font-size: 11px; font-weight: 700; }
+.availability-corner, .availability-employee { position: sticky; left: 0; z-index: 2; }
+.availability-time { text-align: center; color: var(--primary); }
+.availability-employee { display: flex; align-items: center; min-height: 52px; }
+.availability-slot { min-height: 52px; border: 0; border-bottom: 1px solid rgba(100,116,139,.15); border-left: 1px solid rgba(100,116,139,.1); background: rgba(100,116,139,.08); color: var(--text); font-size: 10px; cursor: not-allowed; }
+.availability-slot.available { background: rgba(22,163,74,.08); color: #15803d; cursor: pointer; }
+.availability-slot.available:hover, .availability-slot.selected { background: var(--primary); color: #fff; }
+.availability-slot.selected { box-shadow: inset 0 0 0 2px #fff; }
+.availability-legend { display: flex; gap: 16px; color: var(--text); font-size: 11px; opacity: .8; }
+.availability-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.legend-dot.free { background: #16a34a; }
+.legend-dot.busy { background: #94a3b8; }
+.selected-slot { margin: 0; color: var(--primary); font-size: 12px; font-weight: 700; }
+.appointment-status { display: inline-block; margin-top: 8px; padding: 4px 8px; border-radius: 999px; background: rgba(100,116,139,.12); color: var(--text); font-size: 11px; }
+.appointment-status.status-completed { background: rgba(22,163,74,.12); color: #15803d; }
+.appointment-list { display: grid; gap: 12px; }
 .client-heading { display: flex; justify-content: space-between; align-items: center; color: var(--primary); }
 .client-heading h1 { margin: 0; color: var(--text); font-size: 28px; }
 .client-heading p { margin: 5px 0 20px; color: var(--text); opacity: .7; }
